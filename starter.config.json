@@ -1,0 +1,8 @@
+{
+  "id": "macmood-pos",
+  "name": "MacMood POS",
+  "description": "Mac and cheese creamy dengan pilihan chicken katsu dan kentang. Mood baik, dimulai dari MacMood.",
+  "baseVersion": "0.1.0",
+  "framework": "tanstack-start",
+  "database": "postgresql"
+}

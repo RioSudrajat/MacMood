@@ -1,0 +1,186 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "./hero.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--card);
+  --color-popover-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--border);
+  --color-ring: var(--primary);
+
+  /* MacMood Design Tokens */
+  --color-brand-green-950: var(--brand-green-950);
+  --color-brand-green-900: var(--brand-green-900);
+  --color-brand-green-800: var(--brand-green-800);
+  --color-brand-green-700: var(--brand-green-700);
+  --color-brand-green-100: var(--brand-green-100);
+  --color-brand-cream-50: var(--brand-cream-50);
+  --color-brand-cream-100: var(--brand-cream-100);
+  --color-brand-cream-200: var(--brand-cream-200);
+  --color-brand-yellow-400: var(--brand-yellow-400);
+  --color-brand-yellow-500: var(--brand-yellow-500);
+  --color-brand-coral-600: var(--brand-coral-600);
+
+  --color-semantic-success: var(--semantic-success);
+  --color-semantic-warning: var(--semantic-warning);
+  --color-semantic-danger: var(--semantic-danger);
+  --color-semantic-info: var(--semantic-info);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 6px);
+  --radius-2xl: calc(var(--radius) + 12px);
+
+  --font-sans: "Inter", "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Manrope", "DM Sans", "Inter", sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
+:root {
+  /* MacMood Palette */
+  --brand-green-950: #123b2d;
+  --brand-green-900: #194735;
+  --brand-green-800: #245842;
+  --brand-green-700: #245842;
+  --brand-green-100: #e4eee7;
+
+  --brand-cream-50: #fbfaf3;
+  --brand-cream-100: #f5f4e8;
+  --brand-cream-200: #e8ebd5;
+
+  --brand-yellow-400: #f7c657;
+  --brand-yellow-500: #f4be55;
+
+  --brand-coral-600: #d94143;
+
+  --semantic-success: #24734d;
+  --semantic-warning: #9a5a00;
+  --semantic-danger: #b4232f;
+  --semantic-info: #23658a;
+
+  --neutral-0: #ffffff;
+  --neutral-50: #f7f8f5;
+  --neutral-100: #ecefea;
+  --neutral-600: #59645d;
+  --neutral-900: #202923;
+
+  /* Theme variables mapping */
+  --radius: 0.75rem;
+  --background: #fbfaf3;
+  --foreground: #202923;
+  --card: #ffffff;
+  --card-foreground: #202923;
+  --primary: #194735;
+  --primary-foreground: #ffffff;
+  --secondary: #f5f4e8;
+  --secondary-foreground: #194735;
+  --muted: #ecefea;
+  --muted-foreground: #59645d;
+  --accent: #f7c657;
+  --accent-foreground: #123b2d;
+  --border: #e2e6df;
+  --destructive: #b4232f;
+}
+
+.dark {
+  --background: #121c16;
+  --foreground: #f5f4e8;
+  --card: #192720;
+  --card-foreground: #f5f4e8;
+  --primary: #f7c657;
+  --primary-foreground: #123b2d;
+  --secondary: #24382f;
+  --secondary-foreground: #f5f4e8;
+  --muted: #22332a;
+  --muted-foreground: #9ab0a3;
+  --accent: #245842;
+  --accent-foreground: #f5f4e8;
+  --border: #2c4237;
+  --destructive: #ff6b6b;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  button,
+  a,
+  input,
+  textarea,
+  select {
+    -webkit-tap-highlight-color: transparent;
+  }
+  button:not(:disabled),
+  a {
+    cursor: pointer;
+  }
+  ::selection {
+    background: #f7c65766;
+  }
+}
+
+/* Animations */
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 35s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+@keyframes steam-rise {
+  0%, 100% {
+    opacity: 0.2;
+    transform: translateY(6px);
+  }
+  45% {
+    opacity: 0.85;
+  }
+  70% {
+    opacity: 0.6;
+    transform: translateY(-8px);
+  }
+}
+
+.animate-steam-1 {
+  animation: steam-rise 2.8s ease-in-out infinite;
+}
+
+.animate-steam-2 {
+  animation: steam-rise 2.8s ease-in-out 0.55s infinite;
+}
+
+.animate-steam-3 {
+  animation: steam-rise 2.8s ease-in-out 1.1s infinite;
+}
