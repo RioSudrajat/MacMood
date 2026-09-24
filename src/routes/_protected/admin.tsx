@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { siteConfig } from "@/config/site";
 import type {
@@ -13,6 +13,8 @@ import type {
   AuditLogRecord,
   PromoVoucher,
   RawMaterial,
+  RawMaterialCategory,
+  RawMaterialUnit,
   ProductRecipe,
 } from "@/components/admin/types";
 import {
@@ -106,6 +108,410 @@ export function AdminDashboardPage() {
   const [promos, setPromos] = useState<PromoVoucher[]>(INITIAL_PROMOS);
   const [rawMaterials, setRawMaterials] = useState<RawMaterial[]>(INITIAL_RAW_MATERIALS);
   const [recipes, setRecipes] = useState<ProductRecipe[]>(INITIAL_PRODUCT_RECIPES);
+
+  // Load live data from PostgreSQL Backend
+  useEffect(() => {
+    let isMounted = true;
+    async function loadAdminData() {
+      try {
+        const [prodRes, orderRes, shiftRes, expRes, promoRes, matRes, recipeRes, auditRes] =
+          await Promise.allSettled([
+            fetch("/api/catalog/products").then((r) => r.json()),
+            fetch("/api/pos/orders?limit=50").then((r) => r.json()),
+            fetch("/api/pos/shifts").then((r) => r.json()),
+            fetch("/api/expenses").then((r) => r.json()),
+            fetch("/api/promos").then((r) => r.json()),
+            fetch("/api/inventory/materials").then((r) => r.json()),
+            fetch("/api/inventory/recipes").then((r) => r.json()),
+            fetch("/api/audit-logs").then((r) => r.json()),
+          ]);
+
+        if (!isMounted) return;
+
+        if (prodRes.status === "fulfilled" && prodRes.value?.data?.length > 0) {
+          setProducts(
+            (prodRes.value.data as Array<{
+              id: string;
+              name: string;
+              categorySlug: string;
+              price: number;
+              costPrice?: number;
+              currentStock: number;
+              trackStock: boolean;
+              isAvailable: boolean;
+              imageUrl?: string;
+            }>).map((p) => {
+              const category: "mac" | "sides" | "drinks" =
+                p.categorySlug === "sides" || p.categorySlug === "drinks" ? p.categorySlug : "mac";
+              const catLabels = { mac: "Macaroni", sides: "Sides & Snack", drinks: "Minuman" };
+              return {
+                id: p.id,
+                name: p.name,
+                category,
+                categoryLabel: catLabels[category],
+                price: p.price,
+                costPrice: p.costPrice || Math.round(p.price * 0.45),
+                description: "",
+                image: p.imageUrl || "/assets/menu-super-mac-reference.png",
+                currentStock: p.currentStock,
+                lowStockThreshold: 10,
+                trackStock: p.trackStock,
+                isAvailable: p.isAvailable,
+                soldCount: 0,
+              };
+            })
+          );
+        }
+
+        if (orderRes.status === "fulfilled" && orderRes.value?.data?.length > 0) {
+          setOrders(
+            (orderRes.value.data as Array<{
+              id: string;
+              orderNumber: string;
+              items?: Array<{
+                productId?: string;
+                productName: string;
+                quantity: number;
+                price: number;
+                subtotal: number;
+                notes?: string;
+              }>;
+              subtotal: number;
+              discount?: number;
+              promoCode?: string;
+              promoName?: string;
+              tax: number;
+              total: number;
+              paymentMethod: CompletedOrder["paymentMethod"];
+              amountTendered?: number;
+              changeAmount?: number;
+              createdAt: string;
+              cashierName: string;
+              syncStatus?: "SYNCED" | "PENDING_SYNC";
+              paymentStatus?: "PAID" | "REFUNDED" | "VOID";
+            }>).map((o) => ({
+              id: o.id,
+              orderNumber: o.orderNumber,
+              items: (o.items || []).map((it) => ({
+                productId: it.productId || it.productName,
+                name: it.productName,
+                quantity: it.quantity,
+                price: it.price,
+                subtotal: it.subtotal,
+                notes: it.notes,
+              })),
+              subtotal: o.subtotal,
+              discount: o.discount || 0,
+              promoCode: o.promoCode,
+              promoName: o.promoName,
+              tax: o.tax,
+              total: o.total,
+              paymentMethod: o.paymentMethod,
+              amountTendered: o.amountTendered || o.total,
+              change: o.changeAmount || 0,
+              timestamp: new Date(o.createdAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB",
+              dateStr: new Date(o.createdAt).toISOString().slice(0, 10),
+              cashierName: o.cashierName,
+              syncStatus: o.syncStatus || "SYNCED",
+              status: (o.paymentStatus === "REFUNDED" ? "VOID" : o.paymentStatus || "PAID") as CompletedOrder["status"],
+            }))
+          );
+        }
+
+        if (shiftRes.status === "fulfilled") {
+          const val = shiftRes.value as {
+            active?: {
+              id: string;
+              staffName: string;
+              shiftCode: string;
+              startTime: string;
+              endTime?: string;
+              initialCash: number;
+              cashSales: number;
+              qrisSales: number;
+              totalOrders: number;
+              expectedCash: number;
+              actualCash?: number;
+              cashDifference?: number;
+              status: "OPEN" | "CLOSED";
+              isVerified?: boolean;
+              notes?: string;
+            };
+            past?: Array<{
+              id: string;
+              staffName: string;
+              shiftCode: string;
+              startTime: string;
+              endTime?: string;
+              initialCash: number;
+              cashSales: number;
+              qrisSales: number;
+              totalOrders: number;
+              expectedCash: number;
+              actualCash?: number;
+              cashDifference?: number;
+              status: "OPEN" | "CLOSED";
+              isVerified?: boolean;
+              notes?: string;
+            }>;
+          };
+          const shiftList: Array<{
+            id: string;
+            staffName: string;
+            shiftCode: string;
+            startTime: string;
+            endTime?: string;
+            initialCash: number;
+            cashSales: number;
+            qrisSales: number;
+            totalOrders: number;
+            expectedCash: number;
+            actualCash?: number;
+            cashDifference?: number;
+            status: "OPEN" | "CLOSED";
+            isVerified?: boolean;
+            notes?: string;
+          }> = [];
+          if (val.active) shiftList.push(val.active);
+          if (val.past) shiftList.push(...val.past);
+
+          if (shiftList.length > 0) {
+            setShifts(
+              shiftList.map((s) => ({
+                id: s.id,
+                shiftName: `Shift ${s.shiftCode}`,
+                cashierId: s.staffName,
+                cashierName: s.staffName,
+                startTime: new Date(s.startTime).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB",
+                endTime: s.endTime ? new Date(s.endTime).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB" : null,
+                date: new Date(s.startTime).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }),
+                initialCash: s.initialCash,
+                cashSales: s.cashSales,
+                qrisSales: s.qrisSales,
+                totalOrders: s.totalOrders,
+                expectedCash: s.expectedCash,
+                actualCash: s.actualCash || s.expectedCash,
+                cashDifference: s.cashDifference || 0,
+                status: s.status as "OPEN" | "CLOSED",
+                notes: s.notes || "",
+                verifiedByOwner: s.isVerified || false,
+              }))
+            );
+          }
+        }
+
+        if (expRes.status === "fulfilled" && expRes.value?.data?.length > 0) {
+          const expCategoryLabels: Record<ExpenseRecord["category"], string> = {
+            BAHAN_BAKU: "Bahan Baku Tambahan",
+            UTILITAS_GAS: "Gas & Utilitas Dapur",
+            KEMASAN: "Packaging & Plastik",
+            KEBERSIHAN: "Kebersihan & Sanitasi",
+            OPERASIONAL_LAIN: "Operasional Lain-lain",
+          };
+          setExpenses(
+            (expRes.value.data as Array<{
+              id: string;
+              createdAt: string;
+              title: string;
+              amount: number;
+              category: ExpenseRecord["category"];
+              paymentSource: "CASH_DRAWER" | "BANK_TRANSFER";
+              staffName: string;
+              receiptNumber?: string;
+              notes?: string;
+            }>).map((e) => ({
+              id: e.id,
+              date: new Date(e.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }),
+              time: new Date(e.createdAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB",
+              category: e.category,
+              categoryLabel: expCategoryLabels[e.category] || "Pengeluaran",
+              description: e.title,
+              amount: e.amount,
+              sourceOfFund: e.paymentSource === "CASH_DRAWER" ? ("KAS_LACI" as const) : ("TRANSFER_OWNER" as const),
+              staffName: e.staffName,
+              receiptNumber: e.receiptNumber || undefined,
+              notes: e.notes || "",
+            }))
+          );
+        }
+
+        if (promoRes.status === "fulfilled" && promoRes.value?.data?.length > 0) {
+          setPromos(
+            (promoRes.value.data as Array<{
+              id: string;
+              code: string;
+              name: string;
+              description?: string;
+              discountType: "PERCENTAGE" | "FIXED";
+              discountValue: number;
+              maxDiscount?: number;
+              minSubtotal?: number;
+              maxUsage?: number;
+              currentUsage?: number;
+              isActive: boolean;
+              startDate: string;
+              endDate?: string;
+            }>).map((p) => ({
+              id: p.id,
+              code: p.code,
+              name: p.name,
+              description: p.description || "",
+              discountType: p.discountType === "FIXED" ? "FIXED_AMOUNT" : "PERCENTAGE",
+              discountValue: p.discountValue,
+              maxDiscount: p.maxDiscount || undefined,
+              minOrderAmount: p.minSubtotal || 0,
+              quota: p.maxUsage || 9999,
+              usedCount: p.currentUsage || 0,
+              isActive: p.isActive,
+              startDate: new Date(p.startDate).toISOString().slice(0, 10),
+              endDate: p.endDate ? new Date(p.endDate).toISOString().slice(0, 10) : "2026-12-31",
+            }))
+          );
+        }
+
+        if (matRes.status === "fulfilled" && matRes.value?.data?.length > 0) {
+          setRawMaterials(
+            (matRes.value.data as Array<{
+              id: string;
+              name: string;
+              sku: string;
+              category: RawMaterialCategory;
+              unit: RawMaterialUnit;
+              currentStock: string | number;
+              minStock: string | number;
+              costPerUnit: number;
+              supplierName?: string;
+              updatedAt: string;
+            }>).map((m) => {
+              const catLabels: Record<RawMaterialCategory, string> = {
+                PASTA: "Pasta Kering",
+                DAIRY_CHEESE: "Keju & Olahan Susu",
+                PROTEIN: "Daging & Protein",
+                SEASONING: "Bumbu & Rempah",
+                PACKAGING: "Kemasan & Packaging",
+              };
+              return {
+                id: m.id,
+                code: m.sku,
+                name: m.name,
+                category: m.category,
+                categoryLabel: catLabels[m.category] || "Bahan Baku",
+                unit: m.unit,
+                currentStock: Number(m.currentStock),
+                minThreshold: Number(m.minStock),
+                costPerUnit: m.costPerUnit,
+                supplier: m.supplierName || "-",
+                lastRestockDate: new Date(m.updatedAt).toISOString().slice(0, 10),
+              };
+            })
+          );
+        }
+
+        if (recipeRes.status === "fulfilled" && recipeRes.value?.data?.length > 0) {
+          setRecipes(
+            (recipeRes.value.data as Array<{
+              productId: string;
+              productName: string;
+              categorySlug: string;
+              price: number;
+              calculatedHpp: number;
+              grossMargin: number;
+              availablePortions: number;
+              limitingIngredient?: string;
+              ingredients?: Array<{
+                rawMaterialId: string;
+                materialName: string;
+                amount: number;
+                unit: string;
+                costSubtotal: number;
+              }>;
+            }>).map((r) => {
+              const category: "mac" | "sides" | "drinks" =
+                r.categorySlug === "sides" || r.categorySlug === "drinks" ? r.categorySlug : "mac";
+              return {
+                productId: r.productId,
+                productName: r.productName,
+                category,
+                sellingPrice: r.price,
+                totalHpp: r.calculatedHpp,
+                grossMarginAmount: r.price - r.calculatedHpp,
+                grossMarginPercent: r.grossMargin,
+                maxPortionsAvailable: r.availablePortions,
+                limitingMaterialName: r.limitingIngredient || "Bahan Baku Cukup",
+                ingredients: (r.ingredients || []).map((it) => ({
+                  materialId: it.rawMaterialId,
+                  materialName: it.materialName,
+                  amount: it.amount,
+                  unit: (it.unit as RawMaterialUnit) || "gram",
+                  costPerUnit: Math.round(it.costSubtotal / (it.amount || 1)),
+                  subtotalCost: it.costSubtotal,
+                })),
+              };
+            })
+          );
+        }
+
+        if (auditRes.status === "fulfilled" && auditRes.value?.data?.length > 0) {
+          setAuditLogs(
+            (auditRes.value.data as Array<{
+              id: string;
+              createdAt: string;
+              action: AuditLogRecord["action"];
+              actionLabel: string;
+              entityType: string;
+              entityId?: string;
+              userName: string;
+              userRole: string;
+              oldValue?: string;
+              newValue?: string;
+              reason?: string;
+            }>).map((a) => {
+              const validEntityTypes: AuditLogRecord["entityType"][] = [
+                "PRODUCT",
+                "ORDER",
+                "STAFF",
+                "SHIFT",
+                "SETTING",
+                "EXPENSE",
+                "STOCK",
+                "PROMO",
+                "RECIPE",
+                "RAW_MATERIAL",
+              ];
+              const entityType = validEntityTypes.includes(a.entityType as AuditLogRecord["entityType"])
+                ? (a.entityType as AuditLogRecord["entityType"])
+                : "PRODUCT";
+              return {
+                id: a.id,
+                timestamp: `${new Date(a.createdAt).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}, ${new Date(a.createdAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB`,
+                date: new Date(a.createdAt).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }),
+                time: new Date(a.createdAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB",
+                action: a.action,
+                actionLabel: a.actionLabel,
+                entityType,
+                entityId: a.entityId || "",
+                performedBy: a.userName,
+                userRole: (a.userRole === "cashier" ? "cashier" : "owner") as "owner" | "cashier",
+                details: {
+                  title: a.actionLabel,
+                  before: a.oldValue || "-",
+                  after: a.newValue || "-",
+                  reason: a.reason || "-",
+                },
+              };
+            })
+          );
+        }
+      } catch (err) {
+        console.warn("Using offline fallback data for admin suite:", err);
+      }
+    }
+
+    loadAdminData();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Counts for Badges
   const lowStockCount = products.filter(
@@ -304,6 +710,21 @@ export function AdminDashboardPage() {
       },
     };
     setAuditLogs((prev) => [log, ...prev]);
+
+    // Push to Backend API
+    fetch("/api/expenses", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: newExp.description,
+        amount: newExp.amount,
+        category: newExp.category,
+        paymentSource: newExp.sourceOfFund === "TRANSFER_OWNER" ? "OWNER_TRANSFER" : "CASH_DRAWER",
+        staffName: newExp.staffName,
+        receiptNumber: newExp.receiptNumber,
+        notes: newExp.notes,
+      }),
+    }).catch(console.warn);
   };
 
   // Staff Account Actions
@@ -378,6 +799,25 @@ export function AdminDashboardPage() {
       },
     };
     setAuditLogs((prev) => [log, ...prev]);
+
+    // Push to Backend API
+    fetch("/api/promos", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        code: newPromo.code,
+        name: newPromo.name,
+        description: newPromo.description,
+        discountType: newPromo.discountType === "FIXED_AMOUNT" ? "FIXED" : "PERCENTAGE",
+        discountValue: newPromo.discountValue,
+        maxDiscount: newPromo.maxDiscount,
+        minSubtotal: newPromo.minOrderAmount,
+        maxUsage: newPromo.quota,
+        isActive: newPromo.isActive,
+        startDate: newPromo.startDate,
+        endDate: newPromo.endDate,
+      }),
+    }).catch(console.warn);
   };
 
   const handleUpdatePromo = (id: string, updates: Partial<PromoVoucher>) => {
@@ -464,6 +904,22 @@ export function AdminDashboardPage() {
       },
     };
     setAuditLogs((prev) => [log, ...prev]);
+
+    // Push to Backend API
+    if (!productId.startsWith("prod-")) {
+      fetch("/api/inventory/recipes", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productId,
+          ingredients: updatedIngredients.map((it) => ({
+            rawMaterialId: it.materialId,
+            amount: it.amount,
+            unit: it.unit,
+          })),
+        }),
+      }).catch(console.warn);
+    }
   };
 
   const handleRestockMaterial = (
@@ -506,6 +962,20 @@ export function AdminDashboardPage() {
       },
     };
     setAuditLogs((prev) => [log, ...prev]);
+
+    // Push to Backend API
+    if (!materialId.startsWith("rm-")) {
+      fetch("/api/inventory/materials/restock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          materialId,
+          addedStock,
+          totalCost: (newCostPerUnit || 0) * addedStock,
+          supplierName: notes,
+        }),
+      }).catch(console.warn);
+    }
   };
 
   const handleAddNewMaterial = (newMatData: Omit<RawMaterial, "id">) => {
@@ -514,6 +984,22 @@ export function AdminDashboardPage() {
       id: `rm-${Date.now()}`,
     };
     setRawMaterials((prev) => [newMaterial, ...prev]);
+
+    // Push to Backend API
+    fetch("/api/inventory/materials", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sku: newMatData.code,
+        name: newMatData.name,
+        category: newMatData.category,
+        unit: newMatData.unit,
+        currentStock: newMatData.currentStock,
+        minStock: newMatData.minThreshold,
+        costPerUnit: newMatData.costPerUnit,
+        supplierName: newMatData.supplier,
+      }),
+    }).catch(console.warn);
   };
 
   return (

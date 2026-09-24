@@ -16,11 +16,25 @@ import { Route as AuthSignInRouteImport } from './routes/_auth/sign-in'
 import { Route as AuthSignUpRouteImport } from './routes/_auth/sign-up'
 import { Route as ProtectedAdminRouteImport } from './routes/_protected/admin'
 import { Route as ProtectedAppRouteImport } from './routes/_protected/app'
+import { Route as ApiAnalyticsIndexRouteImport } from './routes/api/analytics/index'
+import { Route as ApiAuditLogsIndexRouteImport } from './routes/api/audit-logs/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ApiExpensesIndexRouteImport } from './routes/api/expenses/index'
 import { Route as ApiNotesIndexRouteImport } from './routes/api/notes/index'
 import { Route as ApiNotesIdRouteImport } from './routes/api/notes/$id'
+import { Route as ApiPromosIndexRouteImport } from './routes/api/promos/index'
+import { Route as ApiPromosValidateRouteImport } from './routes/api/promos/validate'
 import { Route as ApiAdminNotesIndexRouteImport } from './routes/api/admin/notes/index'
 import { Route as ApiAdminNotesIdRouteImport } from './routes/api/admin/notes/$id'
+import { Route as ApiCatalogCategoriesIndexRouteImport } from './routes/api/catalog/categories/index'
+import { Route as ApiCatalogProductsIndexRouteImport } from './routes/api/catalog/products/index'
+import { Route as ApiInventoryMaterialsIndexRouteImport } from './routes/api/inventory/materials/index'
+import { Route as ApiInventoryMaterialsRestockRouteImport } from './routes/api/inventory/materials/restock'
+import { Route as ApiInventoryRecipesIndexRouteImport } from './routes/api/inventory/recipes/index'
+import { Route as ApiPosOrdersIndexRouteImport } from './routes/api/pos/orders/index'
+import { Route as ApiPosOrdersSyncRouteImport } from './routes/api/pos/orders/sync'
+import { Route as ApiPosShiftsIndexRouteImport } from './routes/api/pos/shifts/index'
+import { Route as ApiPosShiftsCloseRouteImport } from './routes/api/pos/shifts/close'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -55,9 +69,24 @@ const ProtectedAppRoute = ProtectedAppRouteImport.update({
   path: '/app',
   getParentRoute: () => ProtectedRoute,
 } as any)
+const ApiAnalyticsIndexRoute = ApiAnalyticsIndexRouteImport.update({
+  id: '/api/analytics/',
+  path: '/api/analytics/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuditLogsIndexRoute = ApiAuditLogsIndexRouteImport.update({
+  id: '/api/audit-logs/',
+  path: '/api/audit-logs/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiExpensesIndexRoute = ApiExpensesIndexRouteImport.update({
+  id: '/api/expenses/',
+  path: '/api/expenses/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiNotesIndexRoute = ApiNotesIndexRouteImport.update({
@@ -70,6 +99,16 @@ const ApiNotesIdRoute = ApiNotesIdRouteImport.update({
   path: '/api/notes/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPromosIndexRoute = ApiPromosIndexRouteImport.update({
+  id: '/api/promos/',
+  path: '/api/promos/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPromosValidateRoute = ApiPromosValidateRouteImport.update({
+  id: '/api/promos/validate',
+  path: '/api/promos/validate',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAdminNotesIndexRoute = ApiAdminNotesIndexRouteImport.update({
   id: '/api/admin/notes/',
   path: '/api/admin/notes/',
@@ -78,6 +117,55 @@ const ApiAdminNotesIndexRoute = ApiAdminNotesIndexRouteImport.update({
 const ApiAdminNotesIdRoute = ApiAdminNotesIdRouteImport.update({
   id: '/api/admin/notes/$id',
   path: '/api/admin/notes/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCatalogCategoriesIndexRoute =
+  ApiCatalogCategoriesIndexRouteImport.update({
+    id: '/api/catalog/categories/',
+    path: '/api/catalog/categories/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiCatalogProductsIndexRoute = ApiCatalogProductsIndexRouteImport.update({
+  id: '/api/catalog/products/',
+  path: '/api/catalog/products/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiInventoryMaterialsIndexRoute =
+  ApiInventoryMaterialsIndexRouteImport.update({
+    id: '/api/inventory/materials/',
+    path: '/api/inventory/materials/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiInventoryMaterialsRestockRoute =
+  ApiInventoryMaterialsRestockRouteImport.update({
+    id: '/api/inventory/materials/restock',
+    path: '/api/inventory/materials/restock',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiInventoryRecipesIndexRoute =
+  ApiInventoryRecipesIndexRouteImport.update({
+    id: '/api/inventory/recipes/',
+    path: '/api/inventory/recipes/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPosOrdersIndexRoute = ApiPosOrdersIndexRouteImport.update({
+  id: '/api/pos/orders/',
+  path: '/api/pos/orders/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPosOrdersSyncRoute = ApiPosOrdersSyncRouteImport.update({
+  id: '/api/pos/orders/sync',
+  path: '/api/pos/orders/sync',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPosShiftsIndexRoute = ApiPosShiftsIndexRouteImport.update({
+  id: '/api/pos/shifts/',
+  path: '/api/pos/shifts/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPosShiftsCloseRoute = ApiPosShiftsCloseRouteImport.update({
+  id: '/api/pos/shifts/close',
+  path: '/api/pos/shifts/close',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -89,9 +177,23 @@ export interface FileRoutesByFullPath {
   '/app': typeof ProtectedAppRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/notes/$id': typeof ApiNotesIdRoute
+  '/api/promos/validate': typeof ApiPromosValidateRoute
+  '/api/analytics/': typeof ApiAnalyticsIndexRoute
+  '/api/audit-logs/': typeof ApiAuditLogsIndexRoute
+  '/api/expenses/': typeof ApiExpensesIndexRoute
   '/api/notes/': typeof ApiNotesIndexRoute
+  '/api/promos/': typeof ApiPromosIndexRoute
   '/api/admin/notes/$id': typeof ApiAdminNotesIdRoute
+  '/api/inventory/materials/restock': typeof ApiInventoryMaterialsRestockRoute
+  '/api/pos/orders/sync': typeof ApiPosOrdersSyncRoute
+  '/api/pos/shifts/close': typeof ApiPosShiftsCloseRoute
   '/api/admin/notes/': typeof ApiAdminNotesIndexRoute
+  '/api/catalog/categories/': typeof ApiCatalogCategoriesIndexRoute
+  '/api/catalog/products/': typeof ApiCatalogProductsIndexRoute
+  '/api/inventory/materials/': typeof ApiInventoryMaterialsIndexRoute
+  '/api/inventory/recipes/': typeof ApiInventoryRecipesIndexRoute
+  '/api/pos/orders/': typeof ApiPosOrdersIndexRoute
+  '/api/pos/shifts/': typeof ApiPosShiftsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -101,9 +203,23 @@ export interface FileRoutesByTo {
   '/app': typeof ProtectedAppRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/notes/$id': typeof ApiNotesIdRoute
+  '/api/promos/validate': typeof ApiPromosValidateRoute
+  '/api/analytics': typeof ApiAnalyticsIndexRoute
+  '/api/audit-logs': typeof ApiAuditLogsIndexRoute
+  '/api/expenses': typeof ApiExpensesIndexRoute
   '/api/notes': typeof ApiNotesIndexRoute
+  '/api/promos': typeof ApiPromosIndexRoute
   '/api/admin/notes/$id': typeof ApiAdminNotesIdRoute
+  '/api/inventory/materials/restock': typeof ApiInventoryMaterialsRestockRoute
+  '/api/pos/orders/sync': typeof ApiPosOrdersSyncRoute
+  '/api/pos/shifts/close': typeof ApiPosShiftsCloseRoute
   '/api/admin/notes': typeof ApiAdminNotesIndexRoute
+  '/api/catalog/categories': typeof ApiCatalogCategoriesIndexRoute
+  '/api/catalog/products': typeof ApiCatalogProductsIndexRoute
+  '/api/inventory/materials': typeof ApiInventoryMaterialsIndexRoute
+  '/api/inventory/recipes': typeof ApiInventoryRecipesIndexRoute
+  '/api/pos/orders': typeof ApiPosOrdersIndexRoute
+  '/api/pos/shifts': typeof ApiPosShiftsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -116,9 +232,23 @@ export interface FileRoutesById {
   '/_protected/app': typeof ProtectedAppRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/notes/$id': typeof ApiNotesIdRoute
+  '/api/promos/validate': typeof ApiPromosValidateRoute
+  '/api/analytics/': typeof ApiAnalyticsIndexRoute
+  '/api/audit-logs/': typeof ApiAuditLogsIndexRoute
+  '/api/expenses/': typeof ApiExpensesIndexRoute
   '/api/notes/': typeof ApiNotesIndexRoute
+  '/api/promos/': typeof ApiPromosIndexRoute
   '/api/admin/notes/$id': typeof ApiAdminNotesIdRoute
+  '/api/inventory/materials/restock': typeof ApiInventoryMaterialsRestockRoute
+  '/api/pos/orders/sync': typeof ApiPosOrdersSyncRoute
+  '/api/pos/shifts/close': typeof ApiPosShiftsCloseRoute
   '/api/admin/notes/': typeof ApiAdminNotesIndexRoute
+  '/api/catalog/categories/': typeof ApiCatalogCategoriesIndexRoute
+  '/api/catalog/products/': typeof ApiCatalogProductsIndexRoute
+  '/api/inventory/materials/': typeof ApiInventoryMaterialsIndexRoute
+  '/api/inventory/recipes/': typeof ApiInventoryRecipesIndexRoute
+  '/api/pos/orders/': typeof ApiPosOrdersIndexRoute
+  '/api/pos/shifts/': typeof ApiPosShiftsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -130,9 +260,23 @@ export interface FileRouteTypes {
     | '/app'
     | '/api/auth/$'
     | '/api/notes/$id'
+    | '/api/promos/validate'
+    | '/api/analytics/'
+    | '/api/audit-logs/'
+    | '/api/expenses/'
     | '/api/notes/'
+    | '/api/promos/'
     | '/api/admin/notes/$id'
+    | '/api/inventory/materials/restock'
+    | '/api/pos/orders/sync'
+    | '/api/pos/shifts/close'
     | '/api/admin/notes/'
+    | '/api/catalog/categories/'
+    | '/api/catalog/products/'
+    | '/api/inventory/materials/'
+    | '/api/inventory/recipes/'
+    | '/api/pos/orders/'
+    | '/api/pos/shifts/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -142,9 +286,23 @@ export interface FileRouteTypes {
     | '/app'
     | '/api/auth/$'
     | '/api/notes/$id'
+    | '/api/promos/validate'
+    | '/api/analytics'
+    | '/api/audit-logs'
+    | '/api/expenses'
     | '/api/notes'
+    | '/api/promos'
     | '/api/admin/notes/$id'
+    | '/api/inventory/materials/restock'
+    | '/api/pos/orders/sync'
+    | '/api/pos/shifts/close'
     | '/api/admin/notes'
+    | '/api/catalog/categories'
+    | '/api/catalog/products'
+    | '/api/inventory/materials'
+    | '/api/inventory/recipes'
+    | '/api/pos/orders'
+    | '/api/pos/shifts'
   id:
     | '__root__'
     | '/'
@@ -156,9 +314,23 @@ export interface FileRouteTypes {
     | '/_protected/app'
     | '/api/auth/$'
     | '/api/notes/$id'
+    | '/api/promos/validate'
+    | '/api/analytics/'
+    | '/api/audit-logs/'
+    | '/api/expenses/'
     | '/api/notes/'
+    | '/api/promos/'
     | '/api/admin/notes/$id'
+    | '/api/inventory/materials/restock'
+    | '/api/pos/orders/sync'
+    | '/api/pos/shifts/close'
     | '/api/admin/notes/'
+    | '/api/catalog/categories/'
+    | '/api/catalog/products/'
+    | '/api/inventory/materials/'
+    | '/api/inventory/recipes/'
+    | '/api/pos/orders/'
+    | '/api/pos/shifts/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -167,9 +339,23 @@ export interface RootRouteChildren {
   ProtectedRoute: typeof ProtectedRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiNotesIdRoute: typeof ApiNotesIdRoute
+  ApiPromosValidateRoute: typeof ApiPromosValidateRoute
+  ApiAnalyticsIndexRoute: typeof ApiAnalyticsIndexRoute
+  ApiAuditLogsIndexRoute: typeof ApiAuditLogsIndexRoute
+  ApiExpensesIndexRoute: typeof ApiExpensesIndexRoute
   ApiNotesIndexRoute: typeof ApiNotesIndexRoute
+  ApiPromosIndexRoute: typeof ApiPromosIndexRoute
   ApiAdminNotesIdRoute: typeof ApiAdminNotesIdRoute
+  ApiInventoryMaterialsRestockRoute: typeof ApiInventoryMaterialsRestockRoute
+  ApiPosOrdersSyncRoute: typeof ApiPosOrdersSyncRoute
+  ApiPosShiftsCloseRoute: typeof ApiPosShiftsCloseRoute
   ApiAdminNotesIndexRoute: typeof ApiAdminNotesIndexRoute
+  ApiCatalogCategoriesIndexRoute: typeof ApiCatalogCategoriesIndexRoute
+  ApiCatalogProductsIndexRoute: typeof ApiCatalogProductsIndexRoute
+  ApiInventoryMaterialsIndexRoute: typeof ApiInventoryMaterialsIndexRoute
+  ApiInventoryRecipesIndexRoute: typeof ApiInventoryRecipesIndexRoute
+  ApiPosOrdersIndexRoute: typeof ApiPosOrdersIndexRoute
+  ApiPosShiftsIndexRoute: typeof ApiPosShiftsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -223,11 +409,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedAppRouteImport
       parentRoute: typeof ProtectedRoute
     }
+    '/api/analytics/': {
+      id: '/api/analytics/'
+      path: '/api/analytics'
+      fullPath: '/api/analytics/'
+      preLoaderRoute: typeof ApiAnalyticsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/audit-logs/': {
+      id: '/api/audit-logs/'
+      path: '/api/audit-logs'
+      fullPath: '/api/audit-logs/'
+      preLoaderRoute: typeof ApiAuditLogsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/expenses/': {
+      id: '/api/expenses/'
+      path: '/api/expenses'
+      fullPath: '/api/expenses/'
+      preLoaderRoute: typeof ApiExpensesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/notes/': {
@@ -244,6 +451,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiNotesIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/promos/': {
+      id: '/api/promos/'
+      path: '/api/promos'
+      fullPath: '/api/promos/'
+      preLoaderRoute: typeof ApiPromosIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/promos/validate': {
+      id: '/api/promos/validate'
+      path: '/api/promos/validate'
+      fullPath: '/api/promos/validate'
+      preLoaderRoute: typeof ApiPromosValidateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/admin/notes/': {
       id: '/api/admin/notes/'
       path: '/api/admin/notes'
@@ -256,6 +477,69 @@ declare module '@tanstack/react-router' {
       path: '/api/admin/notes/$id'
       fullPath: '/api/admin/notes/$id'
       preLoaderRoute: typeof ApiAdminNotesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/catalog/categories/': {
+      id: '/api/catalog/categories/'
+      path: '/api/catalog/categories'
+      fullPath: '/api/catalog/categories/'
+      preLoaderRoute: typeof ApiCatalogCategoriesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/catalog/products/': {
+      id: '/api/catalog/products/'
+      path: '/api/catalog/products'
+      fullPath: '/api/catalog/products/'
+      preLoaderRoute: typeof ApiCatalogProductsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/inventory/materials/': {
+      id: '/api/inventory/materials/'
+      path: '/api/inventory/materials'
+      fullPath: '/api/inventory/materials/'
+      preLoaderRoute: typeof ApiInventoryMaterialsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/inventory/materials/restock': {
+      id: '/api/inventory/materials/restock'
+      path: '/api/inventory/materials/restock'
+      fullPath: '/api/inventory/materials/restock'
+      preLoaderRoute: typeof ApiInventoryMaterialsRestockRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/inventory/recipes/': {
+      id: '/api/inventory/recipes/'
+      path: '/api/inventory/recipes'
+      fullPath: '/api/inventory/recipes/'
+      preLoaderRoute: typeof ApiInventoryRecipesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/pos/orders/': {
+      id: '/api/pos/orders/'
+      path: '/api/pos/orders'
+      fullPath: '/api/pos/orders/'
+      preLoaderRoute: typeof ApiPosOrdersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/pos/orders/sync': {
+      id: '/api/pos/orders/sync'
+      path: '/api/pos/orders/sync'
+      fullPath: '/api/pos/orders/sync'
+      preLoaderRoute: typeof ApiPosOrdersSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/pos/shifts/': {
+      id: '/api/pos/shifts/'
+      path: '/api/pos/shifts'
+      fullPath: '/api/pos/shifts/'
+      preLoaderRoute: typeof ApiPosShiftsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/pos/shifts/close': {
+      id: '/api/pos/shifts/close'
+      path: '/api/pos/shifts/close'
+      fullPath: '/api/pos/shifts/close'
+      preLoaderRoute: typeof ApiPosShiftsCloseRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -293,9 +577,23 @@ const rootRouteChildren: RootRouteChildren = {
   ProtectedRoute: ProtectedRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiNotesIdRoute: ApiNotesIdRoute,
+  ApiPromosValidateRoute: ApiPromosValidateRoute,
+  ApiAnalyticsIndexRoute: ApiAnalyticsIndexRoute,
+  ApiAuditLogsIndexRoute: ApiAuditLogsIndexRoute,
+  ApiExpensesIndexRoute: ApiExpensesIndexRoute,
   ApiNotesIndexRoute: ApiNotesIndexRoute,
+  ApiPromosIndexRoute: ApiPromosIndexRoute,
   ApiAdminNotesIdRoute: ApiAdminNotesIdRoute,
+  ApiInventoryMaterialsRestockRoute: ApiInventoryMaterialsRestockRoute,
+  ApiPosOrdersSyncRoute: ApiPosOrdersSyncRoute,
+  ApiPosShiftsCloseRoute: ApiPosShiftsCloseRoute,
   ApiAdminNotesIndexRoute: ApiAdminNotesIndexRoute,
+  ApiCatalogCategoriesIndexRoute: ApiCatalogCategoriesIndexRoute,
+  ApiCatalogProductsIndexRoute: ApiCatalogProductsIndexRoute,
+  ApiInventoryMaterialsIndexRoute: ApiInventoryMaterialsIndexRoute,
+  ApiInventoryRecipesIndexRoute: ApiInventoryRecipesIndexRoute,
+  ApiPosOrdersIndexRoute: ApiPosOrdersIndexRoute,
+  ApiPosShiftsIndexRoute: ApiPosShiftsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
