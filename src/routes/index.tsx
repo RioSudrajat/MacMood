@@ -381,6 +381,9 @@ function LandingPage() {
       window.removeEventListener("scroll", requestScrollUpdate);
       window.removeEventListener("resize", requestScrollUpdate);
       window.removeEventListener("pageshow", requestScrollUpdate);
+      if (lenis) {
+        lenis.off("scroll", requestScrollUpdate);
+      }
       sharedFoodModel?.removeEventListener?.("load", requestScrollUpdate);
       partnerModel?.removeEventListener?.("load", requestScrollUpdate);
       window.clearTimeout(autoRotateTimer);
@@ -1153,7 +1156,7 @@ function LandingPage() {
             exposure="1.05"
             camera-orbit="28deg 64deg 6.6m"
             camera-target="0m 0.48m 0m"
-            interpolation-decay="45"
+            interpolation-decay="100"
             interaction-prompt="none"
           />
           <svg
