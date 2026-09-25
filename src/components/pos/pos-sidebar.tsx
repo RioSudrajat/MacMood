@@ -10,6 +10,7 @@ import {
   ChevronRight,
   X,
   ArrowUpRight,
+  Lock,
 } from "lucide-react";
 import { SignOutButton } from "@/components/sign-out-button";
 
@@ -28,6 +29,7 @@ interface PosSidebarProps {
   onToggleCollapse: () => void;
   isMobileOpen: boolean;
   onMobileClose: () => void;
+  onLockScreen?: () => void;
 }
 
 export function PosSidebar({
@@ -42,6 +44,7 @@ export function PosSidebar({
   onToggleCollapse,
   isMobileOpen,
   onMobileClose,
+  onLockScreen,
 }: PosSidebarProps) {
   const navItems = [
     {
@@ -242,6 +245,39 @@ export function PosSidebar({
 
         {/* Bottom Section: Role Switcher & Sign Out */}
         <div className="p-3 border-t border-brand-green-900/10 space-y-2">
+          {/* Lock Screen / Ganti Kasir (Fast PIN) */}
+          {onLockScreen && (
+            collapsed ? (
+              <div className="flex justify-center group relative">
+                <button
+                  type="button"
+                  onClick={onLockScreen}
+                  className="size-11 rounded-2xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200/80 flex items-center justify-center transition-colors cursor-pointer"
+                  title="Kunci Layar / Ganti Kasir"
+                >
+                  <Lock className="size-4.5" />
+                </button>
+                <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-lg bg-neutral-900 text-white text-xs font-semibold whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 shadow-md">
+                  Kunci Layar (PIN)
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={onLockScreen}
+                className="w-full flex items-center justify-between p-2.5 rounded-2xl bg-amber-50/70 hover:bg-amber-100/80 text-amber-900 border border-amber-200/80 transition-colors cursor-pointer"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <Lock className="size-4 text-amber-700 flex-shrink-0" />
+                  <span className="text-xs font-bold truncate">Kunci Layar / PIN</span>
+                </div>
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-200/80 text-amber-900">
+                  Lock
+                </span>
+              </button>
+            )
+          )}
+
           {/* Switch to Owner Dashboard */}
           {collapsed ? (
             <div className="flex justify-center group relative">

@@ -33,6 +33,8 @@ export const Route = createRootRoute({
       },
       { rel: "stylesheet", href: globalsCss },
       { rel: "icon", href: "/assets/macmood-logo.png", type: "image/png" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "apple-touch-icon", href: "/assets/macmood-logo.png" },
     ],
     scripts: [
       {

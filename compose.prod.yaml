@@ -1,0 +1,68 @@
+# ==============================================================================
+# MacMood Production Docker Compose
+# Orchestrates PostgreSQL 16 and the MacMood Fullstack Application
+# ==============================================================================
+
+name: macmood-prod
+
+services:
+  # ----------------------------------------------------------------------------
+  # PostgreSQL 16 Database
+  # ----------------------------------------------------------------------------
+  db:
+    image: postgres:16-alpine
+    container_name: macmood-prod-db
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-macmood}
+      POSTGRES_USER: ${POSTGRES_USER:-macmood_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Database password required}
+    volumes:
+      - macmood_prod_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-macmood_user} -d ${POSTGRES_DB:-macmood}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - macmood-network
+
+  # ----------------------------------------------------------------------------
+  # MacMood Fullstack TanStack Start Application
+  # ----------------------------------------------------------------------------
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: macmood-prod-app
+    restart: always
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgres://${POSTGRES_USER:-macmood_user}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-macmood}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?Auth secret required}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3000}
+      R2_ACCOUNT_ID: ${R2_ACCOUNT_ID:-}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:-}
+      R2_BUCKET_NAME: ${R2_BUCKET_NAME:-}
+      R2_PUBLIC_URL: ${R2_PUBLIC_URL:-}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - macmood-network
+
+# ------------------------------------------------------------------------------
+# Persistent Storage Volumes & Networks
+# ------------------------------------------------------------------------------
+volumes:
+  macmood_prod_pgdata:
+    name: macmood_prod_pgdata
+
+networks:
+  macmood-network:
+    name: macmood-prod-network
+    driver: bridge

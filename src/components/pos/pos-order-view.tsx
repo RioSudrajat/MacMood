@@ -242,8 +242,8 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
             {[
               { id: "all", label: "Semua Menu" },
               { id: "mac", label: "Mac & Cheese" },
-              { id: "sides", label: "Sides & Katsu" },
-              { id: "drinks", label: "Minuman Dingin" },
+              { id: "sides", label: "Add-on" },
+              { id: "drinks", label: "Minuman" },
             ].map((cat) => (
               <button
                 key={cat.id}

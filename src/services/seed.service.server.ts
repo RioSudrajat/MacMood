@@ -25,8 +25,8 @@ export async function ensureSeededData() {
     .insert(categories)
     .values([
       { slug: "mac", name: "Mac & Cheese", sortOrder: 1, isActive: true },
-      { slug: "sides", name: "Sides & Katsu", sortOrder: 2, isActive: true },
-      { slug: "drinks", name: "Minuman Segar", sortOrder: 3, isActive: true },
+      { slug: "sides", name: "Add-on", sortOrder: 2, isActive: true },
+      { slug: "drinks", name: "Minuman", sortOrder: 3, isActive: true },
     ])
     .returning();
 
@@ -115,7 +115,7 @@ export async function ensureSeededData() {
         description: "Fillet dada ayam krispi berbalut tepung roti renyah keemasan.",
         price: 12000,
         costPrice: 5800,
-        imageUrl: "/assets/menu-super-mac-reference.png",
+        imageUrl: "/assets/menu-chicken-katsu.png",
         isAvailable: true,
         trackStock: true,
         currentStock: 30,
@@ -127,7 +127,7 @@ export async function ensureSeededData() {
         description: "Kentang goreng renyah gurih dengan garam laut halus.",
         price: 8000,
         costPrice: 3800,
-        imageUrl: "/assets/menu-potato-mac-reference.png",
+        imageUrl: "/assets/menu-french-fries.png",
         isAvailable: true,
         trackStock: true,
         currentStock: 40,
@@ -139,7 +139,7 @@ export async function ensureSeededData() {
         description: "Teh perasan lemon segar asam-manis penghilang dahaga.",
         price: 6000,
         costPrice: 2100,
-        imageUrl: "/assets/menu-classic-mac-reference.png",
+        imageUrl: "/assets/menu-es-lemon-tea.png",
         isAvailable: true,
         trackStock: true,
         currentStock: 60,
@@ -151,7 +151,7 @@ export async function ensureSeededData() {
         description: "Teh melati wangi dingin manis khas MacMood.",
         price: 4000,
         costPrice: 1200,
-        imageUrl: "/assets/menu-classic-mac-reference.png",
+        imageUrl: "/assets/menu-es-teh-manis.png",
         isAvailable: true,
         trackStock: true,
         currentStock: 80,
@@ -163,7 +163,7 @@ export async function ensureSeededData() {
         description: "Air mineral higienis dingin 600ml.",
         price: 3000,
         costPrice: 1500,
-        imageUrl: "/assets/menu-classic-mac-reference.png",
+        imageUrl: "/assets/menu-air-mineral.png",
         isAvailable: true,
         trackStock: true,
         currentStock: 50,
@@ -508,7 +508,7 @@ export async function ensureSeededData() {
   // 9. Seed Audit Logs
   await db.insert(auditLogs).values([
     {
-      userName: "Rian Hendrawan",
+      userName: "Muhammad Afrizal",
       userRole: "Owner",
       action: "PROMO_CREATED",
       actionLabel: "Pembuatan Voucher Baru",
@@ -520,7 +520,7 @@ export async function ensureSeededData() {
       createdAt: new Date("2026-09-24T08:00:00+07:00"),
     },
     {
-      userName: "Rian Hendrawan",
+      userName: "Muhammad Afrizal",
       userRole: "Owner",
       action: "RECIPE_UPDATED",
       actionLabel: "Pembaruan Takaran Resep (BOM)",

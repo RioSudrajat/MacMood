@@ -11,7 +11,47 @@ interface PosReceiptModalProps {
 export function PosReceiptModal({ order, onClose, isReprint = false }: PosReceiptModalProps) {
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl max-w-sm w-full overflow-hidden shadow-2xl p-6 space-y-5 animate-in zoom-in-95 duration-150">
+      {/* Thermal Print Stylesheet (58mm / 80mm) */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+            @media print {
+              body * {
+                visibility: hidden;
+              }
+              #thermal-receipt-area, #thermal-receipt-area * {
+                visibility: visible;
+              }
+              #thermal-receipt-area {
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 58mm;
+                max-width: 58mm;
+                padding: 3mm 2mm;
+                margin: 0;
+                background: white !important;
+                color: black !important;
+                box-shadow: none !important;
+                border: none !important;
+                border-radius: 0 !important;
+              }
+              .no-print {
+                display: none !important;
+              }
+              @page {
+                size: 58mm auto;
+                margin: 0;
+              }
+            }
+          `,
+        }}
+      />
+
+      <div
+        id="thermal-receipt-area"
+        className="bg-white rounded-3xl max-w-sm w-full overflow-hidden shadow-2xl p-6 space-y-5 animate-in zoom-in-95 duration-150"
+      >
         {/* Receipt Header */}
         <div className="text-center space-y-1 pb-4 border-b border-dashed border-neutral-300">
           <div className="flex justify-between items-start mb-1">
@@ -34,7 +74,7 @@ export function PosReceiptModal({ order, onClose, isReprint = false }: PosReceip
             <button
               type="button"
               onClick={onClose}
-              className="size-7 rounded-full bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center text-neutral-500 transition-colors"
+              className="no-print size-7 rounded-full bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center text-neutral-500 transition-colors"
             >
               <X className="size-4" />
             </button>
@@ -138,7 +178,7 @@ export function PosReceiptModal({ order, onClose, isReprint = false }: PosReceip
         </div>
 
         {/* Sync Status Badge */}
-        <div className="flex justify-center pt-1">
+        <div className="no-print flex justify-center pt-1">
           <span
             className={`text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full ${
               order.syncStatus === "SYNCED"
@@ -151,11 +191,11 @@ export function PosReceiptModal({ order, onClose, isReprint = false }: PosReceip
         </div>
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-2 gap-2.5 pt-2">
+        <div className="no-print grid grid-cols-2 gap-2.5 pt-2">
           <button
             type="button"
             onClick={() => window.print()}
-            className="h-11 rounded-xl border border-neutral-300 text-neutral-800 hover:bg-neutral-50 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors"
+            className="h-11 rounded-xl border border-neutral-300 text-neutral-800 hover:bg-neutral-50 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
           >
             <Printer className="size-4 text-brand-green-900" />
             <span>Cetak Struk</span>
@@ -163,7 +203,7 @@ export function PosReceiptModal({ order, onClose, isReprint = false }: PosReceip
           <button
             type="button"
             onClick={onClose}
-            className="h-11 rounded-xl bg-brand-green-900 text-white hover:bg-brand-green-800 text-xs font-bold transition-colors shadow-xs"
+            className="h-11 rounded-xl bg-brand-green-900 text-white hover:bg-brand-green-800 text-xs font-bold transition-colors shadow-xs cursor-pointer"
           >
             {isReprint ? "Selesai" : "Pesanan Baru"}
           </button>

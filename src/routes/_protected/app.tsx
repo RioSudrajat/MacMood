@@ -24,9 +24,14 @@ import { PosSyncView } from "@/components/pos/pos-sync-view";
 import { PosSidebar } from "@/components/pos/pos-sidebar";
 import type { PosTab } from "@/components/pos/pos-sidebar";
 import { PosReceiptModal } from "@/components/pos/pos-receipt-modal";
+import {
+  PosPinLockModal,
+  DEMO_STAFF_PIN_ACCOUNTS,
+  type StaffPinAccount,
+} from "@/components/pos/pos-pin-lock-modal";
 import { TopBar } from "@/components/common/top-bar";
 import { NotificationsView } from "@/components/common/notifications-view";
-import { Clock, Wifi, WifiOff } from "lucide-react";
+import { Clock, Wifi, WifiOff, Lock } from "lucide-react";
 
 export const Route = createFileRoute("/_protected/app")({
   head: () => ({ meta: [{ title: `Kasir POS | ${siteConfig.name}` }] }),
@@ -44,7 +49,25 @@ function subscribeNetwork(callback: () => void) {
 
 export function PosAppPage() {
   const { session } = Route.useRouteContext();
-  const cashierName = session.user.name || "Budi Santoso";
+
+  // Active Staff & Fast PIN Switch State
+  const [activeStaff, setActiveStaff] = useState<StaffPinAccount>(() => {
+    const isOwner =
+      session.user.role === "admin" ||
+      session.user.name?.toLowerCase().includes("afrizal");
+    if (isOwner) {
+      return (
+        DEMO_STAFF_PIN_ACCOUNTS.find((s) => s.role === "owner") ||
+        DEMO_STAFF_PIN_ACCOUNTS[0]
+      );
+    }
+    const matched = DEMO_STAFF_PIN_ACCOUNTS.find(
+      (s) => s.name.toLowerCase() === session.user.name?.toLowerCase()
+    );
+    return matched || DEMO_STAFF_PIN_ACCOUNTS[1]; // default Budi Santoso
+  });
+  const [isPinLockOpen, setIsPinLockOpen] = useState(false);
+  const cashierName = activeStaff.name;
 
   // Sidebar Collapse & Mobile Drawer States
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -72,17 +95,58 @@ export function PosAppPage() {
     }
   };
 
-  // State Management
+  // State Management with localStorage Persistence for offline resiliency
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
-  const [orders, setOrders] = useState<CompletedOrder[]>(INITIAL_ORDERS);
+  const [orders, setOrders] = useState<CompletedOrder[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("macmood_offline_orders");
+        if (saved) return JSON.parse(saved);
+      } catch (e) {
+        console.warn("Failed to load cached orders:", e);
+      }
+    }
+    return INITIAL_ORDERS;
+  });
   const [shift, setShift] = useState<ShiftData>({
     ...INITIAL_SHIFT,
     cashierName,
   });
   const [pastShifts, setPastShifts] = useState<PastShift[]>(INITIAL_PAST_SHIFTS);
-  const [syncQueue, setSyncQueue] = useState<SyncQueueItem[]>(INITIAL_SYNC_QUEUE);
+  const [syncQueue, setSyncQueue] = useState<SyncQueueItem[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("macmood_offline_sync_queue");
+        if (saved) return JSON.parse(saved);
+      } catch (e) {
+        console.warn("Failed to load cached syncQueue:", e);
+      }
+    }
+    return INITIAL_SYNC_QUEUE;
+  });
   const [justCompletedOrder, setJustCompletedOrder] = useState<CompletedOrder | null>(null);
   const [isSimulatedOffline, setIsSimulatedOffline] = useState(false);
+
+  // Sync to localStorage whenever orders or syncQueue change
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("macmood_offline_orders", JSON.stringify(orders));
+      } catch (e) {
+        console.warn("Failed to save orders to localStorage:", e);
+      }
+    }
+  }, [orders]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("macmood_offline_sync_queue", JSON.stringify(syncQueue));
+      } catch (e) {
+        console.warn("Failed to save syncQueue to localStorage:", e);
+      }
+    }
+  }, [syncQueue]);
 
   // Network State
   const rawIsOnline = useSyncExternalStore(
@@ -551,19 +615,31 @@ export function PosAppPage() {
         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         isMobileOpen={isMobileSidebarOpen}
         onMobileClose={() => setIsMobileSidebarOpen(false)}
+        onLockScreen={() => setIsPinLockOpen(true)}
       />
 
       {/* Main View Area (Right side) */}
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         {/* TopBar (Reference Image 3: Welcome + Name, Notification Bell, User Avatar) */}
         <TopBar
-          userName={cashierName}
-          roleLabel="Kasir Outlet"
+          userName={activeStaff.name}
+          roleLabel={activeStaff.roleLabel}
           unreadNotifCount={2}
           onOpenNotifications={() => switchTab("notifications")}
           onOpenMobileMenu={() => setIsMobileSidebarOpen(true)}
           extraActions={
             <div className="flex items-center gap-2">
+              {/* Quick Lock PIN Button */}
+              <button
+                type="button"
+                onClick={() => setIsPinLockOpen(true)}
+                className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 font-semibold text-xs transition-colors cursor-pointer"
+                title="Kunci Layar Kasir / Ganti Shift Cepat via PIN"
+              >
+                <Lock className="size-3 text-amber-700" />
+                <span>Kunci PIN</span>
+              </button>
+
               {/* Shift status pill */}
               <button
                 type="button"
@@ -656,6 +732,22 @@ export function PosAppPage() {
           isReprint={false}
         />
       )}
+
+      {/* Fast Cashier PIN Screen Lock Modal */}
+      <PosPinLockModal
+        isOpen={isPinLockOpen}
+        activeStaffName={activeStaff.name}
+        canDismiss={true}
+        onClose={() => setIsPinLockOpen(false)}
+        onSuccessUnlock={(unlockedStaff) => {
+          setActiveStaff(unlockedStaff);
+          setShift((prev) => ({
+            ...prev,
+            cashierName: unlockedStaff.name,
+          }));
+          setIsPinLockOpen(false);
+        }}
+      />
     </div>
   );
 }

@@ -409,9 +409,6 @@ function LandingPage() {
             <a href="#menu">Menu</a>
             <a href="#mitra">Paket mitra</a>
             <a href="#simulasi">Simulasi</a>
-            <a href="/app" style={{ color: "var(--yellow-400)" }}>
-              Kasir (POS) ↗
-            </a>
           </nav>
           <a className="nav-cta" href="#kontak">
             Yuk ngobrol <span aria-hidden="true">↗</span>

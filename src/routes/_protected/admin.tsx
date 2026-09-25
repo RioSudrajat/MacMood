@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { siteConfig } from "@/config/site";
 import type {
   AdminTab,
@@ -47,13 +47,19 @@ import { NotificationsView } from "@/components/common/notifications-view";
 import { Store } from "lucide-react";
 
 export const Route = createFileRoute("/_protected/admin")({
+  beforeLoad: ({ context }) => {
+    // RBAC: Hanya akun dengan role admin / owner yang diizinkan mengakses Admin Suite
+    if (context.session?.user?.role !== "admin") {
+      throw redirect({ to: "/app" });
+    }
+  },
   head: () => ({ meta: [{ title: `Dashboard Owner & Admin | ${siteConfig.name}` }] }),
   component: AdminDashboardPage,
 });
 
 export function AdminDashboardPage() {
   const { session } = Route.useRouteContext();
-  const ownerName = session.user.name || "Ahmad Fauzi (Owner)";
+  const ownerName = session.user.name || "Muhammad Afrizal";
 
   // Sidebar Collapse & Mobile Drawer States
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);

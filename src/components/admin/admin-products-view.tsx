@@ -12,7 +12,21 @@ import {
   Percent,
   X,
   Package,
+  Upload,
+  Image as ImageIcon,
+  Link as LinkIcon,
 } from "lucide-react";
+
+export const MENU_IMAGE_PRESETS = [
+  { label: "Super Mac (Katsu)", url: "/assets/menu-super-mac-reference.png", category: "mac" },
+  { label: "Potato Mac (Kentang)", url: "/assets/menu-potato-mac-reference.png", category: "mac" },
+  { label: "Classic Mac (Original)", url: "/assets/menu-classic-mac-reference.png", category: "mac" },
+  { label: "Chicken Katsu", url: "/assets/menu-chicken-katsu.png", category: "sides" },
+  { label: "French Fries", url: "/assets/menu-french-fries.png", category: "sides" },
+  { label: "Es Lemon Tea", url: "/assets/menu-es-lemon-tea.png", category: "drinks" },
+  { label: "Es Teh Manis", url: "/assets/menu-es-teh-manis.png", category: "drinks" },
+  { label: "Air Mineral", url: "/assets/menu-air-mineral.png", category: "drinks" },
+];
 
 interface AdminProductsViewProps {
   products: AdminProduct[];
@@ -34,6 +48,7 @@ export function AdminProductsView({
   // Modal States
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<AdminProduct | null>(null);
+  const [imageInputMode, setImageInputMode] = useState<"preset" | "upload" | "url">("preset");
 
   // Form State for Add / Edit
   const [formData, setFormData] = useState({
@@ -50,7 +65,20 @@ export function AdminProductsView({
     lowStockThreshold: 20,
   });
 
+  const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (typeof event.target?.result === "string") {
+        setFormData((prev) => ({ ...prev, image: event.target!.result as string }));
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   const openAddModal = () => {
+    setImageInputMode("preset");
     setFormData({
       name: "",
       category: "mac",
@@ -69,6 +97,9 @@ export function AdminProductsView({
 
   const openEditModal = (prod: AdminProduct) => {
     setEditingProduct(prod);
+    const isPreset = MENU_IMAGE_PRESETS.some((p) => p.url === prod.image);
+    const isDataUrl = prod.image.startsWith("data:");
+    setImageInputMode(isPreset ? "preset" : isDataUrl ? "upload" : "url");
     setFormData({
       name: prod.name,
       category: prod.category,
@@ -84,20 +115,23 @@ export function AdminProductsView({
     });
   };
 
+  const getResolvedCategoryLabel = (cat: "mac" | "sides" | "drinks") => {
+    if (cat === "mac") return "Mac & Cheese";
+    if (cat === "sides") return "Add-on";
+    return "Minuman";
+  };
+
   const handleSaveModal = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim()) return;
+
+    const resolvedCategoryLabel = getResolvedCategoryLabel(formData.category);
 
     if (editingProduct) {
       onUpdateProduct(editingProduct.id, {
         name: formData.name,
         category: formData.category,
-        categoryLabel:
-          formData.category === "mac"
-            ? "Mac & Cheese"
-            : formData.category === "sides"
-              ? "Katsu & Kentang"
-              : "Minuman Dingin",
+        categoryLabel: resolvedCategoryLabel,
         price: Number(formData.price),
         costPrice: Number(formData.costPrice),
         description: formData.description,
@@ -112,12 +146,7 @@ export function AdminProductsView({
       onAddProduct({
         name: formData.name,
         category: formData.category,
-        categoryLabel:
-          formData.category === "mac"
-            ? "Mac & Cheese"
-            : formData.category === "sides"
-              ? "Katsu & Kentang"
-              : "Minuman Dingin",
+        categoryLabel: resolvedCategoryLabel,
         price: Number(formData.price),
         costPrice: Number(formData.costPrice),
         description: formData.description,
@@ -249,7 +278,7 @@ export function AdminProductsView({
             {[
               { id: "all", label: "Semua" },
               { id: "mac", label: "Mac & Cheese" },
-              { id: "sides", label: "Sides" },
+              { id: "sides", label: "Add-on" },
               { id: "drinks", label: "Minuman" },
             ].map((cat) => (
               <button
@@ -558,37 +587,148 @@ export function AdminProductsView({
                 />
               </div>
 
-              {/* Category & Preset Image */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs font-bold text-neutral-700 block mb-1">Kategori</label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        category: e.target.value as "mac" | "sides" | "drinks",
-                      })
-                    }
-                    className="w-full h-10 px-3 rounded-xl border border-neutral-200 text-xs bg-white focus:outline-none focus:border-brand-green-800"
-                  >
-                    <option value="mac">Mac & Cheese</option>
-                    <option value="sides">Katsu & Kentang (Sides)</option>
-                    <option value="drinks">Minuman Dingin</option>
-                  </select>
+              {/* Category */}
+              <div>
+                <label className="text-xs font-bold text-neutral-700 block mb-1">
+                  Kategori Menu <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={formData.category}
+                  onChange={(e) => {
+                    const newCat = e.target.value as "mac" | "sides" | "drinks";
+                    setFormData({
+                      ...formData,
+                      category: newCat,
+                      categoryLabel: getResolvedCategoryLabel(newCat),
+                    });
+                  }}
+                  className="w-full h-10 px-3 rounded-xl border border-neutral-200 text-xs bg-white focus:outline-none focus:border-brand-green-800"
+                >
+                  <option value="mac">Mac & Cheese</option>
+                  <option value="sides">Add-on</option>
+                  <option value="drinks">Minuman</option>
+                </select>
+              </div>
+
+              {/* Product Image Section: Upload File, Preset, or URL */}
+              <div className="p-3.5 rounded-2xl bg-neutral-50 border border-neutral-200/80 space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-neutral-800 flex items-center gap-1.5">
+                    <ImageIcon className="size-3.5 text-brand-green-800" />
+                    <span>Foto Menu</span>
+                  </label>
+                  {/* Mode switcher tabs */}
+                  <div className="flex items-center gap-1 bg-white p-0.5 rounded-lg border border-neutral-200">
+                    <button
+                      type="button"
+                      onClick={() => setImageInputMode("preset")}
+                      className={`px-2 py-0.5 rounded text-[10px] font-bold transition-colors cursor-pointer ${
+                        imageInputMode === "preset"
+                          ? "bg-brand-green-900 text-white"
+                          : "text-neutral-600 hover:text-neutral-900"
+                      }`}
+                    >
+                      Preset
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setImageInputMode("upload")}
+                      className={`px-2 py-0.5 rounded text-[10px] font-bold transition-colors cursor-pointer ${
+                        imageInputMode === "upload"
+                          ? "bg-brand-green-900 text-white"
+                          : "text-neutral-600 hover:text-neutral-900"
+                      }`}
+                    >
+                      Upload File
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setImageInputMode("url")}
+                      className={`px-2 py-0.5 rounded text-[10px] font-bold transition-colors cursor-pointer ${
+                        imageInputMode === "url"
+                          ? "bg-brand-green-900 text-white"
+                          : "text-neutral-600 hover:text-neutral-900"
+                      }`}
+                    >
+                      URL
+                    </button>
+                  </div>
                 </div>
 
-                <div>
-                  <label className="text-xs font-bold text-neutral-700 block mb-1">Template Gambar</label>
-                  <select
-                    value={formData.image}
-                    onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                    className="w-full h-10 px-3 rounded-xl border border-neutral-200 text-xs bg-white focus:outline-none focus:border-brand-green-800"
-                  >
-                    <option value="/assets/menu-super-mac-reference.png">Super Mac (Katsu)</option>
-                    <option value="/assets/menu-potato-mac-reference.png">Potato Mac (Kentang)</option>
-                    <option value="/assets/menu-classic-mac-reference.png">Classic Mac (Original)</option>
-                  </select>
+                <div className="flex items-center gap-3">
+                  {/* Image Preview Thumbnail */}
+                  <div className="size-16 rounded-xl bg-white border border-neutral-200 overflow-hidden flex-shrink-0 flex items-center justify-center relative shadow-2xs">
+                    {formData.image ? (
+                      <img
+                        src={formData.image}
+                        alt="Preview Menu"
+                        className="size-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLElement).style.display = "none";
+                        }}
+                      />
+                    ) : (
+                      <ImageIcon className="size-6 text-neutral-300" />
+                    )}
+                  </div>
+
+                  {/* Mode Specific Inputs */}
+                  <div className="flex-1 min-w-0">
+                    {imageInputMode === "preset" && (
+                      <div>
+                        <select
+                          value={formData.image}
+                          onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                          className="w-full h-9 px-2.5 rounded-xl border border-neutral-200 text-xs bg-white focus:outline-none focus:border-brand-green-800"
+                        >
+                          {MENU_IMAGE_PRESETS.map((preset) => (
+                            <option key={preset.url} value={preset.url}>
+                              {preset.label}
+                            </option>
+                          ))}
+                        </select>
+                        <span className="text-[10px] text-neutral-500 block mt-1">
+                          Foto katalog resmi MacMood siap pakai.
+                        </span>
+                      </div>
+                    )}
+
+                    {imageInputMode === "upload" && (
+                      <div>
+                        <label className="flex items-center justify-center gap-2 w-full h-9 px-3 rounded-xl border border-dashed border-brand-green-800/40 bg-white hover:bg-brand-cream-50/50 text-xs font-bold text-brand-green-900 cursor-pointer transition-colors">
+                          <Upload className="size-3.5" />
+                          <span>Pilih Foto dari Galeri / Kamera</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageFileChange}
+                            className="hidden"
+                          />
+                        </label>
+                        <span className="text-[10px] text-neutral-500 block mt-1 truncate">
+                          Mendukung JPG, PNG, WEBP langsung dari perangkat.
+                        </span>
+                      </div>
+                    )}
+
+                    {imageInputMode === "url" && (
+                      <div>
+                        <div className="relative">
+                          <LinkIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-neutral-400" />
+                          <input
+                            type="url"
+                            value={formData.image}
+                            onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                            placeholder="https://..."
+                            className="w-full h-9 pl-8 pr-2.5 rounded-xl border border-neutral-200 text-xs bg-white focus:outline-none focus:border-brand-green-800 font-mono"
+                          />
+                        </div>
+                        <span className="text-[10px] text-neutral-500 block mt-1 truncate">
+                          Link Cloudflare R2, S3, atau CDN gambar eksternal.
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 

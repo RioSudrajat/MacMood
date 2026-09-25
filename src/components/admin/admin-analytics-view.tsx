@@ -17,8 +17,14 @@ import {
   Wallet,
   Coins,
   Percent,
+  FileText,
 } from "lucide-react";
 import type { CompletedOrder } from "@/components/pos/types";
+import {
+  AdminFinancialReportModal,
+  downloadFinancialCsv,
+  type FinancialReportData,
+} from "./admin-financial-report-modal";
 
 interface AdminAnalyticsViewProps {
   orders?: CompletedOrder[];
@@ -186,7 +192,7 @@ export function AdminAnalyticsView({
   // Donut 1: Kategori Produk
   const categoryBreakdown = [
     { label: "Mac & Cheese", amount: 2585000, percentage: 62.7, color: "#065f46" }, // Emerald 800
-    { label: "Sides & Katsu", amount: 865000, percentage: 21.0, color: "#d97706" }, // Amber 600
+    { label: "Add-on", amount: 865000, percentage: 21.0, color: "#d97706" }, // Amber 600
     { label: "Minuman Dingin", amount: 670000, percentage: 16.3, color: "#0284c7" }, // Sky 600
   ];
 
@@ -232,12 +238,49 @@ export function AdminAnalyticsView({
           { name: "Super Mac", category: "Mac & Cheese", sold: 82, revenue: 1640000, margin: "52.5%", color: "bg-emerald-600", share: 39.8 },
           { name: "Potato Mac", category: "Mac & Cheese", sold: 45, revenue: 675000, margin: "53.3%", color: "bg-emerald-700", share: 16.4 },
           { name: "Es Lemon Tea Segar", category: "Minuman", sold: 68, revenue: 408000, margin: "70.0%", color: "bg-sky-600", share: 9.9 },
-          { name: "Chicken Katsu Ala Carte", category: "Sides", sold: 32, revenue: 384000, margin: "46.2%", color: "bg-amber-600", share: 9.3 },
-          { name: "Crispy French Fries", category: "Sides", sold: 51, revenue: 408000, margin: "56.0%", color: "bg-amber-500", share: 9.3 },
+          { name: "Chicken Katsu Ala Carte", category: "Add-on", sold: 32, revenue: 384000, margin: "46.2%", color: "bg-amber-600", share: 9.3 },
+          { name: "Crispy French Fries", category: "Add-on", sold: 51, revenue: 408000, margin: "56.0%", color: "bg-amber-500", share: 9.3 },
           { name: "Classic Mac", category: "Mac & Cheese", sold: 27, revenue: 270000, margin: "52.0%", color: "bg-emerald-500", share: 6.5 },
         ];
 
-  const handleExport = () => {
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+
+  const currentReportData: FinancialReportData = {
+    periodLabel: metricsData.label,
+    generatedDate:
+      new Date().toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }) + " WIB",
+    ownerName: "Muhammad Afrizal",
+    outletName: "MacMood Express Fatmawati",
+    branchCode: "JKT-01",
+    grossSales: Math.round(metricsData.netSales * 1.05),
+    totalDiscount: Math.round(metricsData.netSales * 0.05),
+    netSales: metricsData.netSales,
+    cogs: metricsData.cogs,
+    grossProfit: metricsData.grossProfit,
+    grossMarginPercent: metricsData.grossMargin,
+    pettyCashExpenses: metricsData.operatingExpenses,
+    operatingNetProfit: metricsData.netProfit,
+    orderCount: metricsData.orderCount,
+    aov: metricsData.aov,
+    cashRevenue: metricsData.cashRevenue,
+    qrisRevenue: metricsData.qrisRevenue,
+    topSellers: topProducts.map((p) => ({
+      name: p.name,
+      category: p.category,
+      portionSold: p.sold,
+      revenue: p.revenue,
+      marginPercent: parseFloat(p.margin.replace("%", "")) || 50,
+    })),
+  };
+
+  const handleExportCsv = () => {
+    downloadFinancialCsv(currentReportData);
     setExportNotice(true);
     setTimeout(() => setExportNotice(false), 3000);
   };
@@ -259,7 +302,7 @@ export function AdminAnalyticsView({
           </p>
         </div>
 
-        {/* Action Buttons: Period Filter & Export CSV */}
+        {/* Action Buttons: Period Filter & Dual Export (CSV + PDF) */}
         <div className="flex items-center gap-2 flex-wrap">
           <div className="flex items-center bg-white p-1 rounded-2xl border border-neutral-200 shadow-2xs">
             {(["today", "week", "month", "year"] as AdminDatePeriod[]).map((p) => (
@@ -286,11 +329,22 @@ export function AdminAnalyticsView({
 
           <button
             type="button"
-            onClick={handleExport}
+            onClick={handleExportCsv}
             className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-neutral-50 text-neutral-700 text-xs font-bold rounded-2xl border border-neutral-200 shadow-2xs transition-colors cursor-pointer"
+            title="Download Spreadsheet CSV"
           >
             <Download className="size-3.5" />
             <span>Ekspor CSV</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsReportModalOpen(true)}
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-brand-green-900 hover:bg-brand-green-950 text-white text-xs font-bold rounded-2xl shadow-xs transition-colors cursor-pointer"
+            title="Buka Lembar Laporan & Cetak PDF Resmi"
+          >
+            <FileText className="size-3.5 text-brand-yellow-400" />
+            <span>Laporan Resmi / PDF</span>
           </button>
         </div>
       </div>
@@ -957,6 +1011,13 @@ export function AdminAnalyticsView({
           ))}
         </div>
       </div>
+
+      {/* Formal Financial Statement & PDF Modal */}
+      <AdminFinancialReportModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        reportData={currentReportData}
+      />
     </div>
   );
 }
