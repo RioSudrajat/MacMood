@@ -17,7 +17,15 @@ export async function ensureSeededData() {
   // Check if categories already seeded
   const existingCategories = await db.select({ count: sql<number>`count(*)::int` }).from(categories);
   if (existingCategories[0]?.count && existingCategories[0].count > 0) {
-    return; // Already seeded
+    // Keep category names and dedicated product images synchronized
+    await db.update(categories).set({ name: "Add-on" }).where(sql`slug = 'sides'`);
+    await db.update(categories).set({ name: "Minuman" }).where(sql`slug = 'drinks'`);
+    await db.update(products).set({ imageUrl: "/assets/menu-chicken-katsu.png", categorySlug: "sides" }).where(sql`name = 'Chicken Katsu Ala Carte'`);
+    await db.update(products).set({ imageUrl: "/assets/menu-french-fries.png", categorySlug: "sides" }).where(sql`name = 'Crispy French Fries'`);
+    await db.update(products).set({ imageUrl: "/assets/menu-es-lemon-tea.png", categorySlug: "drinks" }).where(sql`name = 'Es Lemon Tea'`);
+    await db.update(products).set({ imageUrl: "/assets/menu-es-teh-manis.png", categorySlug: "drinks" }).where(sql`name = 'Es Teh Manis'`);
+    await db.update(products).set({ imageUrl: "/assets/menu-air-mineral.png", categorySlug: "drinks" }).where(sql`name = 'Air Mineral Botol'`);
+    return;
   }
 
   // 1. Seed Categories

@@ -30,6 +30,7 @@ interface PosSidebarProps {
   isMobileOpen: boolean;
   onMobileClose: () => void;
   onLockScreen?: () => void;
+  isOwner?: boolean;
 }
 
 export function PosSidebar({
@@ -45,6 +46,7 @@ export function PosSidebar({
   isMobileOpen,
   onMobileClose,
   onLockScreen,
+  isOwner = false,
 }: PosSidebarProps) {
   const navItems = [
     {
@@ -278,31 +280,33 @@ export function PosSidebar({
             )
           )}
 
-          {/* Switch to Owner Dashboard */}
-          {collapsed ? (
-            <div className="flex justify-center group relative">
+          {/* Switch to Owner Dashboard (Only visible for Owner/Admin role) */}
+          {isOwner && (
+            collapsed ? (
+              <div className="flex justify-center group relative">
+                <Link
+                  to="/admin"
+                  className="size-11 rounded-2xl bg-neutral-100 hover:bg-brand-cream-100 text-neutral-700 hover:text-brand-green-950 flex items-center justify-center transition-colors cursor-pointer"
+                  title="Dashboard Owner"
+                >
+                  <ShieldCheck className="size-5" />
+                </Link>
+                <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-lg bg-neutral-900 text-white text-xs font-semibold whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 shadow-md">
+                  Dashboard Owner
+                </div>
+              </div>
+            ) : (
               <Link
                 to="/admin"
-                className="size-11 rounded-2xl bg-neutral-100 hover:bg-brand-cream-100 text-neutral-700 hover:text-brand-green-950 flex items-center justify-center transition-colors cursor-pointer"
-                title="Dashboard Owner"
+                className="flex items-center justify-between p-2.5 rounded-2xl bg-neutral-50 hover:bg-brand-cream-100 text-neutral-700 hover:text-brand-green-950 border border-neutral-200/80 transition-colors"
               >
-                <ShieldCheck className="size-5" />
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <ShieldCheck className="size-4 text-brand-green-800 flex-shrink-0" />
+                  <span className="text-xs font-bold truncate">Dashboard Owner</span>
+                </div>
+                <ArrowUpRight className="size-3.5 text-neutral-400" />
               </Link>
-              <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-lg bg-neutral-900 text-white text-xs font-semibold whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 shadow-md">
-                Dashboard Owner
-              </div>
-            </div>
-          ) : (
-            <Link
-              to="/admin"
-              className="flex items-center justify-between p-2.5 rounded-2xl bg-neutral-50 hover:bg-brand-cream-100 text-neutral-700 hover:text-brand-green-950 border border-neutral-200/80 transition-colors"
-            >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <ShieldCheck className="size-4 text-brand-green-800 flex-shrink-0" />
-                <span className="text-xs font-bold truncate">Dashboard Owner</span>
-              </div>
-              <ArrowUpRight className="size-3.5 text-neutral-400" />
-            </Link>
+            )
           )}
 
           {/* Sign Out Button (User requested: "lalu sign out juga diletakkan di sidebar") */}

@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
-import { Lock, Unlock, Delete, X, ShieldCheck } from "lucide-react";
+import { Lock, Unlock, Delete, X, ShieldCheck, LogOut, User } from "lucide-react";
 import { motion } from "motion/react";
+import { useNavigate, useRouter } from "@tanstack/react-router";
+import { authClient } from "@/lib/auth-client";
 
 export interface StaffPinAccount {
   id: string;
@@ -8,6 +10,7 @@ export interface StaffPinAccount {
   role: "owner" | "cashier";
   roleLabel: string;
   pin: string;
+  email?: string;
 }
 
 export const DEMO_STAFF_PIN_ACCOUNTS: StaffPinAccount[] = [
@@ -17,6 +20,7 @@ export const DEMO_STAFF_PIN_ACCOUNTS: StaffPinAccount[] = [
     role: "owner",
     roleLabel: "Business Owner",
     pin: "8899",
+    email: "owner@macmood.id",
   },
   {
     id: "staff-2",
@@ -24,49 +28,41 @@ export const DEMO_STAFF_PIN_ACCOUNTS: StaffPinAccount[] = [
     role: "cashier",
     roleLabel: "Kasir Shift Pagi",
     pin: "1234",
-  },
-  {
-    id: "staff-3",
-    name: "Siti Rahma",
-    role: "cashier",
-    roleLabel: "Kasir Shift Siang",
-    pin: "5678",
+    email: "budi.kasir@macmood.id",
   },
 ];
 
 interface PosPinLockModalProps {
   isOpen: boolean;
-  activeStaffName: string;
-  onSuccessUnlock: (staff: StaffPinAccount) => void;
+  staff: StaffPinAccount;
+  onSuccessUnlock: () => void;
   onClose?: () => void;
   canDismiss?: boolean;
 }
 
 function PosPinLockModalContent({
-  activeStaffName,
+  staff,
   onSuccessUnlock,
   onClose,
   canDismiss = false,
 }: Omit<PosPinLockModalProps, "isOpen">) {
-  const [selectedStaff, setSelectedStaff] = useState<StaffPinAccount>(() => {
-    return (
-      DEMO_STAFF_PIN_ACCOUNTS.find((s) => s.name === activeStaffName) ||
-      DEMO_STAFF_PIN_ACCOUNTS[1]
-    );
-  });
   const [enteredPin, setEnteredPin] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const router = useRouter();
+  const navigate = useNavigate();
 
   const validatePin = useCallback(
-    (pin: string, staff: StaffPinAccount) => {
+    (pin: string) => {
       if (pin === staff.pin) {
         setIsSuccess(true);
         setTimeout(() => {
-          onSuccessUnlock(staff);
+          onSuccessUnlock();
           setIsSuccess(false);
           setEnteredPin("");
-        }, 400);
+        }, 350);
       } else {
         setErrorMsg("PIN salah. Silakan coba lagi.");
         setTimeout(() => {
@@ -74,7 +70,7 @@ function PosPinLockModalContent({
         }, 600);
       }
     },
-    [onSuccessUnlock]
+    [onSuccessUnlock, staff.pin]
   );
 
   // Handle number click
@@ -86,10 +82,10 @@ function PosPinLockModalContent({
       setErrorMsg("");
 
       if (newPin.length === 4) {
-        validatePin(newPin, selectedStaff);
+        validatePin(newPin);
       }
     },
-    [enteredPin, isSuccess, selectedStaff, validatePin]
+    [enteredPin, isSuccess, validatePin]
   );
 
   const handleDelete = useCallback(() => {
@@ -103,6 +99,19 @@ function PosPinLockModalContent({
     setEnteredPin("");
     setErrorMsg("");
   }, []);
+
+  const handleSignOut = async () => {
+    setIsLoggingOut(true);
+    try {
+      await authClient.signOut();
+      await router.invalidate();
+      await navigate({ to: "/sign-in", replace: true });
+    } catch {
+      window.location.href = "/sign-in";
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   // Keyboard numeric listener
   useEffect(() => {
@@ -119,6 +128,13 @@ function PosPinLockModalContent({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [canDismiss, handleDelete, handleDigit, onClose]);
+
+  const initials = staff.name
+    .split(" ")
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-green-950/85 backdrop-blur-md animate-in fade-in duration-200">
@@ -155,46 +171,35 @@ function PosPinLockModalContent({
         <h3 className="font-display font-black text-xl text-brand-green-950">
           {isSuccess ? "Layar Terbuka!" : "Layar Kasir Terkunci"}
         </h3>
-        <p className="text-xs text-neutral-500 mt-1 mb-4">
-          Pilih profil staf & masukkan 4-digit PIN untuk melayani pesanan
-        </p>
 
-        {/* Staff Switcher Pills */}
-        <div className="flex items-center gap-1.5 p-1 bg-brand-cream-100/80 rounded-2xl border border-brand-green-900/10 mb-5 w-full justify-center">
-          {DEMO_STAFF_PIN_ACCOUNTS.map((staff) => {
-            const isSelected = selectedStaff.id === staff.id;
-            return (
-              <button
-                key={staff.id}
-                type="button"
-                onClick={() => {
-                  setSelectedStaff(staff);
-                  setEnteredPin("");
-                  setErrorMsg("");
-                }}
-                className={`flex-1 flex flex-col items-center py-2 px-1.5 rounded-xl transition-all cursor-pointer ${
-                  isSelected
-                    ? "bg-brand-green-900 text-white shadow-xs"
-                    : "text-neutral-600 hover:text-neutral-900 hover:bg-white/60"
+        {/* Active Authenticated Staff Card (1-User representation) */}
+        <div className="mt-3 mb-4 w-full p-3 rounded-2xl bg-brand-cream-50 border border-brand-green-900/10 flex items-center gap-3 text-left">
+          <div className="size-10 rounded-xl bg-brand-green-900 text-brand-yellow-400 font-display font-black text-sm flex items-center justify-center shrink-0 shadow-xs">
+            {initials || <User className="size-5" />}
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center justify-between gap-1">
+              <p className="font-extrabold text-sm text-brand-green-950 truncate">
+                {staff.name}
+              </p>
+              <span
+                className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full shrink-0 ${
+                  staff.role === "owner"
+                    ? "bg-amber-100 text-amber-900 border border-amber-300"
+                    : "bg-emerald-100 text-emerald-900 border border-emerald-300"
                 }`}
               >
-                <span className="text-xs font-extrabold truncate max-w-[90px]">
-                  {staff.name.split(" ")[0]}
-                </span>
-                <span
-                  className={`text-[9px] font-semibold uppercase tracking-wider truncate max-w-[90px] ${
-                    isSelected ? "text-brand-yellow-300" : "text-neutral-400"
-                  }`}
-                >
-                  {staff.role === "owner" ? "Owner" : "Kasir"}
-                </span>
-              </button>
-            );
-          })}
+                {staff.role === "owner" ? "Owner" : "Kasir"}
+              </span>
+            </div>
+            <p className="text-[11px] text-neutral-500 truncate">
+              {staff.roleLabel}
+            </p>
+          </div>
         </div>
 
         {/* PIN Dots (Masked Display) */}
-        <div className="flex items-center justify-center gap-3 mb-4 h-8">
+        <div className="flex items-center justify-center gap-3 mb-3 h-8">
           {[0, 1, 2, 3].map((idx) => {
             const isFilled = enteredPin.length > idx;
             return (
@@ -225,11 +230,14 @@ function PosPinLockModalContent({
           ) : isSuccess ? (
             <span className="text-xs font-bold text-emerald-600 flex items-center justify-center gap-1">
               <ShieldCheck className="size-3.5" />
-              Selamat bertugas, {selectedStaff.name.split(" ")[0]}!
+              Selamat bertugas, {staff.name.split(" ")[0]}!
             </span>
           ) : (
             <span className="text-[11px] text-neutral-400">
-              Demo PIN: <strong className="text-neutral-600 font-mono">{selectedStaff.pin}</strong>
+              Demo PIN {staff.name.split(" ")[0]}:{" "}
+              <strong className="text-brand-green-900 font-mono bg-brand-cream-100 px-1.5 py-0.5 rounded">
+                {staff.pin}
+              </strong>
             </span>
           )}
         </div>
@@ -273,6 +281,20 @@ function PosPinLockModalContent({
             <Delete className="size-5" />
           </button>
         </div>
+
+        {/* Switch Account / Logout footer */}
+        <div className="mt-5 pt-3 border-t border-neutral-100 w-full flex items-center justify-between text-xs">
+          <span className="text-neutral-400">Bukan {staff.name.split(" ")[0]}?</span>
+          <button
+            type="button"
+            onClick={handleSignOut}
+            disabled={isLoggingOut}
+            className="text-amber-800 hover:text-amber-950 font-bold hover:underline cursor-pointer flex items-center gap-1.5 transition-colors"
+          >
+            <LogOut className="size-3.5" />
+            <span>{isLoggingOut ? "Keluar..." : "Ganti Akun / Logout"}</span>
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -282,3 +304,4 @@ export function PosPinLockModal(props: PosPinLockModalProps) {
   if (!props.isOpen) return null;
   return <PosPinLockModalContent {...props} />;
 }
+

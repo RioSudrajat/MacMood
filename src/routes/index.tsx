@@ -114,10 +114,11 @@ function LandingPage() {
       if (isSmallScreen) {
         const heroRect = heroSection.getBoundingClientRect();
         const heroOpacity = clamp((heroRect.bottom - headerHeight) / 90, 0, 1);
-        sharedFoodStage.style.left = source.left + "px";
-        sharedFoodStage.style.top = source.top + "px";
-        sharedFoodStage.style.width = source.width + "px";
-        sharedFoodStage.style.height = source.height + "px";
+        sharedFoodStage.style.left = "0px";
+        sharedFoodStage.style.top = "0px";
+        sharedFoodStage.style.transform = `translate3d(${source.left.toFixed(2)}px, ${source.top.toFixed(2)}px, 0)`;
+        sharedFoodStage.style.width = source.width.toFixed(2) + "px";
+        sharedFoodStage.style.height = source.height.toFixed(2) + "px";
         sharedFoodStage.style.opacity = heroOpacity.toFixed(3);
         sharedFoodStage.classList.add("is-ready");
         return;
@@ -141,10 +142,11 @@ function LandingPage() {
       const fadeRange = Math.max(100, window.innerHeight * 0.16);
       const sceneOpacity = clamp((storySectionBottom - headerHeight) / fadeRange, 0, 1);
 
-      sharedFoodStage.style.left = x + "px";
-      sharedFoodStage.style.top = y + "px";
-      sharedFoodStage.style.width = width + "px";
-      sharedFoodStage.style.height = height + "px";
+      sharedFoodStage.style.left = "0px";
+      sharedFoodStage.style.top = "0px";
+      sharedFoodStage.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0)`;
+      sharedFoodStage.style.width = width.toFixed(2) + "px";
+      sharedFoodStage.style.height = height.toFixed(2) + "px";
       sharedFoodStage.style.opacity = sceneOpacity.toFixed(3);
       sharedFoodStage.classList.add("is-ready");
     }
@@ -234,10 +236,14 @@ function LandingPage() {
       if (reduceMotion.matches || !sharedFoodModel) return;
       sharedFoodModel.removeAttribute("auto-rotate");
       window.clearTimeout(autoRotateTimer);
-      autoRotateTimer = window.setTimeout(
-        () => sharedFoodModel.setAttribute("auto-rotate", ""),
-        240
-      );
+      // Only resume gentle auto-rotate if the user is stationary at the top of the hero section for 1.2s
+      if (window.scrollY <= 20) {
+        autoRotateTimer = window.setTimeout(() => {
+          if (window.scrollY <= 20 && !reduceMotion.matches && sharedFoodModel) {
+            sharedFoodModel.setAttribute("auto-rotate", "");
+          }
+        }, 1200);
+      }
     }
 
     function requestScrollUpdate() {
@@ -251,6 +257,12 @@ function LandingPage() {
     window.addEventListener("scroll", requestScrollUpdate, { passive: true });
     window.addEventListener("resize", requestScrollUpdate, { passive: true });
     window.addEventListener("pageshow", requestScrollUpdate);
+
+    // Sync directly with Lenis smooth scroll engine
+    const lenis = (window as unknown as { __lenis?: { on: (event: string, callback: () => void) => void; off: (event: string, callback: () => void) => void } }).__lenis;
+    if (lenis) {
+      lenis.on("scroll", requestScrollUpdate);
+    }
 
     // If models are already loaded or trigger load
     sharedFoodModel?.addEventListener?.("load", requestScrollUpdate);

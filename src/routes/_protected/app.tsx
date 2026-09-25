@@ -26,7 +26,6 @@ import type { PosTab } from "@/components/pos/pos-sidebar";
 import { PosReceiptModal } from "@/components/pos/pos-receipt-modal";
 import {
   PosPinLockModal,
-  DEMO_STAFF_PIN_ACCOUNTS,
   type StaffPinAccount,
 } from "@/components/pos/pos-pin-lock-modal";
 import { TopBar } from "@/components/common/top-bar";
@@ -50,22 +49,20 @@ function subscribeNetwork(callback: () => void) {
 export function PosAppPage() {
   const { session } = Route.useRouteContext();
 
-  // Active Staff & Fast PIN Switch State
-  const [activeStaff, setActiveStaff] = useState<StaffPinAccount>(() => {
-    const isOwner =
-      session.user.role === "admin" ||
-      session.user.name?.toLowerCase().includes("afrizal");
-    if (isOwner) {
-      return (
-        DEMO_STAFF_PIN_ACCOUNTS.find((s) => s.role === "owner") ||
-        DEMO_STAFF_PIN_ACCOUNTS[0]
-      );
-    }
-    const matched = DEMO_STAFF_PIN_ACCOUNTS.find(
-      (s) => s.name.toLowerCase() === session.user.name?.toLowerCase()
-    );
-    return matched || DEMO_STAFF_PIN_ACCOUNTS[1]; // default Budi Santoso
-  });
+  // Active Staff & Fast PIN State (Strictly 1 session = 1 authenticated staff)
+  const isOwner =
+    session.user.role === "admin" ||
+    session.user.name?.toLowerCase().includes("afrizal");
+
+  const activeStaff: StaffPinAccount = {
+    id: session.user.id,
+    name: session.user.name || (isOwner ? "Muhammad Afrizal" : "Budi Santoso"),
+    role: isOwner ? "owner" : "cashier",
+    roleLabel: isOwner ? "Business Owner" : "Kasir Shift Pagi",
+    pin: isOwner ? "8899" : "1234",
+    email: session.user.email,
+  };
+
   const [isPinLockOpen, setIsPinLockOpen] = useState(false);
   const cashierName = activeStaff.name;
 
@@ -616,6 +613,7 @@ export function PosAppPage() {
         isMobileOpen={isMobileSidebarOpen}
         onMobileClose={() => setIsMobileSidebarOpen(false)}
         onLockScreen={() => setIsPinLockOpen(true)}
+        isOwner={session.user.role === "admin"}
       />
 
       {/* Main View Area (Right side) */}
@@ -736,15 +734,10 @@ export function PosAppPage() {
       {/* Fast Cashier PIN Screen Lock Modal */}
       <PosPinLockModal
         isOpen={isPinLockOpen}
-        activeStaffName={activeStaff.name}
+        staff={activeStaff}
         canDismiss={true}
         onClose={() => setIsPinLockOpen(false)}
-        onSuccessUnlock={(unlockedStaff) => {
-          setActiveStaff(unlockedStaff);
-          setShift((prev) => ({
-            ...prev,
-            cashierName: unlockedStaff.name,
-          }));
+        onSuccessUnlock={() => {
           setIsPinLockOpen(false);
         }}
       />
