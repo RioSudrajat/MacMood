@@ -26,7 +26,7 @@ export interface OrderItemSnapshot {
   notes?: string;
 }
 
-export type PaymentMethod = "CASH" | "QRIS_MANUAL";
+export type PaymentMethod = "CASH" | "QRIS_MANUAL" | "QRIS";
 export type OrderStatus = "PAID" | "VOID";
 export type SyncStatus = "SYNCED" | "PENDING_SYNC";
 
@@ -45,7 +45,10 @@ export interface CompletedOrder {
   change: number;
   timestamp: string;
   dateStr: string;
+  createdAt?: string;
   cashierName: string;
+  branchId?: string;
+  branchName?: string;
   syncStatus: SyncStatus;
   status: OrderStatus;
   voidReason?: string;

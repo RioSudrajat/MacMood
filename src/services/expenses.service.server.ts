@@ -4,9 +4,13 @@ import { ensureSeededData } from "./seed.service.server";
 import { desc, eq, sql } from "drizzle-orm";
 import type { CreateExpenseInput } from "@/validators/expenses";
 
-export async function listExpenses() {
+export async function listExpenses(branchId?: string) {
   await ensureSeededData();
-  return db.select().from(expenses).orderBy(desc(expenses.createdAt));
+  const query = db.select().from(expenses);
+  if (branchId && branchId !== "all") {
+    query.where(eq(expenses.branchId, branchId));
+  }
+  return query.orderBy(desc(expenses.createdAt));
 }
 
 export async function createExpense(input: CreateExpenseInput, userId?: string) {
@@ -16,6 +20,8 @@ export async function createExpense(input: CreateExpenseInput, userId?: string) 
     .insert(expenses)
     .values({
       userId: userId || null,
+      branchId: input.branchId || null,
+      branchName: input.branchName || null,
       title: input.title,
       amount: input.amount,
       category: input.category,
@@ -26,12 +32,16 @@ export async function createExpense(input: CreateExpenseInput, userId?: string) 
     })
     .returning();
 
-  // If paid from cash drawer, deduct from open shift's expectedCash
+  // If paid from cash drawer, deduct from open shift's expectedCash (for this branch if provided)
   if (input.paymentSource === "CASH_DRAWER") {
+    const conditions = [eq(shifts.status, "OPEN")];
+    if (input.branchId) {
+      conditions.push(eq(shifts.branchId, input.branchId));
+    }
     const [openShift] = await db
       .select()
       .from(shifts)
-      .where(eq(shifts.status, "OPEN"))
+      .where(conditions.length > 1 ? sql`${shifts.status} = 'OPEN' AND ${shifts.branchId} = ${input.branchId}` : eq(shifts.status, "OPEN"))
       .orderBy(desc(shifts.startTime))
       .limit(1);
 
@@ -44,6 +54,7 @@ export async function createExpense(input: CreateExpenseInput, userId?: string) 
         .where(eq(shifts.id, openShift.id));
     }
   }
+
 
   return newExpense;
 }

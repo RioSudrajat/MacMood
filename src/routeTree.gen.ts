@@ -19,6 +19,8 @@ import { Route as ProtectedAppRouteImport } from './routes/_protected/app'
 import { Route as ApiAnalyticsIndexRouteImport } from './routes/api/analytics/index'
 import { Route as ApiAuditLogsIndexRouteImport } from './routes/api/audit-logs/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ApiBranchesIndexRouteImport } from './routes/api/branches/index'
+import { Route as ApiBranchesIdRouteImport } from './routes/api/branches/$id'
 import { Route as ApiExpensesIndexRouteImport } from './routes/api/expenses/index'
 import { Route as ApiNotesIndexRouteImport } from './routes/api/notes/index'
 import { Route as ApiNotesIdRouteImport } from './routes/api/notes/$id'
@@ -82,6 +84,16 @@ const ApiAuditLogsIndexRoute = ApiAuditLogsIndexRouteImport.update({
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiBranchesIndexRoute = ApiBranchesIndexRouteImport.update({
+  id: '/api/branches/',
+  path: '/api/branches/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiBranchesIdRoute = ApiBranchesIdRouteImport.update({
+  id: '/api/branches/$id',
+  path: '/api/branches/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiExpensesIndexRoute = ApiExpensesIndexRouteImport.update({
@@ -176,10 +188,12 @@ export interface FileRoutesByFullPath {
   '/admin': typeof ProtectedAdminRoute
   '/app': typeof ProtectedAppRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/branches/$id': typeof ApiBranchesIdRoute
   '/api/notes/$id': typeof ApiNotesIdRoute
   '/api/promos/validate': typeof ApiPromosValidateRoute
   '/api/analytics/': typeof ApiAnalyticsIndexRoute
   '/api/audit-logs/': typeof ApiAuditLogsIndexRoute
+  '/api/branches/': typeof ApiBranchesIndexRoute
   '/api/expenses/': typeof ApiExpensesIndexRoute
   '/api/notes/': typeof ApiNotesIndexRoute
   '/api/promos/': typeof ApiPromosIndexRoute
@@ -202,10 +216,12 @@ export interface FileRoutesByTo {
   '/admin': typeof ProtectedAdminRoute
   '/app': typeof ProtectedAppRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/branches/$id': typeof ApiBranchesIdRoute
   '/api/notes/$id': typeof ApiNotesIdRoute
   '/api/promos/validate': typeof ApiPromosValidateRoute
   '/api/analytics': typeof ApiAnalyticsIndexRoute
   '/api/audit-logs': typeof ApiAuditLogsIndexRoute
+  '/api/branches': typeof ApiBranchesIndexRoute
   '/api/expenses': typeof ApiExpensesIndexRoute
   '/api/notes': typeof ApiNotesIndexRoute
   '/api/promos': typeof ApiPromosIndexRoute
@@ -231,10 +247,12 @@ export interface FileRoutesById {
   '/_protected/admin': typeof ProtectedAdminRoute
   '/_protected/app': typeof ProtectedAppRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/branches/$id': typeof ApiBranchesIdRoute
   '/api/notes/$id': typeof ApiNotesIdRoute
   '/api/promos/validate': typeof ApiPromosValidateRoute
   '/api/analytics/': typeof ApiAnalyticsIndexRoute
   '/api/audit-logs/': typeof ApiAuditLogsIndexRoute
+  '/api/branches/': typeof ApiBranchesIndexRoute
   '/api/expenses/': typeof ApiExpensesIndexRoute
   '/api/notes/': typeof ApiNotesIndexRoute
   '/api/promos/': typeof ApiPromosIndexRoute
@@ -259,10 +277,12 @@ export interface FileRouteTypes {
     | '/admin'
     | '/app'
     | '/api/auth/$'
+    | '/api/branches/$id'
     | '/api/notes/$id'
     | '/api/promos/validate'
     | '/api/analytics/'
     | '/api/audit-logs/'
+    | '/api/branches/'
     | '/api/expenses/'
     | '/api/notes/'
     | '/api/promos/'
@@ -285,10 +305,12 @@ export interface FileRouteTypes {
     | '/admin'
     | '/app'
     | '/api/auth/$'
+    | '/api/branches/$id'
     | '/api/notes/$id'
     | '/api/promos/validate'
     | '/api/analytics'
     | '/api/audit-logs'
+    | '/api/branches'
     | '/api/expenses'
     | '/api/notes'
     | '/api/promos'
@@ -313,10 +335,12 @@ export interface FileRouteTypes {
     | '/_protected/admin'
     | '/_protected/app'
     | '/api/auth/$'
+    | '/api/branches/$id'
     | '/api/notes/$id'
     | '/api/promos/validate'
     | '/api/analytics/'
     | '/api/audit-logs/'
+    | '/api/branches/'
     | '/api/expenses/'
     | '/api/notes/'
     | '/api/promos/'
@@ -338,10 +362,12 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRouteWithChildren
   ProtectedRoute: typeof ProtectedRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiBranchesIdRoute: typeof ApiBranchesIdRoute
   ApiNotesIdRoute: typeof ApiNotesIdRoute
   ApiPromosValidateRoute: typeof ApiPromosValidateRoute
   ApiAnalyticsIndexRoute: typeof ApiAnalyticsIndexRoute
   ApiAuditLogsIndexRoute: typeof ApiAuditLogsIndexRoute
+  ApiBranchesIndexRoute: typeof ApiBranchesIndexRoute
   ApiExpensesIndexRoute: typeof ApiExpensesIndexRoute
   ApiNotesIndexRoute: typeof ApiNotesIndexRoute
   ApiPromosIndexRoute: typeof ApiPromosIndexRoute
@@ -428,6 +454,20 @@ declare module '@tanstack/react-router' {
       path: '/api/auth/$'
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/branches/': {
+      id: '/api/branches/'
+      path: '/api/branches'
+      fullPath: '/api/branches/'
+      preLoaderRoute: typeof ApiBranchesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/branches/$id': {
+      id: '/api/branches/$id'
+      path: '/api/branches/$id'
+      fullPath: '/api/branches/$id'
+      preLoaderRoute: typeof ApiBranchesIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/expenses/': {
@@ -576,10 +616,12 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRouteWithChildren,
   ProtectedRoute: ProtectedRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiBranchesIdRoute: ApiBranchesIdRoute,
   ApiNotesIdRoute: ApiNotesIdRoute,
   ApiPromosValidateRoute: ApiPromosValidateRoute,
   ApiAnalyticsIndexRoute: ApiAnalyticsIndexRoute,
   ApiAuditLogsIndexRoute: ApiAuditLogsIndexRoute,
+  ApiBranchesIndexRoute: ApiBranchesIndexRoute,
   ApiExpensesIndexRoute: ApiExpensesIndexRoute,
   ApiNotesIndexRoute: ApiNotesIndexRoute,
   ApiPromosIndexRoute: ApiPromosIndexRoute,

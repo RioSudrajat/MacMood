@@ -16,6 +16,7 @@ import type {
   RawMaterialCategory,
   RawMaterialUnit,
   ProductRecipe,
+  BranchOutlet,
 } from "@/components/admin/types";
 import {
   INITIAL_ADMIN_PRODUCTS,
@@ -28,10 +29,12 @@ import {
   INITIAL_PROMOS,
   INITIAL_RAW_MATERIALS,
   INITIAL_PRODUCT_RECIPES,
+  INITIAL_BRANCHES,
 } from "@/components/admin/mock-data";
 import { INITIAL_ORDERS } from "@/components/pos/mock-data";
 import type { CompletedOrder } from "@/components/pos/types";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
+import { AdminPosAccessModal } from "@/components/admin/admin-pos-access-modal";
 import { AdminAnalyticsView } from "@/components/admin/admin-analytics-view";
 import { AdminProductsView } from "@/components/admin/admin-products-view";
 import { AdminInventoryView } from "@/components/admin/admin-inventory-view";
@@ -105,7 +108,17 @@ export function AdminDashboardPage() {
   // Shared Data States
   const [products, setProducts] = useState<AdminProduct[]>(INITIAL_ADMIN_PRODUCTS);
   const [stockLogs, setStockLogs] = useState<StockLog[]>(INITIAL_STOCK_LOGS);
-  const [orders, setOrders] = useState<CompletedOrder[]>(INITIAL_ORDERS);
+  const [orders, setOrders] = useState<CompletedOrder[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("macmood_offline_orders");
+        if (saved) return JSON.parse(saved);
+      } catch (e) {
+        console.warn("Failed to load cached orders in admin:", e);
+      }
+    }
+    return INITIAL_ORDERS;
+  });
   const [staffAccounts, setStaffAccounts] = useState<StaffAccount[]>(INITIAL_STAFF_ACCOUNTS);
   const [settings, setSettings] = useState<OutletSettings>(INITIAL_OUTLET_SETTINGS);
   const [shifts, setShifts] = useState<ShiftRecord[]>(INITIAL_SHIFTS);
@@ -114,13 +127,25 @@ export function AdminDashboardPage() {
   const [promos, setPromos] = useState<PromoVoucher[]>(INITIAL_PROMOS);
   const [rawMaterials, setRawMaterials] = useState<RawMaterial[]>(INITIAL_RAW_MATERIALS);
   const [recipes, setRecipes] = useState<ProductRecipe[]>(INITIAL_PRODUCT_RECIPES);
+  const [branches, setBranches] = useState<BranchOutlet[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("macmood_branches");
+        if (saved) return JSON.parse(saved);
+      } catch (e) {
+        console.warn("Failed to load cached branches:", e);
+      }
+    }
+    return INITIAL_BRANCHES;
+  });
+  const [isPosAccessModalOpen, setIsPosAccessModalOpen] = useState(false);
 
   // Load live data from PostgreSQL Backend
   useEffect(() => {
     let isMounted = true;
     async function loadAdminData() {
       try {
-        const [prodRes, orderRes, shiftRes, expRes, promoRes, matRes, recipeRes, auditRes] =
+        const [prodRes, orderRes, shiftRes, expRes, promoRes, matRes, recipeRes, auditRes, branchRes] =
           await Promise.allSettled([
             fetch("/api/catalog/products").then((r) => r.json()),
             fetch("/api/pos/orders?limit=50").then((r) => r.json()),
@@ -130,6 +155,7 @@ export function AdminDashboardPage() {
             fetch("/api/inventory/materials").then((r) => r.json()),
             fetch("/api/inventory/recipes").then((r) => r.json()),
             fetch("/api/audit-logs").then((r) => r.json()),
+            fetch("/api/branches").then((r) => r.json()),
           ]);
 
         if (!isMounted) return;
@@ -146,6 +172,9 @@ export function AdminDashboardPage() {
               trackStock: boolean;
               isAvailable: boolean;
               imageUrl?: string;
+              soldCount?: number;
+              branchSoldCounts?: Record<string, number>;
+              branchStocks?: Record<string, number>;
             }>).map((p) => {
               const category: "mac" | "sides" | "drinks" =
                 p.categorySlug === "sides" || p.categorySlug === "drinks" ? p.categorySlug : "mac";
@@ -163,64 +192,96 @@ export function AdminDashboardPage() {
                 lowStockThreshold: 10,
                 trackStock: p.trackStock,
                 isAvailable: p.isAvailable,
-                soldCount: 0,
+                soldCount: p.soldCount ?? 0,
+                branchSoldCounts: p.branchSoldCounts || {},
+                branchStocks: p.branchStocks,
               };
             })
           );
         }
 
         if (orderRes.status === "fulfilled" && orderRes.value?.data?.length > 0) {
-          setOrders(
-            (orderRes.value.data as Array<{
-              id: string;
-              orderNumber: string;
-              items?: Array<{
-                productId?: string;
-                productName: string;
-                quantity: number;
-                price: number;
-                subtotal: number;
-                notes?: string;
-              }>;
+          const backendOrders = (orderRes.value.data as Array<{
+            id: string;
+            orderNumber: string;
+            branchId?: string;
+            branchName?: string;
+            items?: Array<{
+              productId?: string;
+              productName: string;
+              quantity: number;
+              price: number;
               subtotal: number;
-              discount?: number;
-              promoCode?: string;
-              promoName?: string;
-              tax: number;
-              total: number;
-              paymentMethod: CompletedOrder["paymentMethod"];
-              amountTendered?: number;
-              changeAmount?: number;
-              createdAt: string;
-              cashierName: string;
-              syncStatus?: "SYNCED" | "PENDING_SYNC";
-              paymentStatus?: "PAID" | "REFUNDED" | "VOID";
-            }>).map((o) => ({
-              id: o.id,
-              orderNumber: o.orderNumber,
-              items: (o.items || []).map((it) => ({
-                productId: it.productId || it.productName,
-                name: it.productName,
-                quantity: it.quantity,
-                price: it.price,
-                subtotal: it.subtotal,
-                notes: it.notes,
-              })),
-              subtotal: o.subtotal,
-              discount: o.discount || 0,
-              promoCode: o.promoCode,
-              promoName: o.promoName,
-              tax: o.tax,
-              total: o.total,
-              paymentMethod: o.paymentMethod,
-              amountTendered: o.amountTendered || o.total,
-              change: o.changeAmount || 0,
-              timestamp: new Date(o.createdAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB",
-              dateStr: new Date(o.createdAt).toISOString().slice(0, 10),
-              cashierName: o.cashierName,
-              syncStatus: o.syncStatus || "SYNCED",
-              status: (o.paymentStatus === "REFUNDED" ? "VOID" : o.paymentStatus || "PAID") as CompletedOrder["status"],
-            }))
+              notes?: string;
+            }>;
+            subtotal: number;
+            discount?: number;
+            promoCode?: string;
+            promoName?: string;
+            tax: number;
+            total: number;
+            paymentMethod: CompletedOrder["paymentMethod"];
+            amountTendered?: number;
+            changeAmount?: number;
+            createdAt: string;
+            cashierName: string;
+            syncStatus?: "SYNCED" | "PENDING_SYNC";
+            paymentStatus?: "PAID" | "REFUNDED" | "VOID";
+          }>).map((o) => ({
+            id: o.id,
+            orderNumber: o.orderNumber,
+            branchId: o.branchId || (o.cashierName?.includes("Tebet") ? "branch-3" : o.cashierName?.includes("Margonda") ? "branch-2" : "branch-1"),
+            branchName: o.branchName || (o.cashierName?.includes("Tebet") ? "MacMood Kitchen - Tebet" : o.cashierName?.includes("Margonda") ? "MacMood Express - Margonda" : "MacMood Pusat - Fatmawati"),
+            items: (o.items || []).map((it) => ({
+              productId: it.productId || it.productName,
+              name: it.productName,
+              quantity: it.quantity,
+              price: it.price,
+              subtotal: it.subtotal,
+              notes: it.notes,
+            })),
+            subtotal: o.subtotal,
+            discount: o.discount || 0,
+            promoCode: o.promoCode,
+            promoName: o.promoName,
+            tax: o.tax,
+            total: o.total,
+            paymentMethod: o.paymentMethod,
+            amountTendered: o.amountTendered || o.total,
+            change: o.changeAmount || 0,
+            timestamp: new Date(o.createdAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB",
+            dateStr: new Date(o.createdAt).toISOString().slice(0, 10),
+            cashierName: o.cashierName,
+            syncStatus: o.syncStatus || "SYNCED",
+            status: (o.paymentStatus === "REFUNDED" ? "VOID" : o.paymentStatus || "PAID") as CompletedOrder["status"],
+          }));
+          setOrders(backendOrders);
+
+          // Sync soldCounts from loaded orders
+          const orderSoldMap = new Map<string, { total: number; byBranch: Record<string, number> }>();
+          for (const o of backendOrders) {
+            if (o.status !== "VOID") {
+              for (const it of o.items) {
+                const key = it.name;
+                const cur = orderSoldMap.get(key) || { total: 0, byBranch: {} };
+                cur.total += it.quantity;
+                if (o.branchId) {
+                  cur.byBranch[o.branchId] = (cur.byBranch[o.branchId] || 0) + it.quantity;
+                }
+                orderSoldMap.set(key, cur);
+              }
+            }
+          }
+
+          setProducts((prev) =>
+            prev.map((p) => {
+              const fromOrders = orderSoldMap.get(p.name);
+              return {
+                ...p,
+                soldCount: fromOrders ? fromOrders.total : p.soldCount,
+                branchSoldCounts: fromOrders ? fromOrders.byBranch : p.branchSoldCounts,
+              };
+            })
           );
         }
 
@@ -261,7 +322,7 @@ export function AdminDashboardPage() {
               notes?: string;
             }>;
           };
-          const shiftList: Array<{
+          const shiftMap = new Map<string, {
             id: string;
             staffName: string;
             shiftCode: string;
@@ -277,15 +338,40 @@ export function AdminDashboardPage() {
             status: "OPEN" | "CLOSED";
             isVerified?: boolean;
             notes?: string;
-          }> = [];
-          if (val.active) shiftList.push(val.active);
-          if (val.past) shiftList.push(...val.past);
+          }>();
+
+          if (val.active) shiftMap.set(val.active.id, val.active);
+          if (val.past && Array.isArray(val.past)) {
+            val.past.forEach((s) => {
+              if (!shiftMap.has(s.id)) shiftMap.set(s.id, s);
+            });
+          }
+
+          const shiftList = Array.from(shiftMap.values());
 
           if (shiftList.length > 0) {
-            setShifts(
-              shiftList.map((s) => ({
+            const mappedBackendShifts: ShiftRecord[] = shiftList.map((s) => {
+              let branchId = "branch-1";
+              let branchName = "MacMood Pusat - Fatmawati";
+              let branchCode = "MAC-JKT-01";
+
+              const nameLower = (s.staffName || "").toLowerCase();
+              if (nameLower.includes("margonda") || nameLower.includes("rian") || nameLower.includes("outlet 2")) {
+                branchId = "branch-2";
+                branchName = "MacMood Express - Margonda";
+                branchCode = "MAC-DPK-01";
+              } else if (nameLower.includes("tebet") || nameLower.includes("siti") || nameLower.includes("outlet 3")) {
+                branchId = "branch-3";
+                branchName = "MacMood Kitchen - Tebet";
+                branchCode = "MAC-JKT-02";
+              }
+
+              return {
                 id: s.id,
-                shiftName: `Shift ${s.shiftCode}`,
+                shiftName: `Rekap Harian · ${branchName.replace("MacMood ", "")}`,
+                branchId,
+                branchName,
+                branchCode,
                 cashierId: s.staffName,
                 cashierName: s.staffName,
                 startTime: new Date(s.startTime).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB",
@@ -301,8 +387,10 @@ export function AdminDashboardPage() {
                 status: s.status as "OPEN" | "CLOSED",
                 notes: s.notes || "",
                 verifiedByOwner: s.isVerified || false,
-              }))
-            );
+              };
+            });
+
+            setShifts(mappedBackendShifts);
           }
         }
 
@@ -497,7 +585,15 @@ export function AdminDashboardPage() {
                 entityType,
                 entityId: a.entityId || "",
                 performedBy: a.userName,
-                userRole: (a.userRole === "cashier" ? "cashier" : "owner") as "owner" | "cashier",
+                userRole: (
+                  (a.userRole?.toLowerCase() === "owner" || a.userName.toLowerCase().includes("afrizal")) &&
+                  !a.userName.toLowerCase().includes("budi") &&
+                  !a.userName.toLowerCase().includes("rian") &&
+                  !a.userName.toLowerCase().includes("siti") &&
+                  !a.userName.toLowerCase().includes("kasir")
+                    ? "owner"
+                    : "cashier"
+                ) as "owner" | "cashier",
                 details: {
                   title: a.actionLabel,
                   before: a.oldValue || "-",
@@ -507,6 +603,46 @@ export function AdminDashboardPage() {
               };
             })
           );
+        }
+
+        if (branchRes.status === "fulfilled" && branchRes.value?.data?.length > 0) {
+          const mappedBranches: BranchOutlet[] = (branchRes.value.data as Array<{
+            id: string;
+            name: string;
+            branchCode: string;
+            address: string;
+            city: string;
+            phone: string;
+            email?: string;
+            pin?: string;
+            isActive?: boolean;
+            taxRate?: number;
+            serviceChargeRate?: number;
+            qrisMerchantName?: string;
+            qrisNmid?: string;
+            bankAccount?: string;
+            bankName?: string;
+          }>).map((b) => ({
+            id: b.id,
+            name: b.name,
+            branchCode: b.branchCode,
+            code: b.branchCode,
+            address: b.address,
+            city: b.city,
+            phone: b.phone,
+            email: b.email || `${b.branchCode.toLowerCase()}@macmood.id`,
+            pin: b.pin || "1234",
+            isActive: b.isActive !== false,
+            taxRate: b.taxRate ?? 10,
+            serviceChargeRate: b.serviceChargeRate ?? 0,
+            qrisMerchantName: b.qrisMerchantName || b.name,
+            qrisNmid: b.qrisNmid || "ID1020030040",
+            bankAccount: b.bankAccount || "BCA 8830-1928-33",
+            bankName: b.bankName || "BCA",
+            posCount: 1,
+            deviceCount: 1,
+          }));
+          setBranches(mappedBranches);
         }
       } catch (err) {
         console.warn("Using offline fallback data for admin suite:", err);
@@ -593,16 +729,31 @@ export function AdminDashboardPage() {
     delta: number,
     reason: StockMutationReason,
     notes: string,
-    staff: string
+    staff: string,
+    branchId?: string,
+    branchName?: string
   ) => {
     const target = products.find((p) => p.id === productId);
     if (!target) return;
 
     const newStock = Math.max(0, target.currentStock + delta);
+    const updatedBranchStocks = { ...(target.branchStocks || {}) };
+    if (branchId) {
+      const curBranchStock = updatedBranchStocks[branchId] ?? Math.round(target.currentStock / 3);
+      updatedBranchStocks[branchId] = Math.max(0, curBranchStock + delta);
+    }
 
     // Update product stock
     setProducts((prev) =>
-      prev.map((p) => (p.id === productId ? { ...p, currentStock: newStock } : p))
+      prev.map((p) =>
+        p.id === productId
+          ? {
+              ...p,
+              currentStock: newStock,
+              branchStocks: updatedBranchStocks,
+            }
+          : p
+      )
     );
 
     // Add log
@@ -612,6 +763,8 @@ export function AdminDashboardPage() {
       productName: target.name,
       quantityChange: delta,
       finalStock: newStock,
+      branchId,
+      branchName,
       reason,
       reasonLabel:
         reason === "RESTOCK"
@@ -776,6 +929,244 @@ export function AdminDashboardPage() {
     setStaffAccounts((prev) =>
       prev.map((s) => (s.id === staffId ? { ...s, isActive: !s.isActive } : s))
     );
+  };
+
+  const handleResetStaffPassword = (staffId: string, newPass: string) => {
+    const target = staffAccounts.find((s) => s.id === staffId);
+    if (target) {
+      const log: AuditLogRecord = {
+        id: `audit-${Date.now()}`,
+        timestamp: `${new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}, ${new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB`,
+        date: "24 Sep 2026",
+        time: `${new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB`,
+        action: "STAFF_PASSWORD_RESET",
+        actionLabel: "Reset Password Akun Staf",
+        entityType: "STAFF",
+        entityId: staffId,
+        performedBy: ownerName,
+        userRole: "owner",
+        details: {
+          title: `Reset Password Login Akun ${target.name}`,
+          before: "Password Lama",
+          after: `Password Baru Terenkripsi (${newPass.length} karakter)`,
+          reason: "Permintaan reset kredensial oleh owner",
+        },
+      };
+      setAuditLogs((prev) => [log, ...prev]);
+    }
+  };
+
+  const handleUpdateStaffBranch = (staffId: string, branchId: string, branchName: string) => {
+    setStaffAccounts((prev) =>
+      prev.map((s) => (s.id === staffId ? { ...s, branchId, branchName } : s))
+    );
+    const target = staffAccounts.find((s) => s.id === staffId);
+    if (target) {
+      const log: AuditLogRecord = {
+        id: `audit-${Date.now()}`,
+        timestamp: `${new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}, ${new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB`,
+        date: "24 Sep 2026",
+        time: `${new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB`,
+        action: "STAFF_BRANCH_REASSIGN",
+        actionLabel: "Mutasi Penugasan Cabang Staf",
+        entityType: "STAFF",
+        entityId: staffId,
+        performedBy: ownerName,
+        userRole: "owner",
+        details: {
+          title: `Penugasan Staf ${target.name} ke Cabang ${branchName}`,
+          before: target.branchName || "Cabang Belum Ditentukan",
+          after: branchName,
+          reason: "Rotasi penempatan staf kasir operasional",
+        },
+      };
+      setAuditLogs((prev) => [log, ...prev]);
+    }
+  };
+
+  const handleAddBranch = async (newBranchData: Omit<BranchOutlet, "id">) => {
+    let createdBranch: BranchOutlet = {
+      ...newBranchData,
+      id: `branch-${Date.now()}`,
+    };
+
+    try {
+      const res = await fetch("/api/branches", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: newBranchData.name,
+          branchCode: newBranchData.branchCode || newBranchData.code,
+          address: newBranchData.address,
+          city: newBranchData.city || "Jakarta",
+          phone: newBranchData.phone || "0812-9988-1234",
+          email: newBranchData.email || `${(newBranchData.branchCode || "cabang").toLowerCase()}@macmood.id`,
+          pin: newBranchData.pin || "1234",
+          isActive: newBranchData.isActive !== false,
+        }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json?.data?.id) {
+          createdBranch = {
+            ...createdBranch,
+            ...json.data,
+            branchCode: json.data.branchCode,
+            code: json.data.branchCode,
+          };
+        }
+      }
+    } catch (err) {
+      console.warn("Failed to create branch on backend:", err);
+    }
+
+    setBranches((prev) => {
+      const next = [...prev, createdBranch];
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("macmood_branches", JSON.stringify(next));
+        } catch (e) {
+          console.warn("Failed to persist branches:", e);
+        }
+      }
+      return next;
+    });
+
+    const log: AuditLogRecord = {
+      id: `audit-${Date.now()}`,
+      timestamp: `${new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}, ${new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB`,
+      date: "26 Sep 2026",
+      time: `${new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB`,
+      action: "BRANCH_CREATED",
+      actionLabel: "Penambahan Cabang Baru",
+      entityType: "SETTING",
+      entityId: createdBranch.id,
+      performedBy: ownerName,
+      userRole: "owner",
+      details: {
+        title: `Pembukaan Cabang Baru: ${createdBranch.name} (${createdBranch.branchCode || createdBranch.code})`,
+        before: "Belum Terdaftar",
+        after: `Lokasi: ${createdBranch.city}, Email Akun: ${createdBranch.email || "-"}`,
+        reason: "Ekspansi jaringan gerai MacMood",
+      },
+    };
+    setAuditLogs((prev) => [log, ...prev]);
+  };
+
+  const handleUpdateBranch = async (branchId: string, updates: Partial<BranchOutlet>) => {
+    try {
+      await fetch(`/api/branches/${branchId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: updates.name,
+          branchCode: updates.branchCode || updates.code,
+          address: updates.address,
+          city: updates.city,
+          phone: updates.phone,
+          email: updates.email,
+          pin: updates.pin,
+          isActive: updates.isActive,
+        }),
+      });
+    } catch (err) {
+      console.warn("Failed to update branch on backend:", err);
+    }
+
+    setBranches((prev) => {
+      const next = prev.map((b) => (b.id === branchId ? { ...b, ...updates } : b));
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("macmood_branches", JSON.stringify(next));
+        } catch (e) {
+          console.warn("Failed to persist branches:", e);
+        }
+      }
+      return next;
+    });
+
+    // Synchronize staff branchName if branch name updated
+    if (updates.name) {
+      setStaffAccounts((prev) =>
+        prev.map((s) => (s.branchId === branchId ? { ...s, branchName: updates.name } : s))
+      );
+    }
+
+    const target = branches.find((b) => b.id === branchId);
+    const log: AuditLogRecord = {
+      id: `audit-${Date.now()}`,
+      timestamp: `${new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}, ${new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB`,
+      date: "26 Sep 2026",
+      time: `${new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB`,
+      action: "OUTLET_SETTING_UPDATE",
+      actionLabel: "Pembaruan Informasi Cabang",
+      entityType: "SETTING",
+      entityId: branchId,
+      performedBy: ownerName,
+      userRole: "owner",
+      details: {
+        title: `Pembaruan Informasi Cabang: ${updates.name || target?.name}`,
+        before: `Kode: ${target?.branchCode || target?.code}, Email: ${target?.email || "-"}`,
+        after: `Kode: ${updates.branchCode || target?.branchCode}, Email: ${updates.email || target?.email || "-"}`,
+        reason: "Penyesuaian operasional gerai oleh owner",
+      },
+    };
+    setAuditLogs((prev) => [log, ...prev]);
+  };
+
+  const handleDeleteBranch = async (branchId: string) => {
+    if (branchId === "branch-1") return; // Flagship cannot be deleted
+
+    const target = branches.find((b) => b.id === branchId);
+
+    try {
+      await fetch(`/api/branches/${branchId}`, {
+        method: "DELETE",
+      });
+    } catch (err) {
+      console.warn("Failed to delete branch on backend:", err);
+    }
+
+    setBranches((prev) => {
+      const next = prev.filter((b) => b.id !== branchId);
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("macmood_branches", JSON.stringify(next));
+        } catch (e) {
+          console.warn("Failed to persist branches:", e);
+        }
+      }
+      return next;
+    });
+
+    // Reassign any staff on this deleted branch to Pusat
+    setStaffAccounts((prev) =>
+      prev.map((s) =>
+        s.branchId === branchId
+          ? { ...s, branchId: "branch-1", branchName: "MacMood Pusat - Fatmawati" }
+          : s
+      )
+    );
+
+    const log: AuditLogRecord = {
+      id: `audit-${Date.now()}`,
+      timestamp: `${new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}, ${new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB`,
+      date: "26 Sep 2026",
+      time: `${new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB`,
+      action: "OUTLET_SETTING_UPDATE",
+      actionLabel: "Penutupan / Penghapusan Cabang",
+      entityType: "SETTING",
+      entityId: branchId,
+      performedBy: ownerName,
+      userRole: "owner",
+      details: {
+        title: `Penghapusan Cabang: ${target?.name || branchId}`,
+        before: "Status: Cabang Aktif Terdaftar",
+        after: "Status: Dihapus (Kredensial dialihkan ke Pusat)",
+        reason: "Penutupan titik gerai oleh owner",
+      },
+    };
+    setAuditLogs((prev) => [log, ...prev]);
   };
 
   // Promo Handlers (PRD Fase 2)
@@ -1022,6 +1413,7 @@ export function AdminDashboardPage() {
         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         isMobileOpen={isMobileSidebarOpen}
         onMobileClose={() => setIsMobileSidebarOpen(false)}
+        onOpenPosAccessModal={() => setIsPosAccessModalOpen(true)}
       />
 
       {/* Main View Area (Right side) */}
@@ -1044,7 +1436,12 @@ export function AdminDashboardPage() {
         {/* Main Content Scroll Area */}
         <main className="flex-1 overflow-y-auto">
           {activeTab === "analytics" && (
-            <AdminAnalyticsView orders={orders} products={products} expenses={expenses} />
+            <AdminAnalyticsView
+              orders={orders}
+              products={products}
+              expenses={expenses}
+              branches={branches}
+            />
           )}
 
           {activeTab === "products" && (
@@ -1063,6 +1460,7 @@ export function AdminDashboardPage() {
               <AdminInventoryView
                 products={products}
                 stockLogs={stockLogs}
+                branches={branches}
                 onMutateStock={handleMutateStock}
               />
             </div>
@@ -1070,7 +1468,11 @@ export function AdminDashboardPage() {
 
           {activeTab === "transactions" && (
             <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full pb-12">
-              <AdminTransactionsView orders={orders} onVoidOrder={handleVoidOrder} />
+              <AdminTransactionsView
+                orders={orders}
+                branches={branches}
+                onVoidOrder={handleVoidOrder}
+              />
             </div>
           )}
 
@@ -1121,10 +1523,16 @@ export function AdminDashboardPage() {
               <AdminSettingsView
                 settings={settings}
                 staffAccounts={staffAccounts}
+                branches={branches}
                 onUpdateSettings={setSettings}
                 onAddStaff={handleAddStaff}
                 onUpdateStaffPin={handleUpdateStaffPin}
+                onResetStaffPassword={handleResetStaffPassword}
+                onUpdateStaffBranch={handleUpdateStaffBranch}
                 onToggleStaffStatus={handleToggleStaffStatus}
+                onAddBranch={handleAddBranch}
+                onUpdateBranch={handleUpdateBranch}
+                onDeleteBranch={handleDeleteBranch}
               />
             </div>
           )}
@@ -1139,6 +1547,13 @@ export function AdminDashboardPage() {
           )}
         </main>
       </div>
+
+      {/* Secure POS Access Modal for Owner */}
+      <AdminPosAccessModal
+        isOpen={isPosAccessModalOpen}
+        onClose={() => setIsPosAccessModalOpen(false)}
+        branches={branches}
+      />
     </div>
   );
 }

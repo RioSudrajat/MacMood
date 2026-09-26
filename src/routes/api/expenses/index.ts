@@ -8,9 +8,12 @@ export const Route = createFileRoute("/api/expenses/")({
     handlers: {
       GET: ({ request }) =>
         withApiSession(request, async () => {
-          const data = await listExpenses();
+          const url = new URL(request.url);
+          const branchId = url.searchParams.get("branchId") || undefined;
+          const data = await listExpenses(branchId);
           return Response.json({ data });
         }),
+
       POST: ({ request }) =>
         withApiSession(request, async (session) => {
           const body = await readJson(request);

@@ -6,12 +6,14 @@ import {
   Plus,
   Receipt,
   Download,
+  Printer,
   CheckCircle2,
   Search,
   X,
   CreditCard,
   Banknote,
 } from "lucide-react";
+import { downloadCsv, printReportPdf } from "@/lib/export-utils";
 
 interface AdminExpensesViewProps {
   expenses: ExpenseRecord[];
@@ -22,16 +24,22 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState("");
-  const [exportNotice, setExportNotice] = useState(false);
+  const [exportNotice, setExportNotice] = useState<string | null>(null);
 
   // Form State
   const [category, setCategory] = useState<ExpenseCategory>("BAHAN_BAKU");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState<number | "">("");
   const [sourceOfFund, setSourceOfFund] = useState<"KAS_LACI" | "TRANSFER_OWNER">("KAS_LACI");
-  const [staffName, setStaffName] = useState("Budi Santoso");
+  const [staffName, setStaffName] = useState("Kasir Operasional");
   const [receiptNumber, setReceiptNumber] = useState("");
   const [notes, setNotes] = useState("");
+
+  const todayFormatted = new Date().toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 
   // Filtering
   const filteredExpenses = expenses.filter((e) => {
@@ -45,7 +53,12 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
 
   // KPI Calculations
   const todayTotal = expenses
-    .filter((e) => e.date === "24 Sep 2026")
+    .filter(
+      (e) =>
+        e.date === todayFormatted ||
+        e.date === "26 Sep 2026" ||
+        e.date.includes("26 Sep")
+    )
     .reduce((sum, e) => sum + e.amount, 0);
 
   const cashDrawerTotal = expenses
@@ -74,7 +87,7 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
     const timeStr = `${now.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB`;
 
     onAddExpense({
-      date: "24 Sep 2026",
+      date: todayFormatted,
       time: timeStr,
       category,
       categoryLabel: categoryLabels[category],
@@ -94,9 +107,66 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
     setIsAddModalOpen(false);
   };
 
-  const handleExportCSV = () => {
-    setExportNotice(true);
-    setTimeout(() => setExportNotice(false), 3000);
+  const handleExportCsv = () => {
+    downloadCsv({
+      filename: `macmood-biaya-operasional-${new Date().toISOString().slice(0, 10)}.csv`,
+      headers: [
+        "ID Biaya",
+        "Waktu",
+        "Tanggal",
+        "Deskripsi",
+        "Kategori",
+        "Sumber Dana",
+        "Staf / PIC",
+        "No. Kuitansi",
+        "Nominal (Rp)",
+        "Catatan",
+      ],
+      rows: filteredExpenses.map((exp) => [
+        exp.id,
+        exp.time,
+        exp.date,
+        exp.description,
+        exp.categoryLabel,
+        exp.sourceOfFund === "KAS_LACI" ? "Kas Laci Kasir" : "Transfer Owner",
+        exp.staffName,
+        exp.receiptNumber ?? "-",
+        String(exp.amount),
+        exp.notes ?? "-",
+      ]),
+    });
+    setExportNotice("File CSV pengeluaran operasional berhasil diunduh.");
+    setTimeout(() => setExportNotice(null), 3000);
+  };
+
+  const handleExportPdf = () => {
+    printReportPdf({
+      title: "Laporan Pengeluaran & Biaya Operasional (Petty Cash)",
+      subtitle:
+        "Rekapitulasi biaya operasional harian, belanja bahan darurat, gas LPG, dan sanitasi outlet",
+      meta: [
+        { label: "Total Pengeluaran", value: formatRupiah(allTotal) },
+        { label: "Total Kas Laci", value: formatRupiah(cashDrawerTotal) },
+        { label: "Total Transfer Owner", value: formatRupiah(ownerTransferTotal) },
+        { label: "Jumlah Transaksi", value: `${filteredExpenses.length} Transaksi` },
+      ],
+      tables: [
+        {
+          title: "Daftar Pengeluaran Operasional",
+          headers: ["Waktu & Tanggal", "Deskripsi", "Kategori", "Sumber Dana", "Staf / PIC", "Nominal"],
+          rows: filteredExpenses.map((exp) => [
+            `${exp.time} · ${exp.date}`,
+            exp.description,
+            exp.categoryLabel,
+            exp.sourceOfFund === "KAS_LACI" ? "Kas Laci" : "Transfer Owner",
+            exp.staffName,
+            formatRupiah(exp.amount),
+          ]),
+        },
+      ],
+    });
+    setExportNotice("Dokumen PDF pengeluaran operasional siap dicetak / disimpan.");
+    setTimeout(() => setExportNotice(null), 3000);
   };
 
   return (
@@ -115,20 +185,28 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
           </p>
         </div>
 
-        {/* Action Buttons */}
+        {/* Action Buttons: Dual Export CSV & PDF + Add Expense */}
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={handleExportCSV}
-            className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-neutral-50 text-neutral-700 text-xs font-bold rounded-2xl border border-neutral-200 shadow-2xs transition-colors cursor-pointer"
+            onClick={handleExportCsv}
+            className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-brand-cream-100/60 text-brand-green-950 text-xs font-bold rounded-2xl border border-brand-green-900/20 shadow-2xs transition-colors cursor-pointer"
           >
             <Download className="size-3.5" />
             <span>Ekspor CSV</span>
           </button>
           <button
             type="button"
+            onClick={handleExportPdf}
+            className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-brand-cream-100/60 text-brand-green-950 text-xs font-bold rounded-2xl border border-brand-green-900/20 shadow-2xs transition-colors cursor-pointer"
+          >
+            <Printer className="size-3.5" />
+            <span>Ekspor PDF</span>
+          </button>
+          <button
+            type="button"
             onClick={() => setIsAddModalOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-2 bg-brand-green-900 hover:bg-brand-green-950 text-white text-xs font-bold rounded-2xl shadow-xs transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 bg-brand-green-950 hover:bg-brand-green-900 text-brand-cream-50 text-xs font-bold rounded-2xl shadow-xs transition-colors cursor-pointer"
           >
             <Plus className="size-4" />
             <span>Catat Biaya Baru</span>
@@ -137,9 +215,9 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
       </div>
 
       {exportNotice && (
-        <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs rounded-2xl flex items-center gap-2 animate-in fade-in">
-          <CheckCircle2 className="size-4 text-emerald-600 flex-shrink-0" />
-          <span>Data biaya operasional berhasil diekspor ke format CSV.</span>
+        <div className="p-3 bg-brand-green-900/10 border border-brand-green-900/20 text-brand-green-950 text-xs rounded-2xl flex items-center gap-2 animate-in fade-in">
+          <CheckCircle2 className="size-4 text-brand-green-800 flex-shrink-0" />
+          <span>{exportNotice}</span>
         </div>
       )}
 
@@ -149,15 +227,15 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
         <div className="p-5 rounded-3xl bg-white border border-brand-green-900/10 shadow-xs space-y-2">
           <div className="flex items-center justify-between text-neutral-500">
             <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">Total Biaya Hari Ini</span>
-            <span className="size-8 rounded-xl bg-red-50 text-red-700 flex items-center justify-center">
+            <span className="size-8 rounded-xl bg-brand-coral-500/10 text-brand-coral-600 flex items-center justify-center">
               <Wallet className="size-4" />
             </span>
           </div>
-          <div className="font-display font-black text-xl text-red-950 font-mono">
+          <div className="font-display font-black text-xl text-brand-coral-600 font-mono">
             {formatRupiah(todayTotal)}
           </div>
           <div className="text-[11px] text-neutral-500">
-            2 transaksi kas kecil tercatat
+            Biaya operasional kas hari ini
           </div>
         </div>
 
@@ -165,11 +243,11 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
         <div className="p-5 rounded-3xl bg-white border border-brand-green-900/10 shadow-xs space-y-2">
           <div className="flex items-center justify-between text-neutral-500">
             <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">Dipakai dari Kas Laci</span>
-            <span className="size-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center">
+            <span className="size-8 rounded-xl bg-brand-yellow-500/15 text-brand-yellow-700 flex items-center justify-center">
               <Banknote className="size-4" />
             </span>
           </div>
-          <div className="font-display font-black text-xl text-amber-950 font-mono">
+          <div className="font-display font-black text-xl text-brand-yellow-700 font-mono">
             {formatRupiah(cashDrawerTotal)}
           </div>
           <div className="text-[11px] text-neutral-500">
@@ -181,11 +259,11 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
         <div className="p-5 rounded-3xl bg-white border border-brand-green-900/10 shadow-xs space-y-2">
           <div className="flex items-center justify-between text-neutral-500">
             <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">Transfer Mandiri Owner</span>
-            <span className="size-8 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center">
+            <span className="size-8 rounded-xl bg-brand-green-900/10 text-brand-green-950 flex items-center justify-center">
               <CreditCard className="size-4" />
             </span>
           </div>
-          <div className="font-display font-black text-xl text-blue-900 font-mono">
+          <div className="font-display font-black text-xl text-brand-green-950 font-mono">
             {formatRupiah(ownerTransferTotal)}
           </div>
           <div className="text-[11px] text-neutral-500">
@@ -278,11 +356,11 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
 
                   <td className="py-3.5 px-4">
                     {exp.sourceOfFund === "KAS_LACI" ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-brand-yellow-700 bg-brand-yellow-500/15 px-2 py-0.5 rounded-full border border-brand-yellow-500/30">
                         <Banknote className="size-3" /> Kas Laci Kasir
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-800 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-brand-green-950 bg-brand-green-900/10 px-2 py-0.5 rounded-full border border-brand-green-900/20">
                         <CreditCard className="size-3" /> Transfer Owner
                       </span>
                     )}
@@ -296,7 +374,7 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
                     {exp.receiptNumber || "-"}
                   </td>
 
-                  <td className="py-3.5 px-4 sm:px-6 text-right font-mono font-bold text-red-900 text-sm">
+                  <td className="py-3.5 px-4 sm:px-6 text-right font-mono font-bold text-brand-coral-600 text-sm">
                     {formatRupiah(exp.amount)}
                   </td>
                 </tr>

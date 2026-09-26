@@ -15,6 +15,8 @@ import {
 interface PosShiftViewProps {
   shift: ShiftData;
   pastShifts: PastShift[];
+  branchName?: string;
+  branchCode?: string;
   onOpenShift: (initialCash: number) => void;
   onCloseShift: (actualCash: number, notes: string) => void;
 }
@@ -22,6 +24,8 @@ interface PosShiftViewProps {
 export function PosShiftView({
   shift,
   pastShifts,
+  branchName,
+  branchCode,
   onOpenShift,
   onCloseShift,
 }: PosShiftViewProps) {
@@ -91,11 +95,18 @@ export function PosShiftView({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <span className="text-brand-green-800 text-xs font-bold tracking-wider uppercase block">
-              Manajemen Kasir & Outlet
+              Operasional & Rekonsiliasi Kas Cabang
             </span>
-            <h2 className="font-display font-extrabold text-2xl text-brand-green-950">
-              Rekapitulasi Shift & Kas Laci
-            </h2>
+            <div className="flex items-center gap-2 mt-0.5">
+              <h2 className="font-display font-extrabold text-2xl text-brand-green-950">
+                Rekapitulasi Laci Kas Cabang
+              </h2>
+              {branchName && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-brand-cream-100 text-brand-green-900 border border-brand-green-900/15 text-xs font-bold">
+                  {branchName} ({branchCode || "MAC-01"})
+                </span>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
@@ -109,12 +120,12 @@ export function PosShiftView({
               {shift.status === "OPEN" ? (
                 <>
                   <Unlock className="size-3.5" />
-                  <span>Shift Berjalan (Aktif)</span>
+                  <span>Laci Terbuka (Aktif Melayani)</span>
                 </>
               ) : (
                 <>
                   <Lock className="size-3.5" />
-                  <span>Shift Ditutup</span>
+                  <span>Laci Ditutup (Selesai Tutup Buku)</span>
                 </>
               )}
             </span>
@@ -129,10 +140,10 @@ export function PosShiftView({
                 <Lock className="size-6" />
               </div>
               <h3 className="font-display font-extrabold text-lg text-brand-green-950">
-                Buka Shift Baru Kasir
+                Buka Laci Kas Cabang
               </h3>
               <p className="text-xs text-neutral-500">
-                Wajib menginput uang kas modal awal (cash float) sebelum memulai transaksi.
+                Wajib menginput uang kas modal awal (cash float) laci sebelum kasir memulai transaksi cabang.
               </p>
             </div>
 
@@ -191,7 +202,7 @@ export function PosShiftView({
                 className="w-full h-12 rounded-xl bg-brand-green-900 hover:bg-brand-green-800 text-white font-display font-extrabold text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Unlock className="size-4" />
-                <span>Buka Shift Sekarang</span>
+                <span>Buka Laci Kas Sekarang</span>
               </button>
             </form>
           </div>
@@ -236,7 +247,7 @@ export function PosShiftView({
 
                 <div className="p-4 rounded-2xl bg-white border border-brand-green-900/10 shadow-xs">
                   <span className="text-[11px] font-semibold text-neutral-500 block">
-                    Total Omzet Shift
+                    Total Omzet Laci Cabang
                   </span>
                   <div className="font-display font-black text-lg text-brand-green-950 mt-1">
                     {formatRupiah(shift.cashSales + shift.qrisSales)}
@@ -265,10 +276,10 @@ export function PosShiftView({
                 <div className="border-b border-neutral-100 pb-3 flex items-center justify-between">
                   <div>
                     <h3 className="font-display font-extrabold text-base text-brand-green-950">
-                      Rekonsiliasi Kas & Tutup Shift
+                      Rekonsiliasi Kas & Tutup Laci Cabang
                     </h3>
                     <p className="text-xs text-neutral-500 mt-0.5">
-                      Hitung fisik uang tunai di laci kasir secara teliti sebelum menutup shift.
+                      Hitung fisik uang tunai di laci kasir cabang secara teliti sebelum menutup laci kas.
                     </p>
                   </div>
                   <button

@@ -1,4 +1,3 @@
-import { Link } from "@tanstack/react-router";
 import type { AdminTab } from "./types";
 import {
   TrendingUp,
@@ -31,6 +30,7 @@ interface AdminSidebarProps {
   onToggleCollapse: () => void;
   isMobileOpen: boolean;
   onMobileClose: () => void;
+  onOpenPosAccessModal?: () => void;
 }
 
 export function AdminSidebar({
@@ -43,6 +43,7 @@ export function AdminSidebar({
   onToggleCollapse,
   isMobileOpen,
   onMobileClose,
+  onOpenPosAccessModal,
 }: AdminSidebarProps) {
   const navItems = [
     {
@@ -67,7 +68,7 @@ export function AdminSidebar({
       subLabel: "Kontrol porsi & mutasi opname",
       icon: Package,
       badge: lowStockCount > 0 ? `${lowStockCount} menipis` : null,
-      badgeColor: "bg-amber-100 text-amber-900 border border-amber-300 font-bold",
+      badgeColor: "bg-brand-yellow-400/20 text-brand-yellow-600 border border-brand-yellow-400/40 font-bold",
     },
     {
       id: "transactions" as const,
@@ -79,8 +80,8 @@ export function AdminSidebar({
     },
     {
       id: "shifts" as const,
-      label: "Rekap Shift & Laci Kas",
-      subLabel: "Audit kasir & selisih kas fisik",
+      label: "Rekap Kas Cabang",
+      subLabel: "Kas harian & audit outlet",
       icon: Clock,
       badge: null,
       badgeColor: "",
@@ -99,7 +100,7 @@ export function AdminSidebar({
       subLabel: "Voucher diskon % & nominal",
       icon: Tag,
       badge: "5 aktif",
-      badgeColor: "bg-emerald-100 text-emerald-800 font-bold",
+      badgeColor: "bg-brand-cream-200 text-brand-green-900 font-bold",
     },
     {
       id: "recipes" as const,
@@ -123,7 +124,7 @@ export function AdminSidebar({
       subLabel: "Pusat aktivitas & peringatan",
       icon: Bell,
       badge: unreadNotifCount > 0 ? `${unreadNotifCount} baru` : null,
-      badgeColor: "bg-rose-100 text-rose-800 font-bold",
+      badgeColor: "bg-brand-coral-500/15 text-brand-coral-700 font-bold",
     },
     {
       id: "settings" as const,
@@ -149,7 +150,7 @@ export function AdminSidebar({
           <button
             type="button"
             onClick={onToggleCollapse}
-            className="hidden lg:flex absolute -right-3.5 top-6 z-30 size-7 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white items-center justify-center shadow-md cursor-pointer border-2 border-white transition-transform hover:scale-110"
+            className="hidden lg:flex absolute -right-3.5 top-6 z-30 size-7 rounded-full bg-brand-green-900 hover:bg-brand-green-950 text-brand-yellow-400 items-center justify-center shadow-md cursor-pointer border-2 border-white transition-transform hover:scale-110"
             aria-label={collapsed ? "Buka Navigasi" : "Sembunyikan Navigasi"}
             title={collapsed ? "Perluas Sidebar" : "Ciutkan Sidebar"}
           >
@@ -208,20 +209,20 @@ export function AdminSidebar({
                     onClick={() => onTabChange(item.id)}
                     className={`size-11 rounded-2xl flex items-center justify-center transition-all cursor-pointer relative ${
                       isActive
-                        ? "bg-emerald-50 text-emerald-800 shadow-2xs border border-emerald-200/60"
+                        ? "bg-brand-cream-100 text-brand-green-950 shadow-2xs border border-brand-green-900/20"
                         : "text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100"
                     }`}
                     title={item.label}
                   >
                     {/* Active vertical pill indicator on left edge (Reference Image 4) */}
                     {isActive && (
-                      <span className="absolute -left-3 top-2.5 bottom-2.5 w-1.5 rounded-r-full bg-emerald-600" />
+                      <span className="absolute -left-3 top-2.5 bottom-2.5 w-1.5 rounded-r-full bg-brand-green-900" />
                     )}
                     <Icon className="size-5" />
 
                     {/* Unread badge dot */}
                     {item.id === "notifications" && unreadNotifCount > 0 && (
-                      <span className="absolute top-2 right-2 size-2 rounded-full bg-rose-500 ring-2 ring-white" />
+                      <span className="absolute top-2 right-2 size-2 rounded-full bg-brand-coral-600 ring-2 ring-white" />
                     )}
                   </button>
 
@@ -243,7 +244,7 @@ export function AdminSidebar({
                 }}
                 className={`w-full flex items-center justify-between p-3 rounded-2xl transition-all cursor-pointer text-left relative ${
                   isActive
-                    ? "bg-emerald-50 text-emerald-950 border border-emerald-200/60 shadow-2xs font-bold"
+                    ? "bg-brand-cream-100 text-brand-green-950 border border-brand-green-900/20 shadow-2xs font-bold"
                     : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50"
                 }`}
               >
@@ -286,31 +287,33 @@ export function AdminSidebar({
 
         {/* Bottom Section: Role Switcher & Sign Out */}
         <div className="p-3 border-t border-brand-green-900/10 space-y-2">
-          {/* Switch to Kasir POS */}
+          {/* Switch to Kasir POS via Secure Verification */}
           {collapsed ? (
             <div className="flex justify-center group relative">
-              <Link
-                to="/app"
+              <button
+                type="button"
+                onClick={onOpenPosAccessModal}
                 className="size-11 rounded-2xl bg-neutral-100 hover:bg-brand-cream-100 text-neutral-700 hover:text-brand-green-950 flex items-center justify-center transition-colors cursor-pointer"
-                title="Buka Kasir (POS)"
+                title="Buka Kasir (POS) via PIN Owner"
               >
                 <Store className="size-5" />
-              </Link>
+              </button>
               <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-lg bg-neutral-900 text-white text-xs font-semibold whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 shadow-md">
                 Buka Layar Kasir
               </div>
             </div>
           ) : (
-            <Link
-              to="/app"
-              className="flex items-center justify-between p-2.5 rounded-2xl bg-neutral-50 hover:bg-brand-cream-100 text-neutral-700 hover:text-brand-green-950 border border-neutral-200/80 transition-colors"
+            <button
+              type="button"
+              onClick={onOpenPosAccessModal}
+              className="w-full flex items-center justify-between p-2.5 rounded-2xl bg-neutral-50 hover:bg-brand-cream-100 text-neutral-700 hover:text-brand-green-950 border border-neutral-200/80 transition-colors cursor-pointer"
             >
               <div className="flex items-center gap-2.5 min-w-0">
                 <Store className="size-4 text-brand-green-800 flex-shrink-0" />
                 <span className="text-xs font-bold truncate">Buka Layar Kasir (POS)</span>
               </div>
               <ArrowUpRight className="size-3.5 text-neutral-400" />
-            </Link>
+            </button>
           )}
 
           {/* Sign Out Button (User requested: "lalu sign out juga diletakkan di sidebar") */}

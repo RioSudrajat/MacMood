@@ -67,12 +67,12 @@ export function PosSidebar({
     },
     {
       id: "shift" as const,
-      label: "Rekap Shift Kasir",
-      subLabel: "Modal awal & rekonsiliasi",
+      label: "Kas Cabang",
+      subLabel: "Laci kas & rekonsiliasi",
       icon: WalletCards,
       badge: isShiftOpen ? "Buka" : "Tutup",
       badgeColor: isShiftOpen
-        ? "bg-emerald-100 text-emerald-800 font-bold"
+        ? "bg-brand-green-900/10 text-brand-green-950 font-bold"
         : "bg-neutral-200 text-neutral-600",
     },
     {
@@ -83,8 +83,8 @@ export function PosSidebar({
       badge: pendingSyncCount > 0 ? `${pendingSyncCount}` : "OK",
       badgeColor:
         pendingSyncCount > 0
-          ? "bg-amber-400 text-amber-950 font-bold"
-          : "bg-emerald-100 text-emerald-800 font-bold",
+          ? "bg-brand-yellow-500/20 text-brand-yellow-700 font-bold"
+          : "bg-brand-green-900/10 text-brand-green-950 font-bold",
     },
     {
       id: "notifications" as const,
@@ -92,7 +92,7 @@ export function PosSidebar({
       subLabel: "Pemberitahuan & sistem",
       icon: Bell,
       badge: unreadNotifCount > 0 ? `${unreadNotifCount} baru` : null,
-      badgeColor: "bg-rose-100 text-rose-800 font-bold",
+      badgeColor: "bg-brand-coral-500/10 text-brand-coral-600 font-bold",
     },
   ];
 
@@ -110,7 +110,7 @@ export function PosSidebar({
           <button
             type="button"
             onClick={onToggleCollapse}
-            className="hidden lg:flex absolute -right-3.5 top-6 z-30 size-7 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white items-center justify-center shadow-md cursor-pointer border-2 border-white transition-transform hover:scale-110"
+            className="hidden lg:flex absolute -right-3.5 top-6 z-30 size-7 rounded-full bg-brand-green-950 hover:bg-brand-green-900 text-brand-yellow-400 items-center justify-center shadow-md cursor-pointer border-2 border-white transition-transform hover:scale-110"
             aria-label={collapsed ? "Buka Navigasi" : "Sembunyikan Navigasi"}
             title={collapsed ? "Perluas Sidebar" : "Ciutkan Sidebar"}
           >
@@ -128,14 +128,14 @@ export function PosSidebar({
             <img
               src="/assets/macmood-logo.png"
               alt="MacMood Logo"
-              className="size-10 rounded-2xl object-cover shadow-2xs border border-emerald-600/20 flex-shrink-0"
+              className="size-10 rounded-2xl object-cover shadow-2xs border border-brand-green-900/20 flex-shrink-0"
             />
             {!collapsed && (
               <div className="flex flex-col leading-tight min-w-0">
                 <span className="font-display font-extrabold text-base tracking-wider text-brand-green-950 truncate">
                   MACMOOD
                 </span>
-                <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-widest truncate">
+                <span className="text-[10px] font-bold text-brand-green-800 uppercase tracking-widest truncate">
                   Kasir & POS
                 </span>
               </div>
@@ -169,20 +169,20 @@ export function PosSidebar({
                     onClick={() => onTabChange(item.id)}
                     className={`size-11 rounded-2xl flex items-center justify-center transition-all cursor-pointer relative ${
                       isActive
-                        ? "bg-emerald-50 text-emerald-800 shadow-2xs border border-emerald-200/60"
+                        ? "bg-brand-green-900/10 text-brand-green-950 shadow-2xs border border-brand-green-900/20"
                         : "text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100"
                     }`}
                     title={item.label}
                   >
                     {/* Active vertical pill indicator on left edge (Reference Image 4) */}
                     {isActive && (
-                      <span className="absolute -left-3 top-2.5 bottom-2.5 w-1.5 rounded-r-full bg-emerald-600" />
+                      <span className="absolute -left-3 top-2.5 bottom-2.5 w-1.5 rounded-r-full bg-brand-yellow-400" />
                     )}
                     <Icon className="size-5" />
 
                     {/* Unread badge dot */}
                     {item.id === "notifications" && unreadNotifCount > 0 && (
-                      <span className="absolute top-2 right-2 size-2 rounded-full bg-rose-500 ring-2 ring-white" />
+                      <span className="absolute top-2 right-2 size-2 rounded-full bg-brand-coral-500 ring-2 ring-white" />
                     )}
                   </button>
 
@@ -204,20 +204,20 @@ export function PosSidebar({
                 }}
                 className={`w-full flex items-center justify-between p-3 rounded-2xl transition-all cursor-pointer text-left relative ${
                   isActive
-                    ? "bg-emerald-50 text-emerald-950 border border-emerald-200/60 shadow-2xs font-bold"
+                    ? "bg-brand-green-900/10 text-brand-green-950 border border-brand-green-900/20 shadow-2xs font-bold"
                     : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50"
                 }`}
               >
                 {/* Active vertical pill indicator on left edge (Reference Image 4) */}
                 {isActive && (
-                  <span className="absolute -left-3 top-2.5 bottom-2.5 w-1.5 rounded-r-full bg-emerald-600" />
+                  <span className="absolute -left-3 top-2.5 bottom-2.5 w-1.5 rounded-r-full bg-brand-yellow-400" />
                 )}
 
                 <div className="flex items-center gap-3 min-w-0">
                   <div
                     className={`size-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
                       isActive
-                        ? "bg-emerald-600 text-white"
+                        ? "bg-brand-green-950 text-brand-yellow-400"
                         : "bg-neutral-100 text-neutral-600"
                     }`}
                   >

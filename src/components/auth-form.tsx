@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate, useRouter } from "@tanstack/react-router";
-import { ArrowRight, LoaderCircle, ShieldCheck, Store } from "lucide-react";
+import { ArrowRight, LoaderCircle } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,30 +15,6 @@ export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
   const [error, setError] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  async function handleQuickLogin(targetEmail: string, targetPass: string, targetPath: string) {
-    if (pending) return;
-    setEmail(targetEmail);
-    setPassword(targetPass);
-    setPending(true);
-    setError("");
-    try {
-      const result = await authClient.signIn.email({
-        email: targetEmail,
-        password: targetPass,
-      });
-      if (result.error) {
-        setError(result.error.message || "Gagal masuk dengan akun demo.");
-        return;
-      }
-      await router.invalidate();
-      await navigate({ to: targetPath, replace: true });
-    } catch {
-      setError("Tidak dapat terhubung ke server.");
-    } finally {
-      setPending(false);
-    }
-  }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -90,73 +66,6 @@ export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
           ? "One small step. Then make this app your own."
           : "Sign in to pick up where you left off."}
       </p>
-
-      {/* Quick Demo Login Cards for Owner and Kasir */}
-      {!signingUp && (
-        <div className="mt-6 p-4 rounded-2xl bg-brand-cream-100/90 border border-brand-green-900/15 space-y-3 shadow-2xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-brand-green-950 flex items-center gap-1.5">
-              <ShieldCheck className="size-4 text-brand-green-800" />
-              <span>Akses Cepat Demo Akun:</span>
-            </span>
-            <span className="text-[10px] text-brand-green-900 font-bold px-2 py-0.5 rounded-full bg-brand-yellow-300">
-              1-Click Login
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2.5">
-            <button
-              type="button"
-              disabled={pending}
-              onClick={() => handleQuickLogin("owner@macmood.id", "password123", "/admin")}
-              className="p-3 rounded-xl bg-white hover:bg-brand-cream-50 border border-brand-green-900/20 text-left transition-all shadow-2xs hover:shadow-xs cursor-pointer group disabled:opacity-50"
-            >
-              <div className="flex items-center gap-1.5 mb-1">
-                <ShieldCheck className="size-3.5 text-brand-green-800 flex-shrink-0" />
-                <span className="text-xs font-black text-brand-green-950 block truncate group-hover:text-brand-green-800">
-                  Owner
-                </span>
-              </div>
-              <span className="text-[11px] font-bold text-neutral-800 block truncate">
-                Muhammad Afrizal
-              </span>
-              <span className="text-[10px] text-neutral-500 block truncate">
-                owner@macmood.id
-              </span>
-              <span className="inline-block mt-1.5 text-[9px] font-bold text-emerald-800 bg-emerald-100/80 px-1.5 py-0.5 rounded">
-                Masuk ke /admin
-              </span>
-            </button>
-
-            <button
-              type="button"
-              disabled={pending}
-              onClick={() => handleQuickLogin("budi.kasir@macmood.id", "password123", "/app")}
-              className="p-3 rounded-xl bg-white hover:bg-brand-cream-50 border border-brand-green-900/20 text-left transition-all shadow-2xs hover:shadow-xs cursor-pointer group disabled:opacity-50"
-            >
-              <div className="flex items-center gap-1.5 mb-1">
-                <Store className="size-3.5 text-amber-700 flex-shrink-0" />
-                <span className="text-xs font-black text-brand-green-950 block truncate group-hover:text-brand-green-800">
-                  Kasir POS
-                </span>
-              </div>
-              <span className="text-[11px] font-bold text-neutral-800 block truncate">
-                Budi Santoso
-              </span>
-              <span className="text-[10px] text-neutral-500 block truncate">
-                budi.kasir@macmood.id
-              </span>
-              <span className="inline-block mt-1.5 text-[9px] font-bold text-amber-900 bg-amber-100/80 px-1.5 py-0.5 rounded">
-                Masuk ke /app
-              </span>
-            </button>
-          </div>
-
-          <div className="text-[10px] text-neutral-500 text-center">
-            Password kedua akun: <code className="font-mono font-bold text-neutral-800 bg-white px-1.5 py-0.5 rounded border border-neutral-200">password123</code>
-          </div>
-        </div>
-      )}
 
       <form
         onSubmit={onSubmit}

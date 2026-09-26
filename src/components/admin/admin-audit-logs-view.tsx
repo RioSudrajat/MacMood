@@ -3,6 +3,7 @@ import type { AuditLogRecord, AuditActionType } from "./types";
 import {
   Search,
   Download,
+  Printer,
   CheckCircle2,
   FileText,
   KeyRound,
@@ -11,6 +12,7 @@ import {
   DollarSign,
   Lock,
 } from "lucide-react";
+import { downloadCsv, printReportPdf } from "@/lib/export-utils";
 
 interface AdminAuditLogsViewProps {
   auditLogs: AuditLogRecord[];
@@ -19,7 +21,7 @@ interface AdminAuditLogsViewProps {
 export function AdminAuditLogsView({ auditLogs = [] }: AdminAuditLogsViewProps) {
   const [actionFilter, setActionFilter] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState("");
-  const [exportNotice, setExportNotice] = useState(false);
+  const [exportNotice, setExportNotice] = useState<string | null>(null);
 
   // Filter logs
   const filteredLogs = auditLogs.filter((log) => {
@@ -38,9 +40,67 @@ export function AdminAuditLogsView({ auditLogs = [] }: AdminAuditLogsViewProps) 
   const priceChangesCount = auditLogs.filter((l) => l.action === "MENU_PRICE_CHANGE").length;
   const pinResetsCount = auditLogs.filter((l) => l.action === "STAFF_PIN_RESET").length;
 
-  const handleExportCSV = () => {
-    setExportNotice(true);
-    setTimeout(() => setExportNotice(false), 3000);
+  const handleExportCsv = () => {
+    downloadCsv({
+      filename: `macmood-audit-log-${new Date().toISOString().slice(0, 10)}.csv`,
+      headers: [
+        "ID Log",
+        "Waktu",
+        "Tanggal",
+        "Tipe Aksi",
+        "Pelaksana",
+        "Role",
+        "Entitas Target",
+        "Rincian Perubahan",
+        "Nilai Sebelum",
+        "Nilai Sesudah",
+        "Alasan / Keterangan",
+      ],
+      rows: filteredLogs.map((log) => [
+        log.id,
+        log.time,
+        log.date,
+        log.action,
+        log.performedBy,
+        log.userRole,
+        log.entityId,
+        log.details.title,
+        log.details.before ?? "-",
+        log.details.after ?? "-",
+        log.details.reason ?? "-",
+      ]),
+    });
+    setExportNotice("File CSV data audit log keamanan berhasil diunduh.");
+    setTimeout(() => setExportNotice(null), 3000);
+  };
+
+  const handleExportPdf = () => {
+    printReportPdf({
+      title: "Laporan Log Audit Aktivitas & Keamanan Sistem",
+      subtitle:
+        "Rekaman kronologis tak terhapus atas perubahan harga, otorisasi void nota, reset PIN staf, dan verifikasi shift",
+      meta: [
+        { label: "Total Log Tercatat", value: `${filteredLogs.length} Aktivitas` },
+        { label: "Filter Aksi", value: actionFilter },
+        { label: "Waktu Cetak", value: new Date().toLocaleString("id-ID") },
+        { label: "Otorisator", value: "Muhammad Afrizal (Business Owner)" },
+      ],
+      tables: [
+        {
+          title: "Daftar Audit Trail",
+          headers: ["Waktu & Tanggal", "Tipe Aksi", "Pelaksana", "Rincian & Snapshot", "Alasan"],
+          rows: filteredLogs.map((log) => [
+            `${log.time} · ${log.date}`,
+            log.action,
+            `${log.performedBy} (${log.userRole.toUpperCase()})`,
+            `${log.details.title}${log.details.before ? `\n(Sebelum: ${log.details.before} -> Sesudah: ${log.details.after})` : ""}`,
+            log.details.reason ?? "-",
+          ]),
+        },
+      ],
+    });
+    setExportNotice("Dokumen PDF audit log keamanan siap dicetak / disimpan.");
+    setTimeout(() => setExportNotice(null), 3000);
   };
 
   const getActionBadge = (action: AuditActionType) => {
@@ -49,31 +109,31 @@ export function AdminAuditLogsView({ auditLogs = [] }: AdminAuditLogsViewProps) 
         return {
           icon: RotateCcw,
           label: "Otorisasi Void",
-          classes: "bg-red-50 text-red-700 border-red-200",
+          classes: "bg-brand-coral-500/10 text-brand-coral-600 border-brand-coral-500/20",
         };
       case "MENU_PRICE_CHANGE":
         return {
           icon: Tag,
           label: "Ubah Harga Menu",
-          classes: "bg-blue-50 text-blue-700 border-blue-200",
+          classes: "bg-brand-yellow-500/15 text-brand-yellow-700 border-brand-yellow-500/30",
         };
       case "STAFF_PIN_RESET":
         return {
           icon: KeyRound,
           label: "Reset PIN Staf",
-          classes: "bg-amber-50 text-amber-800 border-amber-200",
+          classes: "bg-brand-green-900/10 text-brand-green-950 border-brand-green-900/20",
         };
       case "SHIFT_FORCE_CLOSE":
         return {
           icon: CheckCircle2,
           label: "Verifikasi Shift",
-          classes: "bg-emerald-50 text-emerald-800 border-emerald-200",
+          classes: "bg-brand-green-800/15 text-brand-green-900 border-brand-green-800/25",
         };
       case "EXPENSE_RECORDED":
         return {
           icon: DollarSign,
           label: "Kas Kecil",
-          classes: "bg-purple-50 text-purple-800 border-purple-200",
+          classes: "bg-brand-cream-200 text-brand-green-950 border-brand-green-900/15",
         };
       default:
         return {
@@ -103,23 +163,31 @@ export function AdminAuditLogsView({ auditLogs = [] }: AdminAuditLogsViewProps) 
           </p>
         </div>
 
-        {/* Action Buttons */}
+        {/* Action Buttons: Dual Export CSV & PDF */}
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={handleExportCSV}
-            className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-neutral-50 text-neutral-700 text-xs font-bold rounded-2xl border border-neutral-200 shadow-2xs transition-colors cursor-pointer"
+            onClick={handleExportCsv}
+            className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-brand-cream-100/60 text-brand-green-950 text-xs font-bold rounded-2xl border border-brand-green-900/20 shadow-2xs transition-colors cursor-pointer"
           >
             <Download className="size-3.5" />
-            <span>Ekspor Audit CSV</span>
+            <span>Ekspor CSV</span>
+          </button>
+          <button
+            type="button"
+            onClick={handleExportPdf}
+            className="flex items-center gap-1.5 px-3 py-2 bg-brand-green-950 hover:bg-brand-green-900 text-brand-cream-50 text-xs font-bold rounded-2xl border border-brand-green-900 shadow-2xs transition-colors cursor-pointer"
+          >
+            <Printer className="size-3.5" />
+            <span>Ekspor PDF</span>
           </button>
         </div>
       </div>
 
       {exportNotice && (
-        <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs rounded-2xl flex items-center gap-2 animate-in fade-in">
-          <CheckCircle2 className="size-4 text-emerald-600 flex-shrink-0" />
-          <span>Data log audit keamanan berhasil diekspor ke format CSV.</span>
+        <div className="p-3 bg-brand-green-900/10 border border-brand-green-900/20 text-brand-green-950 text-xs rounded-2xl flex items-center gap-2 animate-in fade-in">
+          <CheckCircle2 className="size-4 text-brand-green-800 flex-shrink-0" />
+          <span>{exportNotice}</span>
         </div>
       )}
 
@@ -145,11 +213,11 @@ export function AdminAuditLogsView({ auditLogs = [] }: AdminAuditLogsViewProps) 
         <div className="p-5 rounded-3xl bg-white border border-brand-green-900/10 shadow-xs space-y-2">
           <div className="flex items-center justify-between text-neutral-500">
             <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">Otorisasi Void Owner</span>
-            <span className="size-8 rounded-xl bg-red-50 text-red-700 flex items-center justify-center">
+            <span className="size-8 rounded-xl bg-brand-coral-500/10 text-brand-coral-600 flex items-center justify-center">
               <RotateCcw className="size-4" />
             </span>
           </div>
-          <div className="font-display font-black text-2xl text-red-950">
+          <div className="font-display font-black text-2xl text-brand-coral-600">
             {voidCount} <span className="text-xs font-normal text-neutral-500">transaksi</span>
           </div>
           <div className="text-[11px] text-neutral-500">
@@ -161,11 +229,11 @@ export function AdminAuditLogsView({ auditLogs = [] }: AdminAuditLogsViewProps) 
         <div className="p-5 rounded-3xl bg-white border border-brand-green-900/10 shadow-xs space-y-2">
           <div className="flex items-center justify-between text-neutral-500">
             <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">Perubahan Harga Menu</span>
-            <span className="size-8 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center">
+            <span className="size-8 rounded-xl bg-brand-yellow-500/15 text-brand-yellow-700 flex items-center justify-center">
               <Tag className="size-4" />
             </span>
           </div>
-          <div className="font-display font-black text-2xl text-blue-900">
+          <div className="font-display font-black text-2xl text-brand-green-950">
             {priceChangesCount} <span className="text-xs font-normal text-neutral-500">kali</span>
           </div>
           <div className="text-[11px] text-neutral-500">
@@ -265,8 +333,10 @@ export function AdminAuditLogsView({ auditLogs = [] }: AdminAuditLogsViewProps) 
                         <div>
                           <strong className="text-neutral-900 font-semibold block">{log.performedBy}</strong>
                           <span
-                            className={`text-[9px] font-bold uppercase px-1.5 py-0.2 rounded ${
-                              log.userRole === "owner" ? "bg-amber-100 text-amber-900" : "bg-neutral-100 text-neutral-700"
+                            className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded border ${
+                              log.userRole === "owner"
+                                ? "bg-brand-yellow-500/15 text-brand-yellow-700 border-brand-yellow-500/30"
+                                : "bg-brand-green-900/10 text-brand-green-950 border-brand-green-900/20"
                             }`}
                           >
                             {log.userRole}
@@ -283,12 +353,12 @@ export function AdminAuditLogsView({ auditLogs = [] }: AdminAuditLogsViewProps) 
                       {(log.details.before || log.details.after) && (
                         <div className="p-2 bg-neutral-50 rounded-xl border border-neutral-200/80 font-mono text-[10px] space-y-0.5">
                           {log.details.before && (
-                            <div className="text-red-700 flex items-center gap-1">
+                            <div className="text-brand-coral-600 flex items-center gap-1">
                               <span className="font-bold">Sebelum:</span> {log.details.before}
                             </div>
                           )}
                           {log.details.after && (
-                            <div className="text-emerald-800 flex items-center gap-1">
+                            <div className="text-brand-green-900 flex items-center gap-1">
                               <span className="font-bold">Sesudah:</span> {log.details.after}
                             </div>
                           )}

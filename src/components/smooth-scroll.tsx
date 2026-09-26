@@ -13,8 +13,24 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
   const location = useLocation();
   const lenisRef = useRef<Lenis | null>(null);
 
+  const isLandingPage = location.pathname === "/";
+
   useEffect(() => {
     if (typeof window === "undefined") return;
+
+    // Only activate Lenis on the landing page (document-level scroll)
+    // Non-landing pages (like POS Kasir /app and Admin /admin) have fixed viewport panels
+    // with internal overflow-y-auto that must scroll with native wheel events.
+    if (!isLandingPage) {
+      if (lenisRef.current) {
+        lenisRef.current.destroy();
+        lenisRef.current = null;
+        setLenisInstance(null);
+        delete (window as unknown as { __lenis?: Lenis }).__lenis;
+        document.documentElement.classList.remove("lenis", "lenis-smooth");
+      }
+      return;
+    }
 
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -31,7 +47,9 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
     });
 
     lenisRef.current = lenis;
-    setLenisInstance(lenis);
+    queueMicrotask(() => {
+      setLenisInstance(lenis);
+    });
     (window as unknown as { __lenis?: Lenis }).__lenis = lenis;
 
     const onMotionPreferenceChange = (e: MediaQueryListEvent) => {
@@ -61,7 +79,9 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
           lenis.scrollTo(0, { duration: 1.2 });
           try {
             history.pushState(null, "", window.location.pathname);
-          } catch {}
+          } catch {
+            void 0;
+          }
           return;
         }
 
@@ -76,7 +96,9 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
           });
           try {
             history.pushState(null, "", href);
-          } catch {}
+          } catch {
+            void 0;
+          }
         }
       }
     };
@@ -90,15 +112,16 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
       lenisRef.current = null;
       setLenisInstance(null);
       delete (window as unknown as { __lenis?: Lenis }).__lenis;
+      document.documentElement.classList.remove("lenis", "lenis-smooth");
     };
-  }, []);
+  }, [isLandingPage]);
 
   // Reset scroll on route change if not a hash navigation
   useEffect(() => {
-    if (lenisRef.current && !location.hash) {
+    if (lenisRef.current && isLandingPage && !location.hash) {
       lenisRef.current.scrollTo(0, { immediate: true });
     }
-  }, [location.pathname, location.hash]);
+  }, [location.pathname, location.hash, isLandingPage]);
 
   return <LenisContext.Provider value={lenisInstance}>{children}</LenisContext.Provider>;
 }

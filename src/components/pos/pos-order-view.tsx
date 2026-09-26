@@ -261,57 +261,269 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
           </div>
         </div>
 
-        {/* Menu Cards Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 pb-20 lg:pb-6">
-          {filteredProducts.map((prod) => (
-            <div
-              key={prod.id}
-              onClick={() => prod.isAvailable && addToCart(prod)}
-              className={`group flex flex-col justify-between p-3 sm:p-4 rounded-2xl bg-white border border-brand-green-900/10 shadow-2xs hover:shadow-md transition-all text-left relative overflow-hidden select-none cursor-pointer ${
-                !prod.isAvailable ? "opacity-60 grayscale cursor-not-allowed" : "hover:-translate-y-0.5"
-              }`}
-            >
-              <div>
-                <div className="aspect-video w-full rounded-xl overflow-hidden bg-brand-cream-100 mb-3 relative">
-                  <img
-                    src={prod.image}
-                    alt={prod.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    loading="lazy"
-                  />
-                  {!prod.isAvailable && (
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-2xs flex items-center justify-center">
-                      <span className="text-[10px] font-black uppercase tracking-wider text-white px-2 py-1 rounded bg-brand-coral-600">
-                        Habis
+        {/* Menu Cards Display */}
+        {selectedCategory === "all" && !searchQuery ? (
+          <div className="space-y-8 pb-20 lg:pb-6">
+            {/* 1. Menu Utama Section */}
+            {filteredProducts.filter((p) => p.category === "mac").length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between pb-1 border-b border-brand-green-900/10">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">🧀</span>
+                    <h3 className="font-display font-black text-base text-brand-green-950">
+                      Menu Utama · Signature Mac & Cheese
+                    </h3>
+                  </div>
+                  <span className="text-xs font-bold text-brand-green-900 bg-brand-cream-100 px-2.5 py-0.5 rounded-full border border-brand-green-900/15">
+                    {filteredProducts.filter((p) => p.category === "mac").length} Pilihan
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
+                  {filteredProducts
+                    .filter((p) => p.category === "mac")
+                    .map((prod) => (
+                      <div
+                        key={prod.id}
+                        onClick={() => prod.isAvailable && addToCart(prod)}
+                        className={`group flex flex-col justify-between p-3 sm:p-4 rounded-3xl bg-white border border-brand-green-900/10 shadow-2xs hover:shadow-md transition-all text-left relative overflow-hidden select-none cursor-pointer ${
+                          !prod.isAvailable ? "opacity-60 grayscale cursor-not-allowed" : "hover:-translate-y-0.5"
+                        }`}
+                      >
+                        <div>
+                          <div className="aspect-video w-full rounded-2xl overflow-hidden bg-brand-cream-100 mb-3 relative">
+                            <img
+                              src={prod.image}
+                              alt={prod.name}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              loading="lazy"
+                            />
+                            {!prod.isAvailable && (
+                              <div className="absolute inset-0 bg-black/60 backdrop-blur-2xs flex items-center justify-center">
+                                <span className="text-[10px] font-black uppercase tracking-wider text-white px-2 py-1 rounded bg-brand-coral-600">
+                                  Habis
+                                </span>
+                              </div>
+                            )}
+                            {prod.isAvailable && (
+                              <span className="absolute bottom-1.5 right-1.5 px-2 py-0.5 rounded-lg bg-white/90 backdrop-blur-xs text-[10px] font-bold text-neutral-700 shadow-2xs">
+                                Sisa {prod.stock}
+                              </span>
+                            )}
+                          </div>
+
+                          <h3 className="font-display font-extrabold text-sm sm:text-base text-brand-green-950 line-clamp-1">
+                            {prod.name}
+                          </h3>
+                          <p className="text-[11px] text-neutral-500 line-clamp-2 mt-0.5 leading-snug">
+                            {prod.description}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-3 mt-2 border-t border-neutral-100">
+                          <span className="font-display font-extrabold text-sm sm:text-base text-brand-green-900">
+                            {formatRupiah(prod.price)}
+                          </span>
+                          <span className="size-7 rounded-xl bg-brand-cream-100 group-hover:bg-brand-green-900 group-hover:text-brand-yellow-400 text-brand-green-900 flex items-center justify-center font-bold text-xs transition-colors">
+                            +
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+
+            {/* 2. Add-on & Camilan Section */}
+            {filteredProducts.filter((p) => p.category === "sides").length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between pb-1 border-b border-brand-green-900/10">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">🍗</span>
+                    <h3 className="font-display font-black text-base text-brand-green-950">
+                      Add-on & Camilan Krispi
+                    </h3>
+                  </div>
+                  <span className="text-xs font-bold text-brand-green-900 bg-brand-cream-100 px-2.5 py-0.5 rounded-full border border-brand-green-900/15">
+                    {filteredProducts.filter((p) => p.category === "sides").length} Pilihan
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
+                  {filteredProducts
+                    .filter((p) => p.category === "sides")
+                    .map((prod) => (
+                      <div
+                        key={prod.id}
+                        onClick={() => prod.isAvailable && addToCart(prod)}
+                        className={`group flex flex-col justify-between p-3 sm:p-4 rounded-3xl bg-white border border-brand-green-900/10 shadow-2xs hover:shadow-md transition-all text-left relative overflow-hidden select-none cursor-pointer ${
+                          !prod.isAvailable ? "opacity-60 grayscale cursor-not-allowed" : "hover:-translate-y-0.5"
+                        }`}
+                      >
+                        <div>
+                          <div className="aspect-video w-full rounded-2xl overflow-hidden bg-brand-cream-100 mb-3 relative">
+                            <img
+                              src={prod.image}
+                              alt={prod.name}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              loading="lazy"
+                            />
+                            {!prod.isAvailable && (
+                              <div className="absolute inset-0 bg-black/60 backdrop-blur-2xs flex items-center justify-center">
+                                <span className="text-[10px] font-black uppercase tracking-wider text-white px-2 py-1 rounded bg-brand-coral-600">
+                                  Habis
+                                </span>
+                              </div>
+                            )}
+                            {prod.isAvailable && (
+                              <span className="absolute bottom-1.5 right-1.5 px-2 py-0.5 rounded-lg bg-white/90 backdrop-blur-xs text-[10px] font-bold text-neutral-700 shadow-2xs">
+                                Sisa {prod.stock}
+                              </span>
+                            )}
+                          </div>
+
+                          <h3 className="font-display font-extrabold text-sm sm:text-base text-brand-green-950 line-clamp-1">
+                            {prod.name}
+                          </h3>
+                          <p className="text-[11px] text-neutral-500 line-clamp-2 mt-0.5 leading-snug">
+                            {prod.description}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-3 mt-2 border-t border-neutral-100">
+                          <span className="font-display font-extrabold text-sm sm:text-base text-brand-green-900">
+                            {formatRupiah(prod.price)}
+                          </span>
+                          <span className="size-7 rounded-xl bg-brand-cream-100 group-hover:bg-brand-green-900 group-hover:text-brand-yellow-400 text-brand-green-900 flex items-center justify-center font-bold text-xs transition-colors">
+                            +
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+
+            {/* 3. Minuman Dingin Section */}
+            {filteredProducts.filter((p) => p.category === "drinks").length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between pb-1 border-b border-brand-green-900/10">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">🥤</span>
+                    <h3 className="font-display font-black text-base text-brand-green-950">
+                      Minuman Dingin & Segar
+                    </h3>
+                  </div>
+                  <span className="text-xs font-bold text-brand-green-900 bg-brand-cream-100 px-2.5 py-0.5 rounded-full border border-brand-green-900/15">
+                    {filteredProducts.filter((p) => p.category === "drinks").length} Pilihan
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
+                  {filteredProducts
+                    .filter((p) => p.category === "drinks")
+                    .map((prod) => (
+                      <div
+                        key={prod.id}
+                        onClick={() => prod.isAvailable && addToCart(prod)}
+                        className={`group flex flex-col justify-between p-3 sm:p-4 rounded-3xl bg-white border border-brand-green-900/10 shadow-2xs hover:shadow-md transition-all text-left relative overflow-hidden select-none cursor-pointer ${
+                          !prod.isAvailable ? "opacity-60 grayscale cursor-not-allowed" : "hover:-translate-y-0.5"
+                        }`}
+                      >
+                        <div>
+                          <div className="aspect-video w-full rounded-2xl overflow-hidden bg-brand-cream-100 mb-3 relative">
+                            <img
+                              src={prod.image}
+                              alt={prod.name}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              loading="lazy"
+                            />
+                            {!prod.isAvailable && (
+                              <div className="absolute inset-0 bg-black/60 backdrop-blur-2xs flex items-center justify-center">
+                                <span className="text-[10px] font-black uppercase tracking-wider text-white px-2 py-1 rounded bg-brand-coral-600">
+                                  Habis
+                                </span>
+                              </div>
+                            )}
+                            {prod.isAvailable && (
+                              <span className="absolute bottom-1.5 right-1.5 px-2 py-0.5 rounded-lg bg-white/90 backdrop-blur-xs text-[10px] font-bold text-neutral-700 shadow-2xs">
+                                Sisa {prod.stock}
+                              </span>
+                            )}
+                          </div>
+
+                          <h3 className="font-display font-extrabold text-sm sm:text-base text-brand-green-950 line-clamp-1">
+                            {prod.name}
+                          </h3>
+                          <p className="text-[11px] text-neutral-500 line-clamp-2 mt-0.5 leading-snug">
+                            {prod.description}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-3 mt-2 border-t border-neutral-100">
+                          <span className="font-display font-extrabold text-sm sm:text-base text-brand-green-900">
+                            {formatRupiah(prod.price)}
+                          </span>
+                          <span className="size-7 rounded-xl bg-brand-cream-100 group-hover:bg-brand-green-900 group-hover:text-brand-yellow-400 text-brand-green-900 flex items-center justify-center font-bold text-xs transition-colors">
+                            +
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          /* Single category or search query grid */
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 pb-20 lg:pb-6">
+            {filteredProducts.map((prod) => (
+              <div
+                key={prod.id}
+                onClick={() => prod.isAvailable && addToCart(prod)}
+                className={`group flex flex-col justify-between p-3 sm:p-4 rounded-3xl bg-white border border-brand-green-900/10 shadow-2xs hover:shadow-md transition-all text-left relative overflow-hidden select-none cursor-pointer ${
+                  !prod.isAvailable ? "opacity-60 grayscale cursor-not-allowed" : "hover:-translate-y-0.5"
+                }`}
+              >
+                <div>
+                  <div className="aspect-video w-full rounded-2xl overflow-hidden bg-brand-cream-100 mb-3 relative">
+                    <img
+                      src={prod.image}
+                      alt={prod.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                    />
+                    {!prod.isAvailable && (
+                      <div className="absolute inset-0 bg-black/60 backdrop-blur-2xs flex items-center justify-center">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-white px-2 py-1 rounded bg-brand-coral-600">
+                          Habis
+                        </span>
+                      </div>
+                    )}
+                    {prod.isAvailable && (
+                      <span className="absolute bottom-1.5 right-1.5 px-2 py-0.5 rounded-lg bg-white/90 backdrop-blur-xs text-[10px] font-bold text-neutral-700 shadow-2xs">
+                        Sisa {prod.stock}
                       </span>
-                    </div>
-                  )}
-                  {prod.isAvailable && (
-                    <span className="absolute bottom-1.5 right-1.5 px-2 py-0.5 rounded-md bg-white/90 backdrop-blur-xs text-[10px] font-bold text-neutral-700 shadow-2xs">
-                      Sisa {prod.stock}
-                    </span>
-                  )}
+                    )}
+                  </div>
+
+                  <h3 className="font-display font-extrabold text-sm sm:text-base text-brand-green-950 line-clamp-1">
+                    {prod.name}
+                  </h3>
+                  <p className="text-[11px] text-neutral-500 line-clamp-2 mt-0.5 leading-snug">
+                    {prod.description}
+                  </p>
                 </div>
 
-                <h3 className="font-display font-extrabold text-sm sm:text-base text-brand-green-950 line-clamp-1">
-                  {prod.name}
-                </h3>
-                <p className="text-[11px] text-neutral-500 line-clamp-2 mt-0.5 leading-snug">
-                  {prod.description}
-                </p>
+                <div className="flex items-center justify-between pt-3 mt-2 border-t border-neutral-100">
+                  <span className="font-display font-extrabold text-sm sm:text-base text-brand-green-900">
+                    {formatRupiah(prod.price)}
+                  </span>
+                  <span className="size-7 rounded-xl bg-brand-cream-100 group-hover:bg-brand-green-900 group-hover:text-brand-yellow-400 text-brand-green-900 flex items-center justify-center font-bold text-xs transition-colors">
+                    +
+                  </span>
+                </div>
               </div>
-
-              <div className="flex items-center justify-between pt-3 mt-2 border-t border-neutral-100">
-                <span className="font-display font-extrabold text-sm sm:text-base text-brand-green-900">
-                  {formatRupiah(prod.price)}
-                </span>
-                <span className="size-7 rounded-lg bg-brand-cream-100 group-hover:bg-brand-green-900 group-hover:text-brand-yellow-400 text-brand-green-900 flex items-center justify-center font-bold text-xs transition-colors">
-                  +
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Right: Cart Summary Panel (Desktop) */}
@@ -423,14 +635,14 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
         {cart.length > 0 && (
           <div className="px-4 py-2.5 bg-neutral-50/70 border-t border-neutral-100">
             {appliedPromo || discount > 0 ? (
-              <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between gap-2">
+              <div className="p-2.5 rounded-2xl bg-brand-cream-100 border border-brand-green-900/20 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 min-w-0">
-                  <Tag className="size-4 text-emerald-700 shrink-0" />
+                  <Tag className="size-4 text-brand-green-900 shrink-0" />
                   <div className="truncate">
-                    <span className="font-mono font-black text-xs text-emerald-950 block truncate">
+                    <span className="font-mono font-black text-xs text-brand-green-950 block truncate">
                       {appliedPromo ? appliedPromo.code : "DISKON MANUAL"}
                     </span>
-                    <span className="text-[10px] text-emerald-700 font-semibold block">
+                    <span className="text-[10px] text-brand-green-800 font-semibold block">
                       Potongan: -{formatRupiah(discount)}
                     </span>
                   </div>
@@ -438,7 +650,7 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
                 <button
                   type="button"
                   onClick={handleRemoveDiscount}
-                  className="p-1 rounded-md text-emerald-700 hover:bg-emerald-100 transition-colors cursor-pointer shrink-0"
+                  className="p-1 rounded-md text-brand-green-900 hover:bg-brand-cream-200 transition-colors cursor-pointer shrink-0"
                   title="Hapus Promo"
                 >
                   <X className="size-3.5" />

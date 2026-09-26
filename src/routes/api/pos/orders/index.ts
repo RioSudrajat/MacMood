@@ -9,11 +9,13 @@ export const Route = createFileRoute("/api/pos/orders/")({
       GET: ({ request }) =>
         withApiSession(request, async () => {
           const url = new URL(request.url);
-          const limit = Number(url.searchParams.get("limit")) || 50;
+          const limit = Number(url.searchParams.get("limit")) || 100;
           const offset = Number(url.searchParams.get("offset")) || 0;
           const shiftId = url.searchParams.get("shiftId") || undefined;
-          const data = await listOrders({ limit, offset, shiftId });
+          const branchId = url.searchParams.get("branchId") || undefined;
+          const data = await listOrders({ limit, offset, shiftId, branchId });
           return Response.json({ data });
+
         }),
       POST: ({ request }) =>
         withApiSession(request, async (session) => {

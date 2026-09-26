@@ -155,9 +155,9 @@ function PosPinLockModalContent({
         <div
           className={`size-14 rounded-2xl flex items-center justify-center mb-3 shadow-md transition-colors duration-300 ${
             isSuccess
-              ? "bg-emerald-600 text-white"
+              ? "bg-brand-green-900 text-brand-yellow-400"
               : errorMsg
-                ? "bg-red-500 text-white"
+                ? "bg-brand-coral-500 text-white"
                 : "bg-brand-green-900 text-brand-yellow-400"
           }`}
         >
@@ -185,8 +185,8 @@ function PosPinLockModalContent({
               <span
                 className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full shrink-0 ${
                   staff.role === "owner"
-                    ? "bg-amber-100 text-amber-900 border border-amber-300"
-                    : "bg-emerald-100 text-emerald-900 border border-emerald-300"
+                    ? "bg-brand-yellow-500/15 text-brand-yellow-700 border border-brand-yellow-500/30"
+                    : "bg-brand-green-900/10 text-brand-green-950 border border-brand-green-900/20"
                 }`}
               >
                 {staff.role === "owner" ? "Owner" : "Kasir"}
@@ -209,9 +209,9 @@ function PosPinLockModalContent({
                 transition={{ duration: 0.3 }}
                 className={`size-4 rounded-full border-2 transition-all duration-150 ${
                   isSuccess
-                    ? "bg-emerald-500 border-emerald-500 scale-110"
+                    ? "bg-brand-green-800 border-brand-green-800 scale-110"
                     : errorMsg
-                      ? "bg-red-400 border-red-500"
+                      ? "bg-brand-coral-500 border-brand-coral-600"
                       : isFilled
                         ? "bg-brand-green-900 border-brand-green-900 scale-110"
                         : "bg-white border-neutral-300"
@@ -224,20 +224,17 @@ function PosPinLockModalContent({
         {/* Error / Helper Message */}
         <div className="h-5 mb-2">
           {errorMsg ? (
-            <span className="text-xs font-bold text-red-600 animate-in fade-in">
+            <span className="text-xs font-bold text-brand-coral-600 animate-in fade-in">
               {errorMsg}
             </span>
           ) : isSuccess ? (
-            <span className="text-xs font-bold text-emerald-600 flex items-center justify-center gap-1">
+            <span className="text-xs font-bold text-brand-green-800 flex items-center justify-center gap-1">
               <ShieldCheck className="size-3.5" />
               Selamat bertugas, {staff.name.split(" ")[0]}!
             </span>
           ) : (
-            <span className="text-[11px] text-neutral-400">
-              Demo PIN {staff.name.split(" ")[0]}:{" "}
-              <strong className="text-brand-green-900 font-mono bg-brand-cream-100 px-1.5 py-0.5 rounded">
-                {staff.pin}
-              </strong>
+            <span className="text-[11px] text-neutral-500 font-medium">
+              Masukkan 4 digit PIN otorisasi Anda
             </span>
           )}
         </div>

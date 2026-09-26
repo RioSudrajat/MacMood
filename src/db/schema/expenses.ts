@@ -1,10 +1,14 @@
 import { integer, pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { branches } from "./branches";
 import { user } from "./user";
 
 export const expenses = pgTable("expenses", {
   id: uuid("id").defaultRandom().primaryKey(),
+  branchId: varchar("branch_id", { length: 50 }).references(() => branches.id, { onDelete: "set null" }),
+  branchName: varchar("branch_name", { length: 150 }),
   userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
   title: varchar("title", { length: 150 }).notNull(),
+
   amount: integer("amount").notNull(),
   category: varchar("category", { length: 50 }).notNull(), // 'INGREDIENT' | 'UTILITY' | 'PACKAGING' | 'OPERATIONAL'
   paymentSource: varchar("payment_source", { length: 50 }).notNull(), // 'CASH_DRAWER' | 'OWNER_TRANSFER'

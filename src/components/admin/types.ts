@@ -24,9 +24,11 @@ export interface AdminProduct {
   image: string;
   isAvailable: boolean;
   trackStock: boolean;
-  currentStock: number;
+  currentStock: number; // Total konsolidasi atau stok cabang aktif
+  branchStocks?: Record<string, number>; // Stok per cabang { [branchId]: quantity }
   lowStockThreshold: number;
   soldCount: number;
+  branchSoldCounts?: Record<string, number>; // Terjual per cabang { [branchId]: quantity }
 }
 
 export type StockMutationReason = "RESTOCK" | "SPOILAGE" | "ADJUSTMENT";
@@ -41,7 +43,33 @@ export interface StockLog {
   reasonLabel: string;
   notes: string;
   staffName: string;
+  branchId?: string;
+  branchName?: string;
   timestamp: string;
+}
+
+export interface BranchOutlet {
+  id: string;
+  name: string;
+  branchCode: string;
+  code?: string; // Alias for branchCode
+  address: string;
+  city: string;
+  phone: string;
+  email: string; // Email akun cabang
+  pin: string; // PIN akses cepat POS
+  picName?: string; // Penanggung Jawab Cabang (PIC)
+  managerName?: string; // Alias for picName
+  picPhone?: string;
+  isActive: boolean;
+
+  openedAt?: string;
+  taxRate?: number;
+  serviceChargeRate?: number;
+  qrisMerchantName?: string;
+  qrisNmid?: string;
+  bankAccount?: string;
+  bankName?: string;
 }
 
 export interface StaffAccount {
@@ -50,6 +78,8 @@ export interface StaffAccount {
   email: string;
   role: "cashier" | "owner";
   pin: string; // 4-6 digit PIN
+  branchId?: string; // ID Cabang Penugasan
+  branchName?: string; // Nama Cabang Penugasan
   isActive: boolean;
   lastLogin: string;
 }
@@ -74,7 +104,10 @@ export interface OutletSettings {
 // -------------------------------------------------------------
 export interface ShiftRecord {
   id: string;
-  shiftName: string; // misal: "Shift Pagi (08:00 - 16:00)"
+  shiftName: string; // misal: "Rekap Harian · Fatmawati (08:00 - 22:00)"
+  branchId?: string;
+  branchName?: string;
+  branchCode?: string;
   cashierId: string;
   cashierName: string;
   startTime: string;
@@ -193,6 +226,9 @@ export type AuditActionType =
   | "MENU_AVAILABILITY_CHANGE"
   | "VOID_ORDER"
   | "STAFF_PIN_RESET"
+  | "STAFF_PASSWORD_RESET"
+  | "STAFF_BRANCH_REASSIGN"
+  | "BRANCH_CREATED"
   | "SHIFT_FORCE_CLOSE"
   | "OUTLET_SETTING_UPDATE"
   | "EXPENSE_RECORDED"

@@ -29,6 +29,20 @@
       "when": 1790266665534,
       "tag": "0003_wandering_butterfly",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790381357370,
+      "tag": "0004_careful_richard_fisk",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790426305546,
+      "tag": "0005_shiny_madame_hydra",
+      "breakpoints": true
     }
   ]
 }

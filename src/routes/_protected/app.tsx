@@ -30,7 +30,8 @@ import {
 } from "@/components/pos/pos-pin-lock-modal";
 import { TopBar } from "@/components/common/top-bar";
 import { NotificationsView } from "@/components/common/notifications-view";
-import { Clock, Wifi, WifiOff, Lock } from "lucide-react";
+import { Clock, Wifi, WifiOff, Lock, Store } from "lucide-react";
+import { INITIAL_BRANCHES } from "@/components/admin/mock-data";
 
 export const Route = createFileRoute("/_protected/app")({
   head: () => ({ meta: [{ title: `Kasir POS | ${siteConfig.name}` }] }),
@@ -65,6 +66,31 @@ export function PosAppPage() {
 
   const [isPinLockOpen, setIsPinLockOpen] = useState(false);
   const cashierName = activeStaff.name;
+
+  // Active Branch resolution:
+  // 1. From localStorage 'macmood_current_branch' (set by Owner PIN modal or branch switcher)
+  // 2. Or from user email matching outlet
+  // 3. Default to branch-1
+  const [currentBranchId, setCurrentBranchId] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("macmood_current_branch");
+      if (stored) return stored;
+    }
+    const email = session.user.email?.toLowerCase() || "";
+    if (email.includes("outlet2") || email.includes("margonda")) return "branch-2";
+    if (email.includes("outlet3") || email.includes("tebet")) return "branch-3";
+    return "branch-1";
+  });
+
+  const handleSwitchBranch = (branchId: string) => {
+    setCurrentBranchId(branchId);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("macmood_current_branch", branchId);
+    }
+  };
+
+  const activeBranch =
+    INITIAL_BRANCHES.find((b) => b.id === currentBranchId) || INITIAL_BRANCHES[0];
 
   // Sidebar Collapse & Mobile Drawer States
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -340,6 +366,8 @@ export function PosAppPage() {
     const newOrder: CompletedOrder = {
       id: `ord-${Date.now()}`,
       orderNumber: orderNum,
+      branchId: activeBranch.id,
+      branchName: activeBranch.name,
       items: orderData.items,
       subtotal: orderData.subtotal,
       discount: orderData.discount,
@@ -394,6 +422,8 @@ export function PosAppPage() {
         body: JSON.stringify({
           id: newOrder.id,
           orderNumber: newOrder.orderNumber,
+          branchId: activeBranch.id,
+          branchName: activeBranch.name,
           shiftId: shift.id?.startsWith("shift-") ? undefined : shift.id,
           cashierName,
           subtotal: newOrder.subtotal,
@@ -627,6 +657,30 @@ export function PosAppPage() {
           onOpenMobileMenu={() => setIsMobileSidebarOpen(true)}
           extraActions={
             <div className="flex items-center gap-2">
+              {/* Active Branch Badge / Switcher */}
+              {isOwner ? (
+                <div className="hidden md:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-green-900/10 text-brand-green-950 font-bold text-xs border border-brand-green-900/15">
+                  <Store className="size-3 text-brand-green-800" />
+                  <select
+                    value={currentBranchId}
+                    onChange={(e) => handleSwitchBranch(e.target.value)}
+                    className="bg-transparent border-none text-xs font-bold text-brand-green-950 outline-none cursor-pointer pr-1"
+                    title="Pilih Cabang Aktif untuk Simulasi Transaksi"
+                  >
+                    {INITIAL_BRANCHES.map((b) => (
+                      <option key={b.id} value={b.id}>
+                        {b.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : (
+                <div className="hidden md:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-green-900/10 text-brand-green-950 font-bold text-xs border border-brand-green-900/15">
+                  <Store className="size-3 text-brand-green-800" />
+                  <span>{activeBranch.name}</span>
+                </div>
+              )}
+
               {/* Quick Lock PIN Button */}
               <button
                 type="button"
@@ -638,15 +692,15 @@ export function PosAppPage() {
                 <span>Kunci PIN</span>
               </button>
 
-              {/* Shift status pill */}
+              {/* Laci Cabang status pill */}
               <button
                 type="button"
                 onClick={() => switchTab("shift")}
                 className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand-cream-100 hover:bg-brand-cream-200 text-brand-green-900 font-semibold text-xs transition-colors cursor-pointer"
-                title="Buka Rekap Shift"
+                title="Buka Rekap Kas Cabang"
               >
                 <Clock className="size-3 text-brand-green-800" />
-                <span>{shift.status === "OPEN" ? "Shift Buka" : "Shift Tutup"}</span>
+                <span>{shift.status === "OPEN" ? "Laci Buka" : "Laci Tutup"}</span>
               </button>
 
               {/* Sync status indicator */}
@@ -696,6 +750,8 @@ export function PosAppPage() {
             <PosShiftView
               shift={shift}
               pastShifts={pastShifts}
+              branchName={activeBranch.name}
+              branchCode={activeBranch.branchCode || activeBranch.code}
               onOpenShift={handleOpenShift}
               onCloseShift={handleCloseShift}
             />

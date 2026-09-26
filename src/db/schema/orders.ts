@@ -1,14 +1,18 @@
 import { integer, pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { branches } from "./branches";
 import { shifts } from "./shifts";
 import { user } from "./user";
 
 export const orders = pgTable("orders", {
   id: text("id").primaryKey(), // Support client-generated UUID for offline idempotency
   orderNumber: varchar("order_number", { length: 50 }).notNull().unique(),
+  branchId: varchar("branch_id", { length: 50 }).references(() => branches.id, { onDelete: "set null" }),
+  branchName: varchar("branch_name", { length: 150 }),
   shiftId: uuid("shift_id").references(() => shifts.id, { onDelete: "set null" }),
   userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
   cashierName: varchar("cashier_name", { length: 100 }).notNull(),
   customerName: varchar("customer_name", { length: 100 }).default("Pelanggan"),
+
   subtotal: integer("subtotal").notNull(),
   discount: integer("discount").default(0).notNull(),
   promoCode: varchar("promo_code", { length: 50 }),

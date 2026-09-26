@@ -4,12 +4,16 @@ import { ensureSeededData } from "./seed.service.server";
 import { desc, eq, sql } from "drizzle-orm";
 import type { CreateOrderInput, OpenShiftInput, CloseShiftInput } from "@/validators/pos";
 
-export async function getActiveShift() {
+export async function getActiveShift(branchId?: string) {
   await ensureSeededData();
+  const conditions = [eq(shifts.status, "OPEN")];
+  if (branchId) {
+    conditions.push(eq(shifts.branchId, branchId));
+  }
   const [activeShift] = await db
     .select()
     .from(shifts)
-    .where(eq(shifts.status, "OPEN"))
+    .where(conditions.length > 1 ? sql`${shifts.status} = 'OPEN' AND ${shifts.branchId} = ${branchId}` : eq(shifts.status, "OPEN"))
     .orderBy(desc(shifts.startTime))
     .limit(1);
   return activeShift || null;
@@ -25,6 +29,9 @@ export async function openShift(input: OpenShiftInput, userId?: string) {
     .values({
       userId: userId || null,
       shiftCode,
+      branchId: input.branchId || null,
+      branchName: input.branchName || null,
+      branchCode: input.branchCode || null,
       staffName: input.cashierName,
       initialCash: input.initialCash,
       expectedCash: input.initialCash,
@@ -36,6 +43,7 @@ export async function openShift(input: OpenShiftInput, userId?: string) {
 
   return newShift;
 }
+
 
 export async function closeShift(shiftId: string, input: CloseShiftInput) {
   const [shift] = await db.select().from(shifts).where(eq(shifts.id, shiftId)).limit(1);
@@ -64,7 +72,11 @@ export async function closeShift(shiftId: string, input: CloseShiftInput) {
 
 export async function listPastShifts() {
   await ensureSeededData();
-  return db.select().from(shifts).orderBy(desc(shifts.startTime));
+  return db
+    .select()
+    .from(shifts)
+    .where(eq(shifts.status, "CLOSED"))
+    .orderBy(desc(shifts.startTime));
 }
 
 export async function createOrder(input: CreateOrderInput, userId?: string) {
@@ -79,7 +91,7 @@ export async function createOrder(input: CreateOrderInput, userId?: string) {
   // Find active shift if not provided
   let activeShiftId = input.shiftId;
   if (!activeShiftId) {
-    const active = await getActiveShift();
+    const active = await getActiveShift(input.branchId);
     activeShiftId = active?.id;
   }
 
@@ -90,6 +102,8 @@ export async function createOrder(input: CreateOrderInput, userId?: string) {
       .values({
         id: orderId,
         orderNumber,
+        branchId: input.branchId || null,
+        branchName: input.branchName || null,
         shiftId: activeShiftId || null,
         userId: userId || null,
         cashierName: input.cashierName,
@@ -111,35 +125,49 @@ export async function createOrder(input: CreateOrderInput, userId?: string) {
       .onConflictDoNothing({ target: orders.id })
       .returning();
 
+
     if (!insertedOrder) {
       // Idempotency: order already exists (offline sync repeat)
       const [existing] = await tx.select().from(orders).where(eq(orders.id, orderId)).limit(1);
       return existing;
     }
 
-    // 2. Insert items
+    // 2. Insert items with verified relational product foreign keys
     if (input.items && input.items.length > 0) {
-      await tx.insert(orderItems).values(
-        input.items.map((it) => ({
+      const allDbProducts = await tx.select().from(products);
+      const prodById = new Map(allDbProducts.map((p) => [p.id, p]));
+      const prodByName = new Map(allDbProducts.map((p) => [p.name.toLowerCase().trim(), p]));
+
+      const itemsWithProd = input.items.map((it) => {
+        const matched =
+          (it.productId && prodById.get(it.productId)) ||
+          prodByName.get(it.productName.toLowerCase().trim());
+        return {
           orderId,
-          productId: it.productId || null,
+          productId: matched?.id || null,
           productName: it.productName,
           price: it.price,
           quantity: it.quantity,
           subtotal: it.subtotal,
           notes: it.notes || null,
-        })),
+          matchedProduct: matched,
+        };
+      });
+
+      await tx.insert(orderItems).values(
+        itemsWithProd.map(({ matchedProduct, ...itemData }) => itemData)
       );
 
       // 3. Decrement stock for products if tracked
-      for (const it of input.items) {
-        if (it.productId) {
+      for (const it of itemsWithProd) {
+        if (it.matchedProduct && it.matchedProduct.trackStock) {
           await tx
             .update(products)
             .set({
               currentStock: sql`GREATEST(0, ${products.currentStock} - ${it.quantity})`,
+              updatedAt: new Date(),
             })
-            .where(eq(products.id, it.productId));
+            .where(eq(products.id, it.matchedProduct.id));
         }
       }
     }
@@ -191,14 +219,28 @@ export async function syncOfflineOrders(ordersList: CreateOrderInput[], userId?:
   return synced;
 }
 
-export async function listOrders(filter?: { limit?: number; offset?: number; shiftId?: string }) {
+export async function listOrders(filter?: { limit?: number; offset?: number; shiftId?: string; branchId?: string }) {
   await ensureSeededData();
-  const limit = filter?.limit || 50;
+  const limit = filter?.limit || 100;
   const offset = filter?.offset || 0;
 
-  const orderRows = await db
+  const conditions = [];
+  if (filter?.branchId && filter.branchId !== "all") {
+    conditions.push(eq(orders.branchId, filter.branchId));
+  }
+  if (filter?.shiftId) {
+    conditions.push(eq(orders.shiftId, filter.shiftId));
+  }
+
+  const query = db
     .select()
-    .from(orders)
+    .from(orders);
+
+  if (conditions.length > 0) {
+    query.where(conditions.length === 1 ? conditions[0] : sql`${conditions[0]} AND ${conditions[1]}`);
+  }
+
+  const orderRows = await query
     .orderBy(desc(orders.createdAt))
     .limit(limit)
     .offset(offset);
@@ -213,6 +255,7 @@ export async function listOrders(filter?: { limit?: number; offset?: number; shi
     items: items.filter((it) => it.orderId === ord.id),
   }));
 }
+
 
 export async function getOrder(id: string) {
   await ensureSeededData();

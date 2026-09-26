@@ -15,6 +15,8 @@ export const createOrderSchema = z
   .object({
     id: z.string().optional(),
     orderNumber: z.string().optional(),
+    branchId: z.string().max(50).optional(),
+    branchName: z.string().max(150).optional(),
     shiftId: z.string().optional(),
     cashierName: z.string().min(1).max(100),
     customerName: z.string().max(100).default("Pelanggan"),
@@ -41,11 +43,15 @@ export const syncOfflineOrdersSchema = z
 
 export const openShiftSchema = z
   .object({
+    branchId: z.string().max(50).optional(),
+    branchName: z.string().max(150).optional(),
+    branchCode: z.string().max(50).optional(),
     cashierName: z.string().min(1).max(100),
     initialCash: z.coerce.number().int().min(0),
     notes: z.string().max(500).optional(),
   })
   .strict();
+
 
 export const closeShiftSchema = z
   .object({
