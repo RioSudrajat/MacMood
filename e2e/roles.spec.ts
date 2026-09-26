@@ -149,11 +149,15 @@ test("the admin page renders only for a permitted role", async ({ page }) => {
   await expect(page).toHaveURL(/\/app$/);
 
   await page.goto("/admin");
-  await expect(page.getByText("Every account’s notes")).toHaveCount(0);
+  await expect(page).toHaveURL(/\/app$/);
+  await expect(
+    page.getByRole("heading", { name: "Performa Finansial & Analitik Outlet" }),
+  ).toHaveCount(0);
 
   await setRole(email, "admin");
   await page.goto("/admin");
+  await expect(page).toHaveURL(/\/admin$/);
   await expect(
-    page.getByRole("heading", { name: "Every account’s notes" }),
+    page.getByRole("heading", { name: "Performa Finansial & Analitik Outlet" }),
   ).toBeVisible();
 });

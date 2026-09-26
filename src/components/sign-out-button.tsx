@@ -42,8 +42,8 @@ export function SignOutButton({
           type="button"
           onClick={signOut}
           disabled={pending}
-          title="Keluar / Sign Out"
-          aria-label="Sign Out"
+          title="Sign out"
+          aria-label="Sign out"
           className={`size-11 rounded-2xl bg-neutral-100 hover:bg-rose-100 text-neutral-600 hover:text-rose-700 flex items-center justify-center transition-colors cursor-pointer ${className}`}
         >
           <LogOut className="size-4.5" />
@@ -56,10 +56,11 @@ export function SignOutButton({
         type="button"
         onClick={signOut}
         disabled={pending}
+        aria-label="Sign out"
         className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl bg-neutral-100 hover:bg-rose-50 text-neutral-700 hover:text-rose-700 font-bold text-xs transition-colors cursor-pointer ${className}`}
       >
         <LogOut className="size-4 text-neutral-500" />
-        <span>{pending ? "Keluar..." : "Keluar (Sign Out)"}</span>
+        <span>{pending ? "Signing out…" : "Sign out"}</span>
       </button>
     );
   }

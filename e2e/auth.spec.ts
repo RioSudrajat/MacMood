@@ -9,9 +9,12 @@ test("anonymous visitors cannot access the protected app", async ({
   await expect(
     page.getByRole("heading", { name: "Welcome back" }),
   ).toBeVisible();
-  // The root has no page: anonymous visitors land on sign-in.
+  // The root is the public marketing landing page.
   await page.goto("/");
-  await expect(page).toHaveURL(/\/sign-in$/);
+  await expect(page).toHaveURL(/\/$/);
+  await expect(
+    page.getByRole("heading", { name: "Mood baik, dimulai dari MacMood." }),
+  ).toBeVisible();
   const session = await request.get("/api/auth/get-session");
   expect(await session.json()).toBeNull();
 });
@@ -40,9 +43,9 @@ test("signup, persisted session, signout, rejected password, and signin work", a
   await expect(
     page.getByRole("button", { name: "Sign out", exact: true }),
   ).toBeVisible();
-  // Signed-in visitors skip the root too.
+  // Root remains the landing page for visitors.
   await page.goto("/");
-  await expect(page).toHaveURL(/\/app$/);
+  await expect(page).toHaveURL(/\/$/);
   const cookies = await context.cookies();
   expect(
     cookies.some(
