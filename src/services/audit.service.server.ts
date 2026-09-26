@@ -17,10 +17,17 @@ export interface RecordAuditLogInput {
 
 export async function listAuditLogs(limit = 100) {
   await ensureSeededData();
-  return db.select().from(auditLogs).orderBy(desc(auditLogs.createdAt)).limit(limit);
+  return db
+    .select()
+    .from(auditLogs)
+    .orderBy(desc(auditLogs.createdAt))
+    .limit(limit);
 }
 
-export async function recordAuditLog(input: RecordAuditLogInput, userId?: string) {
+export async function recordAuditLog(
+  input: RecordAuditLogInput,
+  userId?: string,
+) {
   const [log] = await db
     .insert(auditLogs)
     .values({

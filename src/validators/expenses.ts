@@ -14,5 +14,4 @@ export const createExpenseSchema = z
   })
   .strict();
 
-
 export type CreateExpenseInput = z.infer<typeof createExpenseSchema>;

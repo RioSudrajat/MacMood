@@ -10,7 +10,11 @@ interface PosCheckoutModalProps {
   tax?: number;
   total: number;
   onClose: () => void;
-  onSubmit: (method: PaymentMethod, amountTendered: number, change: number) => void;
+  onSubmit: (
+    method: PaymentMethod,
+    amountTendered: number,
+    change: number,
+  ) => void;
 }
 
 export function PosCheckoutModal({
@@ -65,7 +69,9 @@ export function PosCheckoutModal({
               <div className="space-y-1 pb-2.5 mb-2.5 border-b border-brand-green-900/10 text-xs">
                 <div className="flex justify-between text-neutral-600">
                   <span>Subtotal Belanja</span>
-                  <span className="font-mono font-medium">{formatRupiah(subtotal)}</span>
+                  <span className="font-mono font-medium">
+                    {formatRupiah(subtotal)}
+                  </span>
                 </div>
                 <div className="flex justify-between text-emerald-700 font-bold">
                   <span>Diskon {promoCode ? `(${promoCode})` : ""}</span>
@@ -73,12 +79,16 @@ export function PosCheckoutModal({
                 </div>
                 <div className="flex justify-between text-neutral-600">
                   <span>PB1 (10%)</span>
-                  <span className="font-mono font-medium">{formatRupiah(tax)}</span>
+                  <span className="font-mono font-medium">
+                    {formatRupiah(tax)}
+                  </span>
                 </div>
               </div>
             )}
 
-            <span className="text-xs text-neutral-600 font-medium block text-center">Total tagihan pesanan:</span>
+            <span className="text-xs text-neutral-600 font-medium block text-center">
+              Total tagihan pesanan:
+            </span>
             <div className="font-display font-black text-3xl sm:text-4xl text-brand-green-900 mt-0.5 text-center">
               {formatRupiah(total)}
             </div>
@@ -102,8 +112,12 @@ export function PosCheckoutModal({
               }`}
             >
               <Banknote className="size-6 mb-1 text-brand-green-800" />
-              <span className="text-sm font-display font-bold">Tunai (Cash)</span>
-              <span className="text-[10px] text-neutral-500">Hitung kembalian cepat</span>
+              <span className="text-sm font-display font-bold">
+                Tunai (Cash)
+              </span>
+              <span className="text-[10px] text-neutral-500">
+                Hitung kembalian cepat
+              </span>
             </button>
 
             <button
@@ -119,8 +133,12 @@ export function PosCheckoutModal({
               }`}
             >
               <QrCode className="size-6 mb-1 text-brand-green-800" />
-              <span className="text-sm font-display font-bold">QRIS Manual</span>
-              <span className="text-[10px] text-neutral-500">Verifikasi mutasi kasir</span>
+              <span className="text-sm font-display font-bold">
+                QRIS Manual
+              </span>
+              <span className="text-[10px] text-neutral-500">
+                Verifikasi mutasi kasir
+              </span>
             </button>
           </div>
 
@@ -173,13 +191,19 @@ export function PosCheckoutModal({
                     : "bg-emerald-50/60 border-emerald-200"
                 }`}
               >
-                <span className="text-xs font-semibold text-neutral-600">Uang Kembalian:</span>
+                <span className="text-xs font-semibold text-neutral-600">
+                  Uang Kembalian:
+                </span>
                 <strong
                   className={`font-display font-black text-xl ${
-                    isInsufficientCash ? "text-brand-coral-600" : "text-emerald-800"
+                    isInsufficientCash
+                      ? "text-brand-coral-600"
+                      : "text-emerald-800"
                   }`}
                 >
-                  {isInsufficientCash ? "Uang Masih Kurang" : formatRupiah(changeAmount)}
+                  {isInsufficientCash
+                    ? "Uang Masih Kurang"
+                    : formatRupiah(changeAmount)}
                 </strong>
               </div>
             </div>
@@ -206,13 +230,19 @@ export function PosCheckoutModal({
                   <span className="size-5 rounded-full bg-brand-green-900 text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                     2
                   </span>
-                  <span>Pastikan notifikasi dana masuk telah diterima di HP operasional outlet.</span>
+                  <span>
+                    Pastikan notifikasi dana masuk telah diterima di HP
+                    operasional outlet.
+                  </span>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="size-5 rounded-full bg-brand-green-900 text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                     3
                   </span>
-                  <span>Tekan tombol konfirmasi di bawah untuk menyelesaikan pesanan.</span>
+                  <span>
+                    Tekan tombol konfirmasi di bawah untuk menyelesaikan
+                    pesanan.
+                  </span>
                 </div>
               </div>
             </div>

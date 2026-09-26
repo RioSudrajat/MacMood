@@ -1,4 +1,11 @@
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { useLocation } from "@tanstack/react-router";
 import Lenis from "lenis";
 
@@ -32,7 +39,9 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
       return;
     }
 
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    );
 
     // Initialize Lenis with luxurious, elegant deceleration
     const lenis = new Lenis({
@@ -89,7 +98,9 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
         if (targetElement) {
           e.preventDefault();
           const header = document.querySelector(".site-header");
-          const headerHeight = header ? header.getBoundingClientRect().height : 80;
+          const headerHeight = header
+            ? header.getBoundingClientRect().height
+            : 80;
           lenis.scrollTo(targetElement as HTMLElement, {
             offset: -headerHeight - 8,
             duration: 1.2,
@@ -107,7 +118,10 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
 
     return () => {
       document.removeEventListener("click", handleAnchorClick);
-      prefersReducedMotion.removeEventListener?.("change", onMotionPreferenceChange);
+      prefersReducedMotion.removeEventListener?.(
+        "change",
+        onMotionPreferenceChange,
+      );
       lenis.destroy();
       lenisRef.current = null;
       setLenisInstance(null);
@@ -123,5 +137,9 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
     }
   }, [location.pathname, location.hash, isLandingPage]);
 
-  return <LenisContext.Provider value={lenisInstance}>{children}</LenisContext.Provider>;
+  return (
+    <LenisContext.Provider value={lenisInstance}>
+      {children}
+    </LenisContext.Provider>
+  );
 }

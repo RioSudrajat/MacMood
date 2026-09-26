@@ -8,9 +8,22 @@ export const Route = createFileRoute("/api/inventory/materials/restock")({
     handlers: {
       POST: ({ request }) =>
         withApiSession(request, async () => {
-          const body = (await readJson(request)) as { materialId: string; addedStock: number; totalCost: number; supplierName?: string };
+          const body = (await readJson(request)) as {
+            materialId: string;
+            addedStock: number;
+            totalCost: number;
+            supplierName?: string;
+          };
           if (!body?.materialId) {
-            return Response.json({ error: { code: "MISSING_ID", message: "materialId is required" } }, { status: 400 });
+            return Response.json(
+              {
+                error: {
+                  code: "MISSING_ID",
+                  message: "materialId is required",
+                },
+              },
+              { status: 400 },
+            );
           }
           const input = restockMaterialSchema.parse({
             addedStock: body.addedStock,

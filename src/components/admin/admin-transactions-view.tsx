@@ -1,5 +1,9 @@
 import { useState } from "react";
-import type { CompletedOrder, PaymentMethod, OrderStatus } from "@/components/pos/types";
+import type {
+  CompletedOrder,
+  PaymentMethod,
+  OrderStatus,
+} from "@/components/pos/types";
 import type { BranchOutlet } from "./types";
 import { formatRupiah } from "@/components/pos/format";
 import {
@@ -20,7 +24,12 @@ import {
   FileText,
 } from "lucide-react";
 import { INITIAL_BRANCHES } from "./mock-data";
-import { downloadCsv, printReportPdf, type ReportPrintKpi, type ReportPrintSection } from "@/lib/export-utils";
+import {
+  downloadCsv,
+  printReportPdf,
+  type ReportPrintKpi,
+  type ReportPrintSection,
+} from "@/lib/export-utils";
 
 interface AdminTransactionsViewProps {
   orders: CompletedOrder[];
@@ -33,15 +42,23 @@ export function AdminTransactionsView({
   branches = INITIAL_BRANCHES,
   onVoidOrder,
 }: AdminTransactionsViewProps) {
-  const [selectedBranchId, setSelectedBranchId] = useState<"all" | string>("all");
-  const [datePeriod, setDatePeriod] = useState<"today" | "week" | "month" | "all">("today");
+  const [selectedBranchId, setSelectedBranchId] = useState<"all" | string>(
+    "all",
+  );
+  const [datePeriod, setDatePeriod] = useState<
+    "today" | "week" | "month" | "all"
+  >("today");
   const [searchQuery, setSearchQuery] = useState("");
-  const [paymentFilter, setPaymentFilter] = useState<"all" | PaymentMethod>("all");
+  const [paymentFilter, setPaymentFilter] = useState<"all" | PaymentMethod>(
+    "all",
+  );
   const [statusFilter, setStatusFilter] = useState<"all" | OrderStatus>("all");
   const [exportNotice, setExportNotice] = useState<string | null>(null);
 
   // Selected Order for Detail Modal
-  const [selectedOrder, setSelectedOrder] = useState<CompletedOrder | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<CompletedOrder | null>(
+    null,
+  );
 
   // Void Modal State
   const [orderToVoid, setOrderToVoid] = useState<CompletedOrder | null>(null);
@@ -51,12 +68,19 @@ export function AdminTransactionsView({
 
   // Filtering
   const filteredOrders = orders.filter((ord) => {
-    const matchBranch = selectedBranchId === "all" || !ord.branchId || ord.branchId === selectedBranchId;
+    const matchBranch =
+      selectedBranchId === "all" ||
+      !ord.branchId ||
+      ord.branchId === selectedBranchId;
     const matchSearch =
       ord.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
       ord.cashierName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (ord.branchName || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-      ord.items.some((it) => it.name.toLowerCase().includes(searchQuery.toLowerCase()));
+      (ord.branchName || "")
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
+      ord.items.some((it) =>
+        it.name.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
 
     const matchPayment =
       paymentFilter === "all" ||
@@ -65,21 +89,29 @@ export function AdminTransactionsView({
     const matchStatus = statusFilter === "all" || ord.status === statusFilter;
 
     let matchDate = true;
-    const orderDate = ord.dateStr || (ord.createdAt ? new Date(ord.createdAt).toISOString().slice(0, 10) : "2026-09-26");
+    const orderDate =
+      ord.dateStr ||
+      (ord.createdAt
+        ? new Date(ord.createdAt).toISOString().slice(0, 10)
+        : "2026-09-26");
     if (datePeriod === "today") {
       matchDate = Boolean(
         orderDate === todayDateStr ||
         orderDate === "2026-09-26" ||
         ord.dateStr?.startsWith("2026-09-26") ||
-        (ord.createdAt && ord.createdAt.startsWith("2026-09-26"))
+        (ord.createdAt && ord.createdAt.startsWith("2026-09-26")),
       );
     } else if (datePeriod === "week") {
       matchDate = orderDate >= "2026-09-20";
     } else if (datePeriod === "month") {
-      matchDate = orderDate.startsWith("2026-09") || (orderDate.slice(0, 7) === todayDateStr.slice(0, 7));
+      matchDate =
+        orderDate.startsWith("2026-09") ||
+        orderDate.slice(0, 7) === todayDateStr.slice(0, 7);
     }
 
-    return matchBranch && matchSearch && matchPayment && matchStatus && matchDate;
+    return (
+      matchBranch && matchSearch && matchPayment && matchStatus && matchDate
+    );
   });
 
   // Calculate Metrics
@@ -90,7 +122,9 @@ export function AdminTransactionsView({
     .filter((o) => o.paymentMethod === "CASH")
     .reduce((sum, o) => sum + o.total, 0);
   const qrisPaidTotal = paidOrders
-    .filter((o) => o.paymentMethod === "QRIS_MANUAL" || o.paymentMethod === "QRIS")
+    .filter(
+      (o) => o.paymentMethod === "QRIS_MANUAL" || o.paymentMethod === "QRIS",
+    )
     .reduce((sum, o) => sum + o.total, 0);
 
   const handleConfirmVoid = (e: React.FormEvent) => {
@@ -103,7 +137,12 @@ export function AdminTransactionsView({
   };
 
   const handleExportCSV = () => {
-    const branchLabel = selectedBranchId === "all" ? "Semua_Cabang" : (branches.find((b) => b.id === selectedBranchId)?.branchCode || branches.find((b) => b.id === selectedBranchId)?.code || "Cabang");
+    const branchLabel =
+      selectedBranchId === "all"
+        ? "Semua_Cabang"
+        : branches.find((b) => b.id === selectedBranchId)?.branchCode ||
+          branches.find((b) => b.id === selectedBranchId)?.code ||
+          "Cabang";
     const filename = `MacMood_Riwayat_Transaksi_${branchLabel}_${new Date().toISOString().slice(0, 10)}`;
 
     const headers = [
@@ -144,19 +183,46 @@ export function AdminTransactionsView({
   };
 
   const handlePrintPdf = () => {
-    const branchLabel = selectedBranchId === "all" ? "Seluruh Cabang (Konsolidasi)" : branches.find((b) => b.id === selectedBranchId)?.name || "Cabang";
+    const branchLabel =
+      selectedBranchId === "all"
+        ? "Seluruh Cabang (Konsolidasi)"
+        : branches.find((b) => b.id === selectedBranchId)?.name || "Cabang";
 
     const kpis: ReportPrintKpi[] = [
-      { label: "Total Omzet Lunas", value: formatRupiah(totalPaidRevenue), sub: `${paidOrders.length} nota berhasil` },
-      { label: "Penerimaan Tunai", value: formatRupiah(cashPaidTotal), sub: "Kas laci kasir" },
-      { label: "Penerimaan QRIS", value: formatRupiah(qrisPaidTotal), sub: "Settlement rekening" },
-      { label: "Transaksi Dibatalkan", value: `${voidOrders.length} Nota`, sub: "Otorisasi void owner" },
+      {
+        label: "Total Omzet Lunas",
+        value: formatRupiah(totalPaidRevenue),
+        sub: `${paidOrders.length} nota berhasil`,
+      },
+      {
+        label: "Penerimaan Tunai",
+        value: formatRupiah(cashPaidTotal),
+        sub: "Kas laci kasir",
+      },
+      {
+        label: "Penerimaan QRIS",
+        value: formatRupiah(qrisPaidTotal),
+        sub: "Settlement rekening",
+      },
+      {
+        label: "Transaksi Dibatalkan",
+        value: `${voidOrders.length} Nota`,
+        sub: "Otorisasi void owner",
+      },
     ];
 
     const sections: ReportPrintSection[] = [
       {
         title: "Riwayat Transaksi Penjualan Lengkap",
-        headers: ["No. Nota", "Tanggal & Waktu", "Cabang", "Kasir", "Metode", "Status", "Total"],
+        headers: [
+          "No. Nota",
+          "Tanggal & Waktu",
+          "Cabang",
+          "Kasir",
+          "Metode",
+          "Status",
+          "Total",
+        ],
         rows: filteredOrders.map((o) => [
           o.orderNumber,
           `${o.dateStr || "2026-09-26"} ${o.timestamp}`,
@@ -173,7 +239,11 @@ export function AdminTransactionsView({
     printReportPdf({
       title: "Laporan Riwayat Transaksi Penjualan POS",
       subtitle: `Audit Transaksi Multi-Cabang & Kanal Pembayaran MacMood (${branchLabel})`,
-      periodLabel: new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }),
+      periodLabel: new Date().toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }),
       outletName: branchLabel,
       printedBy: "Muhammad Afrizal (Business Owner)",
       kpis,
@@ -194,7 +264,8 @@ export function AdminTransactionsView({
             Daftar Seluruh Transaksi
           </h2>
           <p className="text-xs sm:text-sm text-neutral-600 mt-0.5">
-            Audit semua nota pembayaran kasir lintas cabang, verifikasi QRIS/Tunai, dan otorisasi void owner.
+            Audit semua nota pembayaran kasir lintas cabang, verifikasi
+            QRIS/Tunai, dan otorisasi void owner.
           </p>
         </div>
 
@@ -246,7 +317,9 @@ export function AdminTransactionsView({
             <button
               key={p.id}
               type="button"
-              onClick={() => setDatePeriod(p.id as "today" | "week" | "month" | "all")}
+              onClick={() =>
+                setDatePeriod(p.id as "today" | "week" | "month" | "all")
+              }
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                 datePeriod === p.id
                   ? "bg-brand-green-900 text-brand-yellow-400 shadow-2xs"
@@ -299,7 +372,9 @@ export function AdminTransactionsView({
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Total Omzet Lunas */}
         <div className="p-4 rounded-3xl bg-white border border-brand-green-900/10 shadow-2xs">
-          <span className="text-[11px] font-semibold text-neutral-500 block">Total Omzet Lunas</span>
+          <span className="text-[11px] font-semibold text-neutral-500 block">
+            Total Omzet Lunas
+          </span>
           <span className="font-display font-black text-xl sm:text-2xl text-brand-green-950 tracking-tight">
             {formatRupiah(totalPaidRevenue)}
           </span>
@@ -310,7 +385,9 @@ export function AdminTransactionsView({
 
         {/* Tunai (Cash) */}
         <div className="p-4 rounded-3xl bg-white border border-brand-green-900/10 shadow-2xs">
-          <span className="text-[11px] font-semibold text-neutral-500 block">Pendapatan Tunai</span>
+          <span className="text-[11px] font-semibold text-neutral-500 block">
+            Pendapatan Tunai
+          </span>
           <span className="font-display font-black text-xl sm:text-2xl text-brand-green-900 tracking-tight">
             {formatRupiah(cashPaidTotal)}
           </span>
@@ -321,7 +398,9 @@ export function AdminTransactionsView({
 
         {/* QRIS Outlet */}
         <div className="p-4 rounded-3xl bg-white border border-brand-green-900/10 shadow-2xs">
-          <span className="text-[11px] font-semibold text-neutral-500 block">Pendapatan QRIS</span>
+          <span className="text-[11px] font-semibold text-neutral-500 block">
+            Pendapatan QRIS
+          </span>
           <span className="font-display font-black text-xl sm:text-2xl text-amber-950 tracking-tight">
             {formatRupiah(qrisPaidTotal)}
           </span>
@@ -332,9 +411,12 @@ export function AdminTransactionsView({
 
         {/* Void / Batal */}
         <div className="p-4 rounded-3xl bg-white border border-brand-green-900/10 shadow-2xs">
-          <span className="text-[11px] font-semibold text-neutral-500 block">Transaksi Dibatalkan</span>
+          <span className="text-[11px] font-semibold text-neutral-500 block">
+            Transaksi Dibatalkan
+          </span>
           <span className="font-display font-black text-xl sm:text-2xl text-brand-coral-600 tracking-tight">
-            {voidOrders.length} <span className="text-xs font-normal text-neutral-500">nota</span>
+            {voidOrders.length}{" "}
+            <span className="text-xs font-normal text-neutral-500">nota</span>
           </span>
           <span className="text-[10px] text-brand-coral-600 font-medium block mt-0.5">
             Otorisasi batal (Void Owner)
@@ -383,7 +465,9 @@ export function AdminTransactionsView({
           {/* Status Filter */}
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as "all" | OrderStatus)}
+            onChange={(e) =>
+              setStatusFilter(e.target.value as "all" | OrderStatus)
+            }
             className="h-9 px-3 rounded-2xl border border-neutral-200 text-xs bg-white font-medium text-neutral-700 focus:outline-none focus:border-brand-green-800 cursor-pointer"
           >
             <option value="all">Semua Status</option>
@@ -415,7 +499,11 @@ export function AdminTransactionsView({
                 const isPaid = ord.status === "PAID";
                 const isCash = ord.paymentMethod === "CASH";
                 const formattedDate = ord.dateStr
-                  ? new Date(ord.dateStr).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })
+                  ? new Date(ord.dateStr).toLocaleDateString("id-ID", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })
                   : "26 Sep 2026";
 
                 return (
@@ -457,7 +545,9 @@ export function AdminTransactionsView({
 
                     {/* Items */}
                     <td className="py-3 px-4 max-w-xs truncate text-neutral-700">
-                      {ord.items.map((i) => `${i.quantity}x ${i.name}`).join(", ")}
+                      {ord.items
+                        .map((i) => `${i.quantity}x ${i.name}`)
+                        .join(", ")}
                     </td>
 
                     {/* Payment Method */}
@@ -469,19 +559,26 @@ export function AdminTransactionsView({
                             : "bg-brand-yellow-400/20 text-amber-900 border border-brand-yellow-400/30"
                         }`}
                       >
-                        {isCash ? <Banknote className="size-3 text-brand-green-800" /> : <CreditCard className="size-3 text-amber-800" />}
+                        {isCash ? (
+                          <Banknote className="size-3 text-brand-green-800" />
+                        ) : (
+                          <CreditCard className="size-3 text-amber-800" />
+                        )}
                         <span>{isCash ? "Tunai" : "QRIS"}</span>
                       </span>
                     </td>
 
                     {/* Total */}
                     <td className="py-3 px-4 text-right font-display font-extrabold text-sm text-neutral-900">
-                      <span className={`block ${!isPaid ? "line-through text-neutral-400" : ""}`}>
+                      <span
+                        className={`block ${!isPaid ? "line-through text-neutral-400" : ""}`}
+                      >
                         {formatRupiah(ord.total)}
                       </span>
                       {ord.discount && ord.discount > 0 && (
                         <span className="text-[10px] text-brand-green-800 font-bold block">
-                          Hemat: -{formatRupiah(ord.discount)} {ord.promoCode ? `(${ord.promoCode})` : ""}
+                          Hemat: -{formatRupiah(ord.discount)}{" "}
+                          {ord.promoCode ? `(${ord.promoCode})` : ""}
                         </span>
                       )}
                     </td>
@@ -539,7 +636,11 @@ export function AdminTransactionsView({
           const isPaid = ord.status === "PAID";
           const isCash = ord.paymentMethod === "CASH";
           const formattedDate = ord.dateStr
-            ? new Date(ord.dateStr).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })
+            ? new Date(ord.dateStr).toLocaleDateString("id-ID", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              })
             : "26 Sep 2026";
 
           return (
@@ -555,7 +656,9 @@ export function AdminTransactionsView({
                     #{ord.orderNumber}
                   </span>
                   <div className="flex items-center gap-2 text-[11px] text-neutral-500 mt-0.5">
-                    <span className="font-semibold text-neutral-700">{formattedDate}</span>
+                    <span className="font-semibold text-neutral-700">
+                      {formattedDate}
+                    </span>
                     <span>•</span>
                     <span>{ord.timestamp}</span>
                   </div>
@@ -584,7 +687,10 @@ export function AdminTransactionsView({
 
               <div className="text-xs text-neutral-700 bg-neutral-50 p-2.5 rounded-2xl border border-neutral-100">
                 <div className="font-bold text-brand-green-950 mb-1">
-                  {ord.branchName || "Pusat (Fatmawati)"} · <span className="font-normal text-neutral-500">{ord.cashierName}</span>
+                  {ord.branchName || "Pusat (Fatmawati)"} ·{" "}
+                  <span className="font-normal text-neutral-500">
+                    {ord.cashierName}
+                  </span>
                 </div>
                 <p className="truncate text-neutral-600">
                   {ord.items.map((i) => `${i.quantity}x ${i.name}`).join(", ")}
@@ -593,7 +699,9 @@ export function AdminTransactionsView({
 
               <div className="flex items-center justify-between pt-1">
                 <div>
-                  <span className="text-[10px] text-neutral-500 block">Total Nota</span>
+                  <span className="text-[10px] text-neutral-500 block">
+                    Total Nota
+                  </span>
                   <strong className="font-display font-black text-base text-brand-green-950">
                     {formatRupiah(ord.total)}
                   </strong>
@@ -645,13 +753,22 @@ export function AdminTransactionsView({
             </div>
 
             <p className="text-xs text-neutral-600">
-              Apakah Anda yakin ingin membatalkan nota <strong className="text-neutral-900 font-mono">#{orderToVoid.orderNumber}</strong> sebesar <strong className="text-neutral-900">{formatRupiah(orderToVoid.total)}</strong>? Tindakan ini akan dicatat ke dalam audit log keamanan.
+              Apakah Anda yakin ingin membatalkan nota{" "}
+              <strong className="text-neutral-900 font-mono">
+                #{orderToVoid.orderNumber}
+              </strong>{" "}
+              sebesar{" "}
+              <strong className="text-neutral-900">
+                {formatRupiah(orderToVoid.total)}
+              </strong>
+              ? Tindakan ini akan dicatat ke dalam audit log keamanan.
             </p>
 
             <form onSubmit={handleConfirmVoid} className="space-y-4">
               <div>
                 <label className="text-xs font-bold text-neutral-700 block mb-1">
-                  Alasan Pembatalan <span className="text-brand-coral-600">*</span>
+                  Alasan Pembatalan{" "}
+                  <span className="text-brand-coral-600">*</span>
                 </label>
                 <textarea
                   rows={3}
@@ -693,7 +810,8 @@ export function AdminTransactionsView({
                   Rincian Nota #{selectedOrder.orderNumber}
                 </h3>
                 <span className="text-[11px] text-neutral-500 font-mono">
-                  {selectedOrder.branchName || "Cabang Pusat"} · {selectedOrder.timestamp}
+                  {selectedOrder.branchName || "Cabang Pusat"} ·{" "}
+                  {selectedOrder.timestamp}
                 </span>
               </div>
               <button
@@ -707,14 +825,21 @@ export function AdminTransactionsView({
 
             <div className="space-y-2 max-h-64 overflow-y-auto divide-y divide-neutral-100 pr-1">
               {selectedOrder.items.map((it, idx) => (
-                <div key={idx} className="pt-2 flex justify-between items-start text-xs">
+                <div
+                  key={idx}
+                  className="pt-2 flex justify-between items-start text-xs"
+                >
                   <div>
-                    <strong className="text-neutral-900 block font-bold">{it.name}</strong>
+                    <strong className="text-neutral-900 block font-bold">
+                      {it.name}
+                    </strong>
                     <span className="text-neutral-500 font-mono">
                       {it.quantity} x {formatRupiah(it.price)}
                     </span>
                   </div>
-                  <strong className="font-mono text-neutral-900">{formatRupiah(it.subtotal)}</strong>
+                  <strong className="font-mono text-neutral-900">
+                    {formatRupiah(it.subtotal)}
+                  </strong>
                 </div>
               ))}
             </div>
@@ -722,26 +847,38 @@ export function AdminTransactionsView({
             <div className="pt-3 border-t border-neutral-200 space-y-1.5 text-xs">
               <div className="flex justify-between text-neutral-600">
                 <span>Subtotal:</span>
-                <span className="font-mono">{formatRupiah(selectedOrder.subtotal)}</span>
+                <span className="font-mono">
+                  {formatRupiah(selectedOrder.subtotal)}
+                </span>
               </div>
               {selectedOrder.discount && selectedOrder.discount > 0 && (
                 <div className="flex justify-between text-brand-green-800 font-bold">
-                  <span>Diskon Promo ({selectedOrder.promoCode || "DISKON"}):</span>
-                  <span className="font-mono">-{formatRupiah(selectedOrder.discount)}</span>
+                  <span>
+                    Diskon Promo ({selectedOrder.promoCode || "DISKON"}):
+                  </span>
+                  <span className="font-mono">
+                    -{formatRupiah(selectedOrder.discount)}
+                  </span>
                 </div>
               )}
               <div className="flex justify-between text-neutral-600">
                 <span>PB1 Restoran (10%):</span>
-                <span className="font-mono">{formatRupiah(selectedOrder.tax)}</span>
+                <span className="font-mono">
+                  {formatRupiah(selectedOrder.tax)}
+                </span>
               </div>
               <div className="flex justify-between text-base font-extrabold text-brand-green-950 pt-1 border-t border-neutral-100">
                 <span>Total:</span>
-                <span className="font-mono">{formatRupiah(selectedOrder.total)}</span>
+                <span className="font-mono">
+                  {formatRupiah(selectedOrder.total)}
+                </span>
               </div>
               <div className="flex justify-between text-xs text-neutral-600 pt-1">
                 <span>Metode Pembayaran:</span>
                 <strong className="text-brand-green-950 font-bold">
-                  {selectedOrder.paymentMethod === "CASH" ? "Tunai (Cash Drawer)" : "QRIS Outlet"}
+                  {selectedOrder.paymentMethod === "CASH"
+                    ? "Tunai (Cash Drawer)"
+                    : "QRIS Outlet"}
                 </strong>
               </div>
             </div>

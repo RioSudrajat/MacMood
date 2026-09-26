@@ -13,5 +13,7 @@ export const auditLogs = pgTable("audit_logs", {
   oldValue: text("old_value"),
   newValue: text("new_value"),
   reason: text("reason"),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
 });

@@ -12,7 +12,7 @@ export interface DownloadCsvConfig {
 export function downloadCsv(
   filenameOrConfig: string | DownloadCsvConfig,
   maybeHeaders?: string[],
-  maybeRows?: (string | number | boolean | null | undefined)[][]
+  maybeRows?: (string | number | boolean | null | undefined)[][],
 ) {
   if (typeof window === "undefined") return;
 
@@ -30,7 +30,9 @@ export function downloadCsv(
     rows = maybeRows || [];
   }
 
-  const escapeCell = (val: string | number | boolean | null | undefined): string => {
+  const escapeCell = (
+    val: string | number | boolean | null | undefined,
+  ): string => {
     if (val === null || val === undefined) return '""';
     const str = String(val);
     if (str.includes(",") || str.includes('"') || str.includes("\n")) {
@@ -53,7 +55,9 @@ export function downloadCsv(
 
   const link = document.createElement("a");
   link.setAttribute("href", url);
-  const cleanFilename = filename.endsWith(".csv") ? filename : `${filename}.csv`;
+  const cleanFilename = filename.endsWith(".csv")
+    ? filename
+    : `${filename}.csv`;
   link.setAttribute("download", cleanFilename);
   document.body.appendChild(link);
   link.click();
@@ -101,7 +105,10 @@ export function printReportPdf(options: ReportPrintOptions) {
       year: "numeric",
     }) +
     ", " +
-    new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) +
+    new Date().toLocaleTimeString("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit",
+    }) +
     " WIB";
 
   const effectiveKpis: ReportPrintKpi[] =
@@ -112,7 +119,9 @@ export function printReportPdf(options: ReportPrintOptions) {
 
   const printWindow = window.open("", "_blank");
   if (!printWindow) {
-    alert("Pop-up diblokir oleh peramban. Mohon izinkan pop-up untuk mencetak laporan.");
+    alert(
+      "Pop-up diblokir oleh peramban. Mohon izinkan pop-up untuk mencetak laporan.",
+    );
     return;
   }
 
@@ -128,7 +137,7 @@ export function printReportPdf(options: ReportPrintOptions) {
           <div class="kpi-value">${kpi.value}</div>
           ${kpi.sub ? `<div class="kpi-sub">${kpi.sub}</div>` : ""}
         </div>
-      `
+      `,
         )
         .join("")}
     </div>
@@ -153,14 +162,14 @@ export function printReportPdf(options: ReportPrintOptions) {
             <tr>
               ${row.map((cell) => `<td>${cell !== null && cell !== undefined ? cell : "-"}</td>`).join("")}
             </tr>
-          `
+          `,
             )
             .join("")}
         </tbody>
       </table>
       ${sec.summaryText ? `<div class="section-summary">${sec.summaryText}</div>` : ""}
     </div>
-  `
+  `,
     )
     .join("");
 

@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { readJson, withApiSession } from "@/lib/api.server";
-import { listProductRecipes, updateProductRecipe } from "@/services/inventory.service.server";
+import {
+  listProductRecipes,
+  updateProductRecipe,
+} from "@/services/inventory.service.server";
 import { updateRecipeSchema } from "@/validators/inventory";
 
 export const Route = createFileRoute("/api/inventory/recipes/")({

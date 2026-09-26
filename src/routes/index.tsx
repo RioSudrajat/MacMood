@@ -12,7 +12,10 @@ export const Route = createFileRoute("/")({
         content:
           "Mac and cheese creamy dengan pilihan chicken katsu dan kentang. Comfort food untuk bikin hari terasa lebih baik.",
       },
-      { property: "og:title", content: "MacMood — Mood baik, dimulai dari MacMood" },
+      {
+        property: "og:title",
+        content: "MacMood — Mood baik, dimulai dari MacMood",
+      },
       {
         property: "og:description",
         content:
@@ -43,7 +46,10 @@ function LandingPage() {
       if (!menuToggle || !navLinks) return;
       const open = menuToggle.getAttribute("aria-expanded") !== "true";
       menuToggle.setAttribute("aria-expanded", String(open));
-      menuToggle.setAttribute("aria-label", open ? "Tutup navigasi" : "Buka navigasi");
+      menuToggle.setAttribute(
+        "aria-label",
+        open ? "Tutup navigasi" : "Buka navigasi",
+      );
       menuToggle.textContent = open ? "×" : "☰";
       navLinks.classList.toggle("is-open", open);
     };
@@ -58,7 +64,9 @@ function LandingPage() {
 
     if (menuToggle) menuToggle.addEventListener("click", onToggleClick);
     const navAnchors = navLinks ? navLinks.querySelectorAll("a") : [];
-    navAnchors.forEach((link) => link.addEventListener("click", onNavLinkClick));
+    navAnchors.forEach((link) =>
+      link.addEventListener("click", onNavLinkClick),
+    );
 
     // Reveal animations
     const reveals = document.querySelectorAll("[data-reveal]");
@@ -73,7 +81,7 @@ function LandingPage() {
             }
           });
         },
-        { threshold: 0.12 }
+        { threshold: 0.12 },
       );
       reveals.forEach((el) => revealObserver?.observe(el));
     } else {
@@ -87,11 +95,17 @@ function LandingPage() {
     const heroModelSlot = document.getElementById("hero-model-slot");
     const storyModelSlot = document.querySelector(".story-model-slot");
     const sharedFoodStage = document.getElementById("shared-food-stage");
-    const sharedFoodModel = document.getElementById("shared-food-model") as ModelViewerElement | null;
-    const storySteps = Array.from(document.querySelectorAll("[data-story-step]"));
+    const sharedFoodModel = document.getElementById(
+      "shared-food-model",
+    ) as ModelViewerElement | null;
+    const storySteps = Array.from(
+      document.querySelectorAll("[data-story-step]"),
+    );
     const partnerWrap = document.getElementById("partner-model-wrap");
     const partnerSection = document.getElementById("mitra");
-    const partnerModel = document.getElementById("partner-model") as ModelViewerElement | null;
+    const partnerModel = document.getElementById(
+      "partner-model",
+    ) as ModelViewerElement | null;
 
     let scrollQueued = false;
     let sharedSceneStartAt = 0;
@@ -102,7 +116,13 @@ function LandingPage() {
     }
 
     function updateSharedFoodPosition() {
-      if (!heroModelSlot || !storyModelSlot || !sharedFoodStage || !heroSection || !storySection) {
+      if (
+        !heroModelSlot ||
+        !storyModelSlot ||
+        !sharedFoodStage ||
+        !heroSection ||
+        !storySection
+      ) {
         return;
       }
       const source = heroModelSlot.getBoundingClientRect();
@@ -129,7 +149,8 @@ function LandingPage() {
       const targetLeft = destination.left;
       const startAt = source.top + window.scrollY - headerHeight;
       sharedSceneStartAt = startAt;
-      const storySectionPageTop = storySection.getBoundingClientRect().top + window.scrollY;
+      const storySectionPageTop =
+        storySection.getBoundingClientRect().top + window.scrollY;
       const destinationPageTop = storySectionPageTop - stickyTop;
       const endAt = Math.max(startAt + 1, destinationPageTop);
       let t = clamp((window.scrollY - startAt) / (endAt - startAt), 0, 1);
@@ -140,7 +161,11 @@ function LandingPage() {
       const height = source.height + (destination.height - source.height) * t;
       const storySectionBottom = storySection.getBoundingClientRect().bottom;
       const fadeRange = Math.max(100, window.innerHeight * 0.16);
-      const sceneOpacity = clamp((storySectionBottom - headerHeight) / fadeRange, 0, 1);
+      const sceneOpacity = clamp(
+        (storySectionBottom - headerHeight) / fadeRange,
+        0,
+        1,
+      );
 
       sharedFoodStage.style.left = "0px";
       sharedFoodStage.style.top = "0px";
@@ -153,7 +178,8 @@ function LandingPage() {
 
     function updateScrollScenes() {
       scrollQueued = false;
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const maxScroll =
+        document.documentElement.scrollHeight - window.innerHeight;
       if (progress) {
         progress.style.transform =
           "scaleX(" + (maxScroll > 0 ? window.scrollY / maxScroll : 0) + ")";
@@ -164,7 +190,9 @@ function LandingPage() {
       if (storyModelWrap) {
         const storyModelRect = storyModelWrap.getBoundingClientRect();
         const header = document.querySelector(".site-header");
-        const headerHeight = header ? header.getBoundingClientRect().height : 82;
+        const headerHeight = header
+          ? header.getBoundingClientRect().height
+          : 82;
         const focusY =
           window.innerWidth <= 760
             ? headerHeight + window.innerHeight * 0.5
@@ -179,7 +207,9 @@ function LandingPage() {
             index = i;
           }
         });
-        storySteps.forEach((step, i) => step.classList.toggle("is-active", i === index));
+        storySteps.forEach((step, i) =>
+          step.classList.toggle("is-active", i === index),
+        );
       }
 
       if (!reduceMotion.matches) {
@@ -187,24 +217,29 @@ function LandingPage() {
           let bowlProgress = 0;
           if (window.innerWidth <= 760) {
             const header = document.querySelector(".site-header");
-            const headerHeight = header ? header.getBoundingClientRect().height : 82;
+            const headerHeight = header
+              ? header.getBoundingClientRect().height
+              : 82;
             const heroRect = heroSection?.getBoundingClientRect();
             if (heroRect && heroSection) {
               bowlProgress = clamp(
                 (headerHeight - heroRect.top) /
                   Math.max(1, heroSection.offsetHeight - window.innerHeight),
                 0,
-                1
+                1,
               );
             }
           } else {
-            const lastStoryStep = storySteps[storySteps.length - 1]?.getBoundingClientRect();
-            const storyEndAt = lastStoryStep ? lastStoryStep.bottom + window.scrollY : window.scrollY;
+            const lastStoryStep =
+              storySteps[storySteps.length - 1]?.getBoundingClientRect();
+            const storyEndAt = lastStoryStep
+              ? lastStoryStep.bottom + window.scrollY
+              : window.scrollY;
             bowlProgress = clamp(
               (window.scrollY - sharedSceneStartAt) /
                 Math.max(1, storyEndAt - sharedSceneStartAt),
               0,
-              1
+              1,
             );
           }
           const yaw = 20 + bowlProgress * 125;
@@ -212,16 +247,23 @@ function LandingPage() {
           sharedFoodModel.cameraOrbit = orbit;
         }
 
-        if (partnerWrap && partnerModel && partnerModel.modelIsVisible && partnerSection) {
+        if (
+          partnerWrap &&
+          partnerModel &&
+          partnerModel.modelIsVisible &&
+          partnerSection
+        ) {
           const header = document.querySelector(".site-header");
-          const headerHeight = header ? header.getBoundingClientRect().height : 82;
+          const headerHeight = header
+            ? header.getBoundingClientRect().height
+            : 82;
           const sectionTop = partnerSection.getBoundingClientRect().top;
           const scrollFromSectionStart = headerHeight - sectionTop;
           const yaw = clamp(scrollFromSectionStart * 0.34, -35, 145);
           const prog = clamp(
             scrollFromSectionStart / Math.max(1, partnerSection.offsetHeight),
             0,
-            1
+            1,
           );
           partnerModel.cameraOrbit =
             yaw.toFixed(1) +
@@ -239,7 +281,11 @@ function LandingPage() {
       // Only resume gentle auto-rotate if the user is stationary at the top of the hero section for 1.2s
       if (window.scrollY <= 20) {
         autoRotateTimer = window.setTimeout(() => {
-          if (window.scrollY <= 20 && !reduceMotion.matches && sharedFoodModel) {
+          if (
+            window.scrollY <= 20 &&
+            !reduceMotion.matches &&
+            sharedFoodModel
+          ) {
             sharedFoodModel.setAttribute("auto-rotate", "");
           }
         }, 1200);
@@ -259,7 +305,14 @@ function LandingPage() {
     window.addEventListener("pageshow", requestScrollUpdate);
 
     // Sync directly with Lenis smooth scroll engine
-    const lenis = (window as unknown as { __lenis?: { on: (event: string, callback: () => void) => void; off: (event: string, callback: () => void) => void } }).__lenis;
+    const lenis = (
+      window as unknown as {
+        __lenis?: {
+          on: (event: string, callback: () => void) => void;
+          off: (event: string, callback: () => void) => void;
+        };
+      }
+    ).__lenis;
     if (lenis) {
       lenis.on("scroll", requestScrollUpdate);
     }
@@ -271,15 +324,30 @@ function LandingPage() {
     updateScrollScenes();
 
     // Profit Simulator
-    const avgOrder = document.getElementById("avg-order") as HTMLInputElement | null;
-    const ordersDay = document.getElementById("orders-day") as HTMLInputElement | null;
-    const openDays = document.getElementById("open-days") as HTMLInputElement | null;
+    const avgOrder = document.getElementById(
+      "avg-order",
+    ) as HTMLInputElement | null;
+    const ordersDay = document.getElementById(
+      "orders-day",
+    ) as HTMLInputElement | null;
+    const openDays = document.getElementById(
+      "open-days",
+    ) as HTMLInputElement | null;
     const margin = document.getElementById("margin") as HTMLInputElement | null;
-    const monthlyCost = document.getElementById("monthly-cost") as HTMLInputElement | null;
-    const simInputs = [avgOrder, ordersDay, openDays, margin, monthlyCost].filter(Boolean) as HTMLInputElement[];
+    const monthlyCost = document.getElementById(
+      "monthly-cost",
+    ) as HTMLInputElement | null;
+    const simInputs = [
+      avgOrder,
+      ordersDay,
+      openDays,
+      margin,
+      monthlyCost,
+    ].filter(Boolean) as HTMLInputElement[];
 
     function updateSimulation() {
-      if (!avgOrder || !ordersDay || !openDays || !margin || !monthlyCost) return;
+      if (!avgOrder || !ordersDay || !openDays || !margin || !monthlyCost)
+        return;
       const average = Number(avgOrder.value);
       const orders = Number(ordersDay.value);
       const days = Number(openDays.value);
@@ -309,10 +377,14 @@ function LandingPage() {
       }
     }
 
-    simInputs.forEach((input) => input.addEventListener("input", updateSimulation));
+    simInputs.forEach((input) =>
+      input.addEventListener("input", updateSimulation),
+    );
 
     // Contact form
-    const form = document.getElementById("contact-form") as HTMLFormElement | null;
+    const form = document.getElementById(
+      "contact-form",
+    ) as HTMLFormElement | null;
     const contactStatus = document.getElementById("contact-status");
     const onFormSubmit = (event: SubmitEvent) => {
       event.preventDefault();
@@ -330,9 +402,11 @@ function LandingPage() {
         "Keperluan: " + values.get("interest"),
         "Pesan: " + values.get("message"),
       ].join("\n");
-      const url = "https://wa.me/" + OWNER_WHATSAPP + "?text=" + encodeURIComponent(body);
+      const url =
+        "https://wa.me/" + OWNER_WHATSAPP + "?text=" + encodeURIComponent(body);
       window.open(url, "_blank", "noopener,noreferrer");
-      contactStatus.textContent = "WhatsApp terbuka dengan pesan yang sudah disiapkan.";
+      contactStatus.textContent =
+        "WhatsApp terbuka dengan pesan yang sudah disiapkan.";
     };
 
     if (form) form.addEventListener("submit", onFormSubmit as EventListener);
@@ -343,10 +417,13 @@ function LandingPage() {
       const link = event.currentTarget as HTMLElement;
       const interest = link.getAttribute("data-interest");
       if (interest) {
-        const selector = document.getElementById("contact-interest") as HTMLSelectElement | null;
+        const selector = document.getElementById(
+          "contact-interest",
+        ) as HTMLSelectElement | null;
         if (selector) {
           const hasExactOption = Array.from(selector.options).some(
-            (option) => option.value === interest || option.textContent === interest
+            (option) =>
+              option.value === interest || option.textContent === interest,
           );
           selector.value = hasExactOption
             ? interest
@@ -356,7 +433,9 @@ function LandingPage() {
         }
       }
     };
-    interestLinks.forEach((link) => link.addEventListener("click", onInterestClick));
+    interestLinks.forEach((link) =>
+      link.addEventListener("click", onInterestClick),
+    );
 
     if (reduceMotion.matches && sharedFoodModel) {
       sharedFoodModel.removeAttribute("auto-rotate");
@@ -376,7 +455,9 @@ function LandingPage() {
     // Cleanup
     return () => {
       if (menuToggle) menuToggle.removeEventListener("click", onToggleClick);
-      navAnchors.forEach((link) => link.removeEventListener("click", onNavLinkClick));
+      navAnchors.forEach((link) =>
+        link.removeEventListener("click", onNavLinkClick),
+      );
       revealObserver?.disconnect();
       window.removeEventListener("scroll", requestScrollUpdate);
       window.removeEventListener("resize", requestScrollUpdate);
@@ -387,9 +468,14 @@ function LandingPage() {
       sharedFoodModel?.removeEventListener?.("load", requestScrollUpdate);
       partnerModel?.removeEventListener?.("load", requestScrollUpdate);
       window.clearTimeout(autoRotateTimer);
-      simInputs.forEach((input) => input.removeEventListener("input", updateSimulation));
-      if (form) form.removeEventListener("submit", onFormSubmit as EventListener);
-      interestLinks.forEach((link) => link.removeEventListener("click", onInterestClick));
+      simInputs.forEach((input) =>
+        input.removeEventListener("input", updateSimulation),
+      );
+      if (form)
+        form.removeEventListener("submit", onFormSubmit as EventListener);
+      interestLinks.forEach((link) =>
+        link.removeEventListener("click", onInterestClick),
+      );
       reduceMotion.removeEventListener?.("change", onMotionChange);
     };
   }, []);
@@ -402,7 +488,11 @@ function LandingPage() {
       <div className="progress-line" id="scroll-progress" aria-hidden="true" />
       <header className="site-header">
         <div className="nav-wrap">
-          <a className="brand" href="#hero" aria-label="MacMood, kembali ke awal">
+          <a
+            className="brand"
+            href="#hero"
+            aria-label="MacMood, kembali ke awal"
+          >
             <img src="/assets/macmood-logo.png?v=2" alt="" />
             <span className="brand-copy">
               <strong>MACMOOD</strong>
@@ -435,13 +525,15 @@ function LandingPage() {
         <section className="hero" id="hero" aria-labelledby="hero-title">
           <div className="hero-inner">
             <div className="hero-copy" data-reveal="">
-              <p className="eyebrow eyebrow-light">A little comfort for your day</p>
+              <p className="eyebrow eyebrow-light">
+                A little comfort for your day
+              </p>
               <h1 id="hero-title">
                 Mood baik,<span>dimulai dari MacMood.</span>
               </h1>
               <p className="hero-lede">
-                Mac and cheese creamy dengan pilihan chicken katsu dan kentang—teman cheesy buat
-                nemenin cerita seru hari ini.
+                Mac and cheese creamy dengan pilihan chicken katsu dan
+                kentang—teman cheesy buat nemenin cerita seru hari ini.
               </p>
               <div className="hero-actions">
                 <a
@@ -456,7 +548,8 @@ function LandingPage() {
                 </a>
               </div>
               <p className="hero-footnote">
-                Pilihan mac and cheese hangat, siap bikin jeda hari terasa lebih enak.
+                Pilihan mac and cheese hangat, siap bikin jeda hari terasa lebih
+                enak.
               </p>
               <a className="hero-scroll" href="#cerita">
                 <span aria-hidden="true">↓</span> Ikuti ceritanya
@@ -464,7 +557,11 @@ function LandingPage() {
             </div>
             <div className="hero-visual" aria-label="Bowl MacMood 3D">
               <div className="hero-orbit" aria-hidden="true" />
-              <div className="hero-model-slot" id="hero-model-slot" aria-hidden="true" />
+              <div
+                className="hero-model-slot"
+                id="hero-model-slot"
+                aria-hidden="true"
+              />
               <div className="model-sticker" aria-hidden="true">
                 <strong>Cheesy comfort</strong>
                 <span>made for your mood</span>
@@ -486,18 +583,24 @@ function LandingPage() {
           </div>
         </div>
 
-        <section className="mood-section" id="cerita" aria-labelledby="mood-title">
+        <section
+          className="mood-section"
+          id="cerita"
+          aria-labelledby="mood-title"
+        >
           <div className="container mood-grid">
             <div className="mood-copy" data-reveal="">
               <p className="eyebrow eyebrow-light">Lebih dari sekadar makan</p>
               <h2 className="section-title" id="mood-title">
                 Hari panjang?{" "}
-                <span style={{ color: "var(--yellow-400)" }}>Kasih jeda yang cheesy.</span>
+                <span style={{ color: "var(--yellow-400)" }}>
+                  Kasih jeda yang cheesy.
+                </span>
               </h2>
               <p className="section-copy">
-                Ada hari yang butuh teman ngobrol, ada juga yang cukup ditemani semangkuk mac and
-                cheese. MacMood hadir membawa comfort food yang sederhana, hangat, dan bikin
-                senyum balik lagi.
+                Ada hari yang butuh teman ngobrol, ada juga yang cukup ditemani
+                semangkuk mac and cheese. MacMood hadir membawa comfort food
+                yang sederhana, hangat, dan bikin senyum balik lagi.
               </p>
               <div className="mood-points">
                 <div className="mood-point">
@@ -515,7 +618,11 @@ function LandingPage() {
               </div>
             </div>
             <div className="mood-story" id="mood-story">
-              <div className="story-model-wrap" id="story-model-wrap" aria-hidden="true">
+              <div
+                className="story-model-wrap"
+                id="story-model-wrap"
+                aria-hidden="true"
+              >
                 <div className="story-model-slot" />
               </div>
               <div className="story-steps">
@@ -527,19 +634,29 @@ function LandingPage() {
                 <article className="story-step" data-story-step="1">
                   <span className="step-count">02 / CRUNCH</span>
                   <h3>Tambah tekstur, tambah cerita.</h3>
-                  <p>Chicken katsu dan kentang melengkapi semangkuk mac and cheese MacMood.</p>
+                  <p>
+                    Chicken katsu dan kentang melengkapi semangkuk mac and
+                    cheese MacMood.
+                  </p>
                 </article>
                 <article className="story-step" data-story-step="2">
                   <span className="step-count">03 / GOOD MOOD</span>
                   <h3>Satu mangkuk kecil, jeda yang berarti.</h3>
-                  <p>Temani obrolan, waktu istirahat, atau hadiah kecil buat diri sendiri.</p>
+                  <p>
+                    Temani obrolan, waktu istirahat, atau hadiah kecil buat diri
+                    sendiri.
+                  </p>
                 </article>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="menu-section" id="menu" aria-labelledby="menu-title">
+        <section
+          className="menu-section"
+          id="menu"
+          aria-labelledby="menu-title"
+        >
           <div className="container">
             <div className="section-heading menu-heading-row" data-reveal="">
               <div>
@@ -548,7 +665,8 @@ function LandingPage() {
                   Cheesy, crispy, <em>happy.</em>
                 </h2>
                 <p className="menu-note">
-                  Kenalan dengan pilihan MacMood dari materi menu yang kamu kirim.
+                  Kenalan dengan pilihan MacMood dari materi menu yang kamu
+                  kirim.
                 </p>
               </div>
               <a className="button button-light menu-link" href="#kontak">
@@ -568,12 +686,16 @@ function LandingPage() {
                 <div className="menu-card-body">
                   <h3>Super Mac</h3>
                   <p>
-                    Mac and cheese creamy dengan chicken katsu dan kentang untuk suapan yang lebih
-                    lengkap.
+                    Mac and cheese creamy dengan chicken katsu dan kentang untuk
+                    suapan yang lebih lengkap.
                   </p>
                   <div className="menu-meta">
                     <span className="menu-price">Rp20.000</span>
-                    <a className="menu-order" href="#kontak" aria-label="Tanya tentang Super Mac">
+                    <a
+                      className="menu-order"
+                      href="#kontak"
+                      aria-label="Tanya tentang Super Mac"
+                    >
                       ↗
                     </a>
                   </div>
@@ -591,11 +713,16 @@ function LandingPage() {
                 <div className="menu-card-body">
                   <h3>Potato Mac</h3>
                   <p>
-                    Makaroni bersaus keju creamy bertemu kentang renyah dalam satu mangkuk hangat.
+                    Makaroni bersaus keju creamy bertemu kentang renyah dalam
+                    satu mangkuk hangat.
                   </p>
                   <div className="menu-meta">
                     <span className="menu-price">Rp15.000</span>
-                    <a className="menu-order" href="#kontak" aria-label="Tanya tentang Potato Mac">
+                    <a
+                      className="menu-order"
+                      href="#kontak"
+                      aria-label="Tanya tentang Potato Mac"
+                    >
                       ↗
                     </a>
                   </div>
@@ -612,10 +739,17 @@ function LandingPage() {
                 </div>
                 <div className="menu-card-body">
                   <h3>Classic Mac</h3>
-                  <p>Comfort food klasik dengan makaroni dan saus keju creamy khas MacMood.</p>
+                  <p>
+                    Comfort food klasik dengan makaroni dan saus keju creamy
+                    khas MacMood.
+                  </p>
                   <div className="menu-meta">
                     <span className="menu-price">Rp10.000</span>
-                    <a className="menu-order" href="#kontak" aria-label="Tanya tentang Classic Mac">
+                    <a
+                      className="menu-order"
+                      href="#kontak"
+                      aria-label="Tanya tentang Classic Mac"
+                    >
                       ↗
                     </a>
                   </div>
@@ -623,8 +757,9 @@ function LandingPage() {
               </article>
             </div>
             <p className="menu-disclaimer">
-              Harga Potato Mac dan Classic Mac mengikuti konfirmasi owner. Harga Super Mac,
-              komposisi, dan ketersediaan menu perlu dipastikan sebelum landing page dipublikasikan.
+              Harga Potato Mac dan Classic Mac mengikuti konfirmasi owner. Harga
+              Super Mac, komposisi, dan ketersediaan menu perlu dipastikan
+              sebelum landing page dipublikasikan.
             </p>
           </div>
         </section>
@@ -642,7 +777,11 @@ function LandingPage() {
           </div>
         </section>
 
-        <section className="partner-section" id="mitra" aria-labelledby="partner-title">
+        <section
+          className="partner-section"
+          id="mitra"
+          aria-labelledby="partner-title"
+        >
           <div className="container">
             <div className="partner-top">
               <div className="partner-copy" data-reveal="">
@@ -651,8 +790,9 @@ function LandingPage() {
                   Ada tempat untuk MacMood di ceritamu.
                 </h2>
                 <p className="section-copy">
-                  Punya ide lokasi, pengalaman di bidang kuliner, atau mau mulai ngobrol soal kerja
-                  sama? Kita bisa mulai dari skala yang paling cocok buat kamu.
+                  Punya ide lokasi, pengalaman di bidang kuliner, atau mau mulai
+                  ngobrol soal kerja sama? Kita bisa mulai dari skala yang
+                  paling cocok buat kamu.
                 </p>
                 <div className="hero-actions">
                   <a
@@ -701,7 +841,8 @@ function LandingPage() {
                   <span className="plan-index">PAKET 01 · TANPA BOOTH</span>
                   <h4>MacMood Mulai</h4>
                   <p className="plan-summary">
-                    Untuk mulai jualan dari rumah atau memakai gerai milik sendiri.
+                    Untuk mulai jualan dari rumah atau memakai gerai milik
+                    sendiri.
                   </p>
                   <div className="plan-prices">
                     <span className="plan-normal">
@@ -729,7 +870,8 @@ function LandingPage() {
                   <span className="plan-index">PAKET 02 · DENGAN BOOTH</span>
                   <h4>MacMood Gerai</h4>
                   <p className="plan-summary">
-                    Paket gerai ringkas beridentitas MacMood, siap untuk penjualan take-away.
+                    Paket gerai ringkas beridentitas MacMood, siap untuk
+                    penjualan take-away.
                   </p>
                   <div className="plan-prices">
                     <span className="plan-normal">
@@ -757,7 +899,8 @@ function LandingPage() {
                   <span className="plan-index">PAKET 03 · BOOTH PREMIUM</span>
                   <h4>MacMood Gerai Plus</h4>
                   <p className="plan-summary">
-                    Gerai lebih menonjol dengan tambahan perlengkapan dan materi peluncuran.
+                    Gerai lebih menonjol dengan tambahan perlengkapan dan materi
+                    peluncuran.
                   </p>
                   <div className="plan-prices">
                     <span className="plan-normal">
@@ -790,7 +933,10 @@ function LandingPage() {
                     <span className="pkg-index">FORMAT 04</span>
                     <h4>Pop-up / Event</h4>
                     <p>Untuk tes pasar, bazar, atau aktivasi singkat.</p>
-                    <a href="#kontak" data-interest="Kemitraan — Pop-up / Event">
+                    <a
+                      href="#kontak"
+                      data-interest="Kemitraan — Pop-up / Event"
+                    >
                       Diskusikan format <span aria-hidden="true">↗</span>
                     </a>
                   </article>
@@ -806,7 +952,10 @@ function LandingPage() {
                     <span className="pkg-index">FORMAT 06</span>
                     <h4>Outlet partner</h4>
                     <p>Untuk rencana kerja sama jangka panjang.</p>
-                    <a href="#kontak" data-interest="Kemitraan — Outlet partner">
+                    <a
+                      href="#kontak"
+                      data-interest="Kemitraan — Outlet partner"
+                    >
                       Diskusikan format <span aria-hidden="true">↗</span>
                     </a>
                   </article>
@@ -816,7 +965,11 @@ function LandingPage() {
           </div>
         </section>
 
-        <section className="sim-section" id="simulasi" aria-labelledby="sim-title">
+        <section
+          className="sim-section"
+          id="simulasi"
+          aria-labelledby="sim-title"
+        >
           <div className="container sim-layout">
             <div className="sim-intro" data-reveal="">
               <p className="eyebrow">Rencanakan dengan realistis</p>
@@ -824,11 +977,13 @@ function LandingPage() {
                 Coba hitung skenarionya.
               </h2>
               <p className="section-copy">
-                Geser asumsi di bawah untuk melihat contoh omzet dan laba operasional bulanan.
-                Semua nilai bisa kamu ubah sesuai rencana lokasi.
+                Geser asumsi di bawah untuk melihat contoh omzet dan laba
+                operasional bulanan. Semua nilai bisa kamu ubah sesuai rencana
+                lokasi.
               </p>
               <p className="menu-disclaimer">
-                Angka contoh bukan proyeksi MacMood, janji keuntungan, atau penawaran resmi.
+                Angka contoh bukan proyeksi MacMood, janji keuntungan, atau
+                penawaran resmi.
               </p>
             </div>
             <div className="sim-panel" data-reveal="">
@@ -893,7 +1048,9 @@ function LandingPage() {
                   />
                 </div>
                 <div className="sim-control">
-                  <label htmlFor="monthly-cost">Biaya operasional per bulan</label>
+                  <label htmlFor="monthly-cost">
+                    Biaya operasional per bulan
+                  </label>
                   <output id="monthly-cost-value" htmlFor="monthly-cost">
                     Rp8.000.000
                   </output>
@@ -918,18 +1075,23 @@ function LandingPage() {
                 </div>
               </div>
               <p className="sim-math" id="sim-math">
-                35 transaksi/hari × 26 hari × Rp22.000 rata-rata transaksi. Estimasi laba: omzet ×
-                45% margin − Rp8.000.000 biaya bulanan.
+                35 transaksi/hari × 26 hari × Rp22.000 rata-rata transaksi.
+                Estimasi laba: omzet × 45% margin − Rp8.000.000 biaya bulanan.
               </p>
               <p className="sim-warning">
-                *Belum memasukkan pajak, biaya modal, gaji, sewa, promo, susut bahan, dan faktor
-                lain. Hasil aktual dapat berbeda dan tidak dijamin.
+                *Belum memasukkan pajak, biaya modal, gaji, sewa, promo, susut
+                bahan, dan faktor lain. Hasil aktual dapat berbeda dan tidak
+                dijamin.
               </p>
             </div>
           </div>
         </section>
 
-        <section className="join-section" id="cara-bergabung" aria-labelledby="join-title">
+        <section
+          className="join-section"
+          id="cara-bergabung"
+          aria-labelledby="join-title"
+        >
           <div className="container">
             <div className="join-head" data-reveal="">
               <div>
@@ -939,35 +1101,44 @@ function LandingPage() {
                 </h2>
               </div>
               <p className="join-intro">
-                Mulai dari obrolan sederhana, lalu susun kebutuhan dan rencana jualanmu bersama
-                MacMood.
+                Mulai dari obrolan sederhana, lalu susun kebutuhan dan rencana
+                jualanmu bersama MacMood.
               </p>
             </div>
-            <div className="join-steps" aria-label="Empat langkah bergabung dengan MacMood">
+            <div
+              className="join-steps"
+              aria-label="Empat langkah bergabung dengan MacMood"
+            >
               <article className="join-step" data-reveal="">
                 <span className="join-step-number">01</span>
                 <h3>Konsultasi</h3>
-                <p>Ceritakan lokasi, pengalaman, dan rencana jualanmu lewat form kontak.</p>
+                <p>
+                  Ceritakan lokasi, pengalaman, dan rencana jualanmu lewat form
+                  kontak.
+                </p>
               </article>
               <article className="join-step delay-1" data-reveal="">
                 <span className="join-step-number">02</span>
                 <h3>Pilih model</h3>
                 <p>
-                  Tentukan paket tanpa booth, booth MacMood, booth premium, atau format fleksibel.
+                  Tentukan paket tanpa booth, booth MacMood, booth premium, atau
+                  format fleksibel.
                 </p>
               </article>
               <article className="join-step delay-1" data-reveal="">
                 <span className="join-step-number">03</span>
                 <h3>Susun rencana</h3>
                 <p>
-                  Bahas kebutuhan gerai, perlengkapan, bahan awal, dan langkah operasional.
+                  Bahas kebutuhan gerai, perlengkapan, bahan awal, dan langkah
+                  operasional.
                 </p>
               </article>
               <article className="join-step delay-2" data-reveal="">
                 <span className="join-step-number">04</span>
                 <h3>Siap mulai</h3>
                 <p>
-                  Siapkan lokasi dan perlengkapan, lalu tentukan rencana mulai jualan bersama.
+                  Siapkan lokasi dan perlengkapan, lalu tentukan rencana mulai
+                  jualan bersama.
                 </p>
               </article>
             </div>
@@ -983,7 +1154,11 @@ function LandingPage() {
           </div>
         </section>
 
-        <section className="contact-section" id="kontak" aria-labelledby="contact-title">
+        <section
+          className="contact-section"
+          id="kontak"
+          aria-labelledby="contact-title"
+        >
           <div className="container contact-layout">
             <div className="contact-copy" data-reveal="">
               <p className="eyebrow eyebrow-light">Ada yang mau ditanyain?</p>
@@ -991,8 +1166,9 @@ function LandingPage() {
                 Ngobrol dulu, yuk.
               </h2>
               <p className="section-copy">
-                Untuk order, acara, peluang mitra, atau kerja sama lain—tinggalkan pesan. Form ini
-                akan menyiapkan pesan WhatsApp setelah nomor owner dikonfigurasi.
+                Untuk order, acara, peluang mitra, atau kerja sama
+                lain—tinggalkan pesan. Form ini akan menyiapkan pesan WhatsApp
+                setelah nomor owner dikonfigurasi.
               </p>
               <div className="contact-lines">
                 <span>✳ Order dan pertanyaan menu</span>
@@ -1044,10 +1220,18 @@ function LandingPage() {
                   required
                 />
               </div>
-              <button className="button button-primary contact-submit" type="submit">
+              <button
+                className="button button-primary contact-submit"
+                type="submit"
+              >
                 Siapkan pesan WhatsApp <span aria-hidden="true">↗</span>
               </button>
-              <p className="contact-status" id="contact-status" role="status" aria-live="polite" />
+              <p
+                className="contact-status"
+                id="contact-status"
+                role="status"
+                aria-live="polite"
+              />
             </form>
           </div>
         </section>
@@ -1062,8 +1246,9 @@ function LandingPage() {
                 MACMOOD
               </a>
               <p>
-                Comfort food mac and cheese dengan pilihan chicken katsu dan kentang. MacMood,
-                teman cheesy buat bikin mood hari ini lebih baik.
+                Comfort food mac and cheese dengan pilihan chicken katsu dan
+                kentang. MacMood, teman cheesy buat bikin mood hari ini lebih
+                baik.
               </p>
             </div>
             <nav className="footer-column" aria-label="Navigasi footer">
@@ -1100,7 +1285,10 @@ function LandingPage() {
                   </a>
                 </li>
                 <li>
-                  <a href="#mitra" data-interest="Kemitraan — MacMood Gerai Plus">
+                  <a
+                    href="#mitra"
+                    data-interest="Kemitraan — MacMood Gerai Plus"
+                  >
                     MacMood Gerai Plus
                   </a>
                 </li>
@@ -1129,7 +1317,8 @@ function LandingPage() {
           </div>
           <div className="footer-bottom">
             <p>
-              © <span id="year">2026</span> MacMood · Mac and cheese, made happy.
+              © <span id="year">2026</span> MacMood · Mac and cheese, made
+              happy.
             </p>
             <a className="footer-back-top" href="#hero">
               Kembali ke atas ↑

@@ -13,16 +13,26 @@ import {
   Banknote,
   Search,
 } from "lucide-react";
-import { downloadCsv, printReportPdf, type ReportPrintKpi, type ReportPrintSection } from "@/lib/export-utils";
+import {
+  downloadCsv,
+  printReportPdf,
+  type ReportPrintKpi,
+  type ReportPrintSection,
+} from "@/lib/export-utils";
 
 interface AdminShiftsViewProps {
   shifts: ShiftRecord[];
   onVerifyShift?: (shiftId: string) => void;
 }
 
-export function AdminShiftsView({ shifts = [], onVerifyShift }: AdminShiftsViewProps) {
+export function AdminShiftsView({
+  shifts = [],
+  onVerifyShift,
+}: AdminShiftsViewProps) {
   const [selectedShift, setSelectedShift] = useState<ShiftRecord | null>(null);
-  const [statusFilter, setStatusFilter] = useState<"ALL" | "OPEN" | "CLOSED">("ALL");
+  const [statusFilter, setStatusFilter] = useState<"ALL" | "OPEN" | "CLOSED">(
+    "ALL",
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [exportNotice, setExportNotice] = useState<string | null>(null);
 
@@ -33,11 +43,19 @@ export function AdminShiftsView({ shifts = [], onVerifyShift }: AdminShiftsViewP
       const norm: ShiftRecord = { ...s };
       if (!norm.branchName || norm.branchName.startsWith("Shift ")) {
         const nameLower = (norm.cashierName || "").toLowerCase();
-        if (nameLower.includes("margonda") || nameLower.includes("rian") || nameLower.includes("outlet 2")) {
+        if (
+          nameLower.includes("margonda") ||
+          nameLower.includes("rian") ||
+          nameLower.includes("outlet 2")
+        ) {
           norm.branchId = "branch-2";
           norm.branchName = "MacMood Express - Margonda";
           norm.branchCode = "MAC-DPK-01";
-        } else if (nameLower.includes("tebet") || nameLower.includes("siti") || nameLower.includes("outlet 3")) {
+        } else if (
+          nameLower.includes("tebet") ||
+          nameLower.includes("siti") ||
+          nameLower.includes("outlet 3")
+        ) {
           norm.branchId = "branch-3";
           norm.branchName = "MacMood Kitchen - Tebet";
           norm.branchCode = "MAC-JKT-02";
@@ -64,9 +82,18 @@ export function AdminShiftsView({ shifts = [], onVerifyShift }: AdminShiftsViewP
   });
 
   // KPI Calculations
-  const totalCashCollected = filteredShifts.reduce((sum, s) => sum + s.cashSales, 0);
-  const totalQrisCollected = filteredShifts.reduce((sum, s) => sum + s.qrisSales, 0);
-  const totalVariance = filteredShifts.reduce((sum, s) => sum + Math.abs(s.cashDifference), 0);
+  const totalCashCollected = filteredShifts.reduce(
+    (sum, s) => sum + s.cashSales,
+    0,
+  );
+  const totalQrisCollected = filteredShifts.reduce(
+    (sum, s) => sum + s.qrisSales,
+    0,
+  );
+  const totalVariance = filteredShifts.reduce(
+    (sum, s) => sum + Math.abs(s.cashDifference),
+    0,
+  );
 
   const handleExportCSV = () => {
     const filename = `MacMood_Rekap_Shift_${new Date().toISOString().slice(0, 10)}`;
@@ -113,16 +140,41 @@ export function AdminShiftsView({ shifts = [], onVerifyShift }: AdminShiftsViewP
 
   const handlePrintPDF = () => {
     const kpis: ReportPrintKpi[] = [
-      { label: "Total Penjualan Tunai", value: formatRupiah(totalCashCollected), sub: "Kas masuk laci" },
-      { label: "Total Penjualan QRIS", value: formatRupiah(totalQrisCollected), sub: "Settlement rekening" },
-      { label: "Total Selisih Kas", value: formatRupiah(totalVariance), sub: "Toleransi 100% terkontrol" },
-      { label: "Total Shift Ditutup", value: `${shifts.filter((s) => s.status === "CLOSED").length} Shift`, sub: "Rekonsiliasi selesai" },
+      {
+        label: "Total Penjualan Tunai",
+        value: formatRupiah(totalCashCollected),
+        sub: "Kas masuk laci",
+      },
+      {
+        label: "Total Penjualan QRIS",
+        value: formatRupiah(totalQrisCollected),
+        sub: "Settlement rekening",
+      },
+      {
+        label: "Total Selisih Kas",
+        value: formatRupiah(totalVariance),
+        sub: "Toleransi 100% terkontrol",
+      },
+      {
+        label: "Total Shift Ditutup",
+        value: `${shifts.filter((s) => s.status === "CLOSED").length} Shift`,
+        sub: "Rekonsiliasi selesai",
+      },
     ];
 
     const sections: ReportPrintSection[] = [
       {
         title: "Tabel Audit Rekapitulasi Shift Kasir & Laci Kas Fisik",
-        headers: ["Shift & Tanggal", "Kasir", "Kas Awal", "Penjualan Tunai", "QRIS", "Fisik Laci", "Selisih", "Status"],
+        headers: [
+          "Shift & Tanggal",
+          "Kasir",
+          "Kas Awal",
+          "Penjualan Tunai",
+          "QRIS",
+          "Fisik Laci",
+          "Selisih",
+          "Status",
+        ],
         rows: filteredShifts.map((s) => [
           `${s.shiftName} (${s.date})`,
           s.cashierName,
@@ -130,8 +182,14 @@ export function AdminShiftsView({ shifts = [], onVerifyShift }: AdminShiftsViewP
           formatRupiah(s.cashSales),
           formatRupiah(s.qrisSales),
           formatRupiah(s.actualCash),
-          s.cashDifference === 0 ? "Rp 0 (Pas)" : formatRupiah(s.cashDifference),
-          s.verifiedByOwner ? "Terverifikasi Owner" : s.status === "OPEN" ? "Berjalan" : "Tutup",
+          s.cashDifference === 0
+            ? "Rp 0 (Pas)"
+            : formatRupiah(s.cashDifference),
+          s.verifiedByOwner
+            ? "Terverifikasi Owner"
+            : s.status === "OPEN"
+              ? "Berjalan"
+              : "Tutup",
         ]),
       },
     ];
@@ -139,7 +197,11 @@ export function AdminShiftsView({ shifts = [], onVerifyShift }: AdminShiftsViewP
     printReportPdf({
       title: "Laporan Rekapitulasi Shift Kasir & Rekonsiliasi Kas Laci",
       subtitle: "Audit Akuntabilitas Kas Fisik Shift MacMood POS",
-      periodLabel: new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }),
+      periodLabel: new Date().toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }),
       outletName: "Seluruh Cabang Operasional",
       printedBy: "Muhammad Afrizal (Business Owner)",
       kpis,
@@ -162,7 +224,8 @@ export function AdminShiftsView({ shifts = [], onVerifyShift }: AdminShiftsViewP
             Rekapitulasi Kas & Operasional Cabang
           </h2>
           <p className="text-xs sm:text-sm text-neutral-600 mt-0.5">
-            Audit serah terima uang fisik laci kasir harian per cabang outlet, monitoring selisih kas fisik, dan otorisasi tutup buku.
+            Audit serah terima uang fisik laci kasir harian per cabang outlet,
+            monitoring selisih kas fisik, dan otorisasi tutup buku.
           </p>
         </div>
 
@@ -202,7 +265,9 @@ export function AdminShiftsView({ shifts = [], onVerifyShift }: AdminShiftsViewP
         {/* KPI 1: Total Kas Terkumpul (Tunai + QRIS) */}
         <div className="p-5 rounded-3xl bg-brand-green-950 text-white shadow-xs space-y-2">
           <div className="flex items-center justify-between text-brand-cream-100/70">
-            <span className="text-xs font-bold uppercase tracking-wider text-brand-yellow-400">Total Kas Terkumpul</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-brand-yellow-400">
+              Total Kas Terkumpul
+            </span>
             <span className="size-8 rounded-xl bg-white/10 text-brand-yellow-400 flex items-center justify-center">
               <Banknote className="size-4" />
             </span>
@@ -218,7 +283,9 @@ export function AdminShiftsView({ shifts = [], onVerifyShift }: AdminShiftsViewP
         {/* KPI 2: Total Kas Fisik Laci */}
         <div className="p-5 rounded-3xl bg-white border border-brand-green-900/10 shadow-xs space-y-2">
           <div className="flex items-center justify-between text-neutral-500">
-            <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">Kas Fisik Laci (Tunai)</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">
+              Kas Fisik Laci (Tunai)
+            </span>
             <span className="size-8 rounded-xl bg-brand-cream-100 text-brand-green-900 flex items-center justify-center">
               <Banknote className="size-4" />
             </span>
@@ -234,7 +301,9 @@ export function AdminShiftsView({ shifts = [], onVerifyShift }: AdminShiftsViewP
         {/* KPI 3: Total QRIS Masuk */}
         <div className="p-5 rounded-3xl bg-white border border-brand-green-900/10 shadow-xs space-y-2">
           <div className="flex items-center justify-between text-neutral-500">
-            <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">Settlement QRIS (Bank)</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">
+              Settlement QRIS (Bank)
+            </span>
             <span className="size-8 rounded-xl bg-brand-yellow-400/20 text-amber-800 flex items-center justify-center">
               <CreditCard className="size-4" />
             </span>
@@ -250,7 +319,9 @@ export function AdminShiftsView({ shifts = [], onVerifyShift }: AdminShiftsViewP
         {/* KPI 4: Selisih Kas Keseluruhan */}
         <div className="p-5 rounded-3xl bg-white border border-brand-green-900/10 shadow-xs space-y-2">
           <div className="flex items-center justify-between text-neutral-500">
-            <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">Total Selisih Kas</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">
+              Total Selisih Kas
+            </span>
             <span className="size-8 rounded-xl bg-brand-cream-100 text-brand-green-900 flex items-center justify-center">
               <CheckCircle2 className="size-4" />
             </span>
@@ -279,13 +350,17 @@ export function AdminShiftsView({ shifts = [], onVerifyShift }: AdminShiftsViewP
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-neutral-500">Status:</span>
+          <span className="text-xs font-semibold text-neutral-500">
+            Status:
+          </span>
           <div className="flex items-center bg-neutral-100 p-0.5 rounded-xl border border-neutral-200">
             <button
               type="button"
               onClick={() => setStatusFilter("ALL")}
               className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                statusFilter === "ALL" ? "bg-white text-brand-green-950 shadow-2xs" : "text-neutral-600"
+                statusFilter === "ALL"
+                  ? "bg-white text-brand-green-950 shadow-2xs"
+                  : "text-neutral-600"
               }`}
             >
               Semua ({shifts.length})
@@ -294,7 +369,9 @@ export function AdminShiftsView({ shifts = [], onVerifyShift }: AdminShiftsViewP
               type="button"
               onClick={() => setStatusFilter("OPEN")}
               className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                statusFilter === "OPEN" ? "bg-white text-brand-green-950 shadow-2xs" : "text-neutral-600"
+                statusFilter === "OPEN"
+                  ? "bg-white text-brand-green-950 shadow-2xs"
+                  : "text-neutral-600"
               }`}
             >
               Berjalan
@@ -303,7 +380,9 @@ export function AdminShiftsView({ shifts = [], onVerifyShift }: AdminShiftsViewP
               type="button"
               onClick={() => setStatusFilter("CLOSED")}
               className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                statusFilter === "CLOSED" ? "bg-white text-neutral-900 shadow-2xs" : "text-neutral-600"
+                statusFilter === "CLOSED"
+                  ? "bg-white text-neutral-900 shadow-2xs"
+                  : "text-neutral-600"
               }`}
             >
               Selesai Ditutup
@@ -333,7 +412,10 @@ export function AdminShiftsView({ shifts = [], onVerifyShift }: AdminShiftsViewP
               {filteredShifts.map((shift) => {
                 const hasVariance = shift.cashDifference !== 0;
                 return (
-                  <tr key={shift.id} className="hover:bg-neutral-50/60 transition-colors">
+                  <tr
+                    key={shift.id}
+                    className="hover:bg-neutral-50/60 transition-colors"
+                  >
                     <td className="py-3.5 px-4 sm:px-6">
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <strong className="font-display font-bold text-neutral-900 block text-xs">
@@ -344,7 +426,10 @@ export function AdminShiftsView({ shifts = [], onVerifyShift }: AdminShiftsViewP
                         </span>
                       </div>
                       <span className="text-[11px] text-neutral-500 font-mono">
-                        {shift.date} · {shift.startTime} {shift.endTime ? `- ${shift.endTime}` : "(Aktif Melayani)"}
+                        {shift.date} · {shift.startTime}{" "}
+                        {shift.endTime
+                          ? `- ${shift.endTime}`
+                          : "(Aktif Melayani)"}
                       </span>
                     </td>
 
@@ -354,8 +439,12 @@ export function AdminShiftsView({ shifts = [], onVerifyShift }: AdminShiftsViewP
                           {shift.cashierName.slice(0, 2).toUpperCase()}
                         </div>
                         <div>
-                          <strong className="text-neutral-900 font-semibold block">{shift.cashierName}</strong>
-                          <span className="text-[10px] text-neutral-500">{shift.totalOrders} nota diproses</span>
+                          <strong className="text-neutral-900 font-semibold block">
+                            {shift.cashierName}
+                          </strong>
+                          <span className="text-[10px] text-neutral-500">
+                            {shift.totalOrders} nota diproses
+                          </span>
                         </div>
                       </div>
                     </td>
@@ -377,14 +466,20 @@ export function AdminShiftsView({ shifts = [], onVerifyShift }: AdminShiftsViewP
                     </td>
 
                     <td className="py-3.5 px-4 font-mono text-[11px]">
-                      <div>Fisik: <strong className="text-neutral-900">{formatRupiah(shift.actualCash)}</strong></div>
+                      <div>
+                        Fisik:{" "}
+                        <strong className="text-neutral-900">
+                          {formatRupiah(shift.actualCash)}
+                        </strong>
+                      </div>
                       {!hasVariance ? (
                         <span className="inline-flex items-center gap-1 text-[10px] font-bold text-brand-green-900 bg-brand-cream-100 px-1.5 py-0.5 rounded-full mt-0.5">
                           <CheckCircle2 className="size-2.5" /> Pas (Rp0)
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-900 bg-brand-yellow-400/20 px-1.5 py-0.5 rounded-full mt-0.5">
-                          <AlertCircle className="size-2.5" /> {formatRupiah(shift.cashDifference)}
+                          <AlertCircle className="size-2.5" />{" "}
+                          {formatRupiah(shift.cashDifference)}
                         </span>
                       )}
                     </td>
@@ -404,7 +499,8 @@ export function AdminShiftsView({ shifts = [], onVerifyShift }: AdminShiftsViewP
 
                         {shift.verifiedByOwner ? (
                           <span className="inline-flex items-center gap-1 text-[10px] text-brand-green-900 font-semibold">
-                            <ShieldCheck className="size-3" /> Terverifikasi Owner
+                            <ShieldCheck className="size-3" /> Terverifikasi
+                            Owner
                           </span>
                         ) : (
                           shift.status === "CLOSED" && (
@@ -463,22 +559,37 @@ export function AdminShiftsView({ shifts = [], onVerifyShift }: AdminShiftsViewP
                 <strong className="font-display font-black text-sm text-brand-green-950 block">
                   MACMOOD POS — REKAPITULASI KAS CABANG
                 </strong>
-                <span className="text-neutral-500 text-[11px] block">{selectedShift.branchName || selectedShift.shiftName} ({selectedShift.branchCode || "MAC-01"})</span>
-                <span className="text-neutral-500 text-[11px]">{selectedShift.date} · Kasir: {selectedShift.cashierName}</span>
+                <span className="text-neutral-500 text-[11px] block">
+                  {selectedShift.branchName || selectedShift.shiftName} (
+                  {selectedShift.branchCode || "MAC-01"})
+                </span>
+                <span className="text-neutral-500 text-[11px]">
+                  {selectedShift.date} · Kasir: {selectedShift.cashierName}
+                </span>
               </div>
 
               <div className="space-y-1.5 pt-1">
                 <div className="flex justify-between">
-                  <span className="text-neutral-500">1. Modal Kas Awal (Float):</span>
+                  <span className="text-neutral-500">
+                    1. Modal Kas Awal (Float):
+                  </span>
                   <strong>{formatRupiah(selectedShift.initialCash)}</strong>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-neutral-500">2. Total Penjualan Tunai:</span>
-                  <strong className="text-brand-green-900">{formatRupiah(selectedShift.cashSales)}</strong>
+                  <span className="text-neutral-500">
+                    2. Total Penjualan Tunai:
+                  </span>
+                  <strong className="text-brand-green-900">
+                    {formatRupiah(selectedShift.cashSales)}
+                  </strong>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-neutral-500">3. Total Penjualan QRIS:</span>
-                  <strong className="text-amber-800">{formatRupiah(selectedShift.qrisSales)}</strong>
+                  <span className="text-neutral-500">
+                    3. Total Penjualan QRIS:
+                  </span>
+                  <strong className="text-amber-800">
+                    {formatRupiah(selectedShift.qrisSales)}
+                  </strong>
                 </div>
                 <div className="flex justify-between text-neutral-500">
                   <span>Jumlah Nota Diproses:</span>
@@ -494,15 +605,25 @@ export function AdminShiftsView({ shifts = [], onVerifyShift }: AdminShiftsViewP
                 </div>
                 <div className="flex justify-between font-bold text-xs pt-1 border-t border-neutral-200">
                   <span>Selisih Fisik Laci:</span>
-                  <span className={selectedShift.cashDifference === 0 ? "text-brand-green-900" : "text-brand-coral-600"}>
-                    {selectedShift.cashDifference === 0 ? "Rp0 (Seimbang)" : formatRupiah(selectedShift.cashDifference)}
+                  <span
+                    className={
+                      selectedShift.cashDifference === 0
+                        ? "text-brand-green-900"
+                        : "text-brand-coral-600"
+                    }
+                  >
+                    {selectedShift.cashDifference === 0
+                      ? "Rp0 (Seimbang)"
+                      : formatRupiah(selectedShift.cashDifference)}
                   </span>
                 </div>
               </div>
 
               {selectedShift.notes && (
                 <div className="p-2.5 bg-white rounded-xl border border-neutral-200 text-[11px] font-sans text-neutral-700">
-                  <strong className="text-neutral-900 block mb-0.5">Catatan Kasir:</strong>
+                  <strong className="text-neutral-900 block mb-0.5">
+                    Catatan Kasir:
+                  </strong>
                   {selectedShift.notes}
                 </div>
               )}

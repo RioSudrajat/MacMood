@@ -59,11 +59,14 @@ export function downloadFinancialCsv(data: FinancialReportData) {
     `""`,
     `"KONTRIBUSI MENU TERLARIS (TOP SELLERS)","KATEGORI","TERJUAL (PORSI)","OMZET (IDR)","MARGIN KOTOR (%)"`,
     ...data.topSellers.map(
-      (m) => `"${m.name}","${m.category}",${m.portionSold},${m.revenue},"${m.marginPercent}%"`
+      (m) =>
+        `"${m.name}","${m.category}",${m.portionSold},${m.revenue},"${m.marginPercent}%"`,
     ),
   ];
 
-  const blob = new Blob([csvRows.join("\n")], { type: "text/csv;charset=utf-8;" });
+  const blob = new Blob([csvRows.join("\n")], {
+    type: "text/csv;charset=utf-8;",
+  });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -229,7 +232,8 @@ export function AdminFinancialReportModal({
                   </tr>
                   <tr className="border-b border-neutral-200 bg-emerald-50/60 font-bold">
                     <td className="py-2.5 px-4 text-emerald-950">
-                      Laba Kotor (Gross Profit) — Margin {reportData.grossMarginPercent}%
+                      Laba Kotor (Gross Profit) — Margin{" "}
+                      {reportData.grossMarginPercent}%
                     </td>
                     <td className="py-2.5 px-4 text-right font-mono text-emerald-800">
                       {formatRupiah(reportData.grossProfit)}
@@ -269,7 +273,9 @@ export function AdminFinancialReportModal({
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-neutral-500">Rata-Rata Nilai Nota (AOV):</span>
+                <span className="text-neutral-500">
+                  Rata-Rata Nilai Nota (AOV):
+                </span>
                 <span className="font-bold font-mono text-neutral-900">
                   {formatRupiah(reportData.aov)}
                 </span>
@@ -287,7 +293,9 @@ export function AdminFinancialReportModal({
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-neutral-500">QRIS Merchant Cashless:</span>
+                <span className="text-neutral-500">
+                  QRIS Merchant Cashless:
+                </span>
                 <span className="font-bold font-mono text-neutral-900">
                   {formatRupiah(reportData.qrisRevenue)}
                 </span>
@@ -314,8 +322,12 @@ export function AdminFinancialReportModal({
                 <tbody className="divide-y divide-neutral-100">
                   {reportData.topSellers.map((item, idx) => (
                     <tr key={idx} className="hover:bg-neutral-50/60">
-                      <td className="py-2 px-3 font-semibold text-neutral-800">{item.name}</td>
-                      <td className="py-2 px-3 text-neutral-500">{item.category}</td>
+                      <td className="py-2 px-3 font-semibold text-neutral-800">
+                        {item.name}
+                      </td>
+                      <td className="py-2 px-3 text-neutral-500">
+                        {item.category}
+                      </td>
                       <td className="py-2 px-3 text-center font-mono font-bold text-neutral-700">
                         {item.portionSold}
                       </td>
@@ -335,7 +347,9 @@ export function AdminFinancialReportModal({
           {/* Signature Sign-Off Block */}
           <div className="pt-6 border-t border-neutral-200 grid grid-cols-2 gap-8 text-center text-xs">
             <div>
-              <span className="text-neutral-500 block mb-12">Disiapkan oleh:</span>
+              <span className="text-neutral-500 block mb-12">
+                Disiapkan oleh:
+              </span>
               <span className="font-bold text-neutral-900 block border-b border-neutral-400 mx-auto w-40 pb-1">
                 Budi Santoso
               </span>
@@ -345,7 +359,9 @@ export function AdminFinancialReportModal({
             </div>
 
             <div>
-              <span className="text-neutral-500 block mb-12">Disetujui oleh:</span>
+              <span className="text-neutral-500 block mb-12">
+                Disetujui oleh:
+              </span>
               <span className="font-bold text-neutral-900 block border-b border-neutral-400 mx-auto w-40 pb-1 flex items-center justify-center gap-1">
                 <ShieldCheck className="size-3.5 text-emerald-600 inline" />
                 {reportData.ownerName}

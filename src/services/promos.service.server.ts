@@ -38,14 +38,19 @@ export async function validatePromo(code: string, subtotal: number) {
   }
 
   if (promo.maxUsage && promo.currentUsage >= promo.maxUsage) {
-    return { valid: false, message: `Kuota pemakaian voucher '${code}' sudah habis.` };
+    return {
+      valid: false,
+      message: `Kuota pemakaian voucher '${code}' sudah habis.`,
+    };
   }
 
   // Calculate discount
   let discountAmount = 0;
   if (promo.discountType === "PERCENTAGE") {
     const calculated = Math.round((subtotal * promo.discountValue) / 100);
-    discountAmount = promo.maxDiscount ? Math.min(calculated, promo.maxDiscount) : calculated;
+    discountAmount = promo.maxDiscount
+      ? Math.min(calculated, promo.maxDiscount)
+      : calculated;
   } else {
     discountAmount = promo.discountValue;
   }
@@ -83,11 +88,19 @@ export async function updatePromo(id: string, input: UpdatePromoInput) {
     .set({
       ...(input.code ? { code: input.code.toUpperCase() } : {}),
       ...(input.name ? { name: input.name } : {}),
-      ...(input.description !== undefined ? { description: input.description } : {}),
+      ...(input.description !== undefined
+        ? { description: input.description }
+        : {}),
       ...(input.discountType ? { discountType: input.discountType } : {}),
-      ...(input.discountValue !== undefined ? { discountValue: input.discountValue } : {}),
-      ...(input.maxDiscount !== undefined ? { maxDiscount: input.maxDiscount } : {}),
-      ...(input.minSubtotal !== undefined ? { minSubtotal: input.minSubtotal } : {}),
+      ...(input.discountValue !== undefined
+        ? { discountValue: input.discountValue }
+        : {}),
+      ...(input.maxDiscount !== undefined
+        ? { maxDiscount: input.maxDiscount }
+        : {}),
+      ...(input.minSubtotal !== undefined
+        ? { minSubtotal: input.minSubtotal }
+        : {}),
       ...(input.maxUsage !== undefined ? { maxUsage: input.maxUsage } : {}),
       ...(input.isActive !== undefined ? { isActive: input.isActive } : {}),
       ...(input.startDate ? { startDate: new Date(input.startDate) } : {}),
@@ -108,6 +121,9 @@ export async function togglePromo(id: string, isActive: boolean) {
 }
 
 export async function deletePromo(id: string) {
-  const [deleted] = await db.delete(promos).where(eq(promos.id, id)).returning({ id: promos.id });
+  const [deleted] = await db
+    .delete(promos)
+    .where(eq(promos.id, id))
+    .returning({ id: promos.id });
   return Boolean(deleted);
 }

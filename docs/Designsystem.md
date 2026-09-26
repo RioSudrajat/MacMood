@@ -14,24 +14,24 @@ Antarmuka POS harus tenang dan mudah dipindai saat outlet ramai. Warna cerah dip
 
 Nilai HEX di bawah adalah titik awal visual yang diturunkan dari gambar referensi, bukan hasil ekstraksi dari file logo final. Validasi dan sesuaikan dengan aset master saat tersedia.
 
-| Token | Nilai awal | Peran |
-|---|---|---|
-| `brand.green.700` | `#245842` | Hijau utama logo, header atau navigasi terpilih, tombol utama dengan teks terang. |
-| `brand.green.800` | `#194735` | Hover/pressed hijau dan teks bermerek pada bidang terang. |
-| `brand.green.100` | `#E4EEE7` | Latar lembut untuk pilihan aktif atau panel informasi merek. |
-| `brand.cream.100` | `#F5F4E8` | Latar hangat atau bidang sekunder. |
-| `brand.cream.200` | `#E8EBD5` | Krem logo; aksen bidang ilustrasi, bukan teks kecil tanpa pengecekan kontras. |
-| `brand.yellow.500` | `#F4BE55` | Kuning hangat logo, sorotan, badge, atau ikon. Gunakan teks hijau tua untuk kontras. |
-| `brand.coral.600` | `#D94143` | Aksen merah dari materi poster; untuk penekanan terbatas, bukan status sukses. |
-| `neutral.0` | `#FFFFFF` | Permukaan kartu dan bidang utama. |
-| `neutral.50` | `#F7F8F5` | Latar aplikasi terang. |
-| `neutral.100` | `#ECEFEA` | Batas, pemisah, bidang nonaktif. |
-| `neutral.600` | `#59645D` | Teks sekunder. |
-| `neutral.900` | `#202923` | Teks utama. |
-| `semantic.success` | `#24734D` | Transaksi berhasil dan sinkronisasi selesai. |
-| `semantic.warning` | `#9A5A00` | Perlu perhatian, stok menipis, atau koneksi terganggu. |
-| `semantic.danger` | `#B4232F` | Gagal, pembatalan, atau tindakan destruktif. |
-| `semantic.info` | `#23658A` | Informasi dan status netral. |
+| Token              | Nilai awal | Peran                                                                                |
+| ------------------ | ---------- | ------------------------------------------------------------------------------------ |
+| `brand.green.700`  | `#245842`  | Hijau utama logo, header atau navigasi terpilih, tombol utama dengan teks terang.    |
+| `brand.green.800`  | `#194735`  | Hover/pressed hijau dan teks bermerek pada bidang terang.                            |
+| `brand.green.100`  | `#E4EEE7`  | Latar lembut untuk pilihan aktif atau panel informasi merek.                         |
+| `brand.cream.100`  | `#F5F4E8`  | Latar hangat atau bidang sekunder.                                                   |
+| `brand.cream.200`  | `#E8EBD5`  | Krem logo; aksen bidang ilustrasi, bukan teks kecil tanpa pengecekan kontras.        |
+| `brand.yellow.500` | `#F4BE55`  | Kuning hangat logo, sorotan, badge, atau ikon. Gunakan teks hijau tua untuk kontras. |
+| `brand.coral.600`  | `#D94143`  | Aksen merah dari materi poster; untuk penekanan terbatas, bukan status sukses.       |
+| `neutral.0`        | `#FFFFFF`  | Permukaan kartu dan bidang utama.                                                    |
+| `neutral.50`       | `#F7F8F5`  | Latar aplikasi terang.                                                               |
+| `neutral.100`      | `#ECEFEA`  | Batas, pemisah, bidang nonaktif.                                                     |
+| `neutral.600`      | `#59645D`  | Teks sekunder.                                                                       |
+| `neutral.900`      | `#202923`  | Teks utama.                                                                          |
+| `semantic.success` | `#24734D`  | Transaksi berhasil dan sinkronisasi selesai.                                         |
+| `semantic.warning` | `#9A5A00`  | Perlu perhatian, stok menipis, atau koneksi terganggu.                               |
+| `semantic.danger`  | `#B4232F`  | Gagal, pembatalan, atau tindakan destruktif.                                         |
+| `semantic.info`    | `#23658A`  | Informasi dan status netral.                                                         |
 
 ### Perilaku Warna
 
@@ -75,11 +75,11 @@ Nilai HEX di bawah adalah titik awal visual yang diturunkan dari gambar referens
 
 Gunakan breakpoint awal berikut sebagai token layout, lalu verifikasi pada perangkat kasir aktual:
 
-| Lebar viewport | Tata letak |
-|---|---|
+| Lebar viewport  | Tata letak                                                                                                                                                                             |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Di bawah 600 px | Satu kolom. Katalog dan pencarian menjadi area utama; keranjang/bayar memakai panel atau sheet yang dapat dibuka tanpa menutupi status dan aksi penting. Kontrol utama ramah sentuhan. |
-| 600–1023 px | Tablet: katalog dan keranjang dua panel bila orientasi memungkinkan. Pada layar sempit/portrait, keranjang berpindah ke drawer atau panel bawah. |
-| 1024 px ke atas | Laptop/desktop: layar kasir memakai katalog dan keranjang berdampingan. Dashboard owner dapat memakai navigasi samping, kartu ringkasan, dan tabel yang dapat difilter. |
+| 600–1023 px     | Tablet: katalog dan keranjang dua panel bila orientasi memungkinkan. Pada layar sempit/portrait, keranjang berpindah ke drawer atau panel bawah.                                       |
+| 1024 px ke atas | Laptop/desktop: layar kasir memakai katalog dan keranjang berdampingan. Dashboard owner dapat memakai navigasi samping, kartu ringkasan, dan tabel yang dapat difilter.                |
 
 ### Kasir
 

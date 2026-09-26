@@ -1,5 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
-import { Lock, Unlock, Delete, X, ShieldCheck, LogOut, User } from "lucide-react";
+import {
+  Lock,
+  Unlock,
+  Delete,
+  X,
+  ShieldCheck,
+  LogOut,
+  User,
+} from "lucide-react";
 import { motion } from "motion/react";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { authClient } from "@/lib/auth-client";
@@ -70,7 +78,7 @@ function PosPinLockModalContent({
         }, 600);
       }
     },
-    [onSuccessUnlock, staff.pin]
+    [onSuccessUnlock, staff.pin],
   );
 
   // Handle number click
@@ -85,7 +93,7 @@ function PosPinLockModalContent({
         validatePin(newPin);
       }
     },
-    [enteredPin, isSuccess, validatePin]
+    [enteredPin, isSuccess, validatePin],
   );
 
   const handleDelete = useCallback(() => {
@@ -281,7 +289,9 @@ function PosPinLockModalContent({
 
         {/* Switch Account / Logout footer */}
         <div className="mt-5 pt-3 border-t border-neutral-100 w-full flex items-center justify-between text-xs">
-          <span className="text-neutral-400">Bukan {staff.name.split(" ")[0]}?</span>
+          <span className="text-neutral-400">
+            Bukan {staff.name.split(" ")[0]}?
+          </span>
           <button
             type="button"
             onClick={handleSignOut}
@@ -301,4 +311,3 @@ export function PosPinLockModal(props: PosPinLockModalProps) {
   if (!props.isOpen) return null;
   return <PosPinLockModalContent {...props} />;
 }
-

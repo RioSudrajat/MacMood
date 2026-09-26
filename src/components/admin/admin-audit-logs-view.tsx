@@ -18,7 +18,9 @@ interface AdminAuditLogsViewProps {
   auditLogs: AuditLogRecord[];
 }
 
-export function AdminAuditLogsView({ auditLogs = [] }: AdminAuditLogsViewProps) {
+export function AdminAuditLogsView({
+  auditLogs = [],
+}: AdminAuditLogsViewProps) {
   const [actionFilter, setActionFilter] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState("");
   const [exportNotice, setExportNotice] = useState<string | null>(null);
@@ -30,15 +32,22 @@ export function AdminAuditLogsView({ auditLogs = [] }: AdminAuditLogsViewProps) 
       log.details.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       log.performedBy.toLowerCase().includes(searchQuery.toLowerCase()) ||
       log.entityId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (log.details.reason && log.details.reason.toLowerCase().includes(searchQuery.toLowerCase()));
+      (log.details.reason &&
+        log.details.reason.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesAction && matchesSearch;
   });
 
   // KPI Calculations
-  const todayLogsCount = auditLogs.filter((l) => l.date === "24 Sep 2026").length;
+  const todayLogsCount = auditLogs.filter(
+    (l) => l.date === "24 Sep 2026",
+  ).length;
   const voidCount = auditLogs.filter((l) => l.action === "VOID_ORDER").length;
-  const priceChangesCount = auditLogs.filter((l) => l.action === "MENU_PRICE_CHANGE").length;
-  const pinResetsCount = auditLogs.filter((l) => l.action === "STAFF_PIN_RESET").length;
+  const priceChangesCount = auditLogs.filter(
+    (l) => l.action === "MENU_PRICE_CHANGE",
+  ).length;
+  const pinResetsCount = auditLogs.filter(
+    (l) => l.action === "STAFF_PIN_RESET",
+  ).length;
 
   const handleExportCsv = () => {
     downloadCsv({
@@ -80,7 +89,10 @@ export function AdminAuditLogsView({ auditLogs = [] }: AdminAuditLogsViewProps) 
       subtitle:
         "Rekaman kronologis tak terhapus atas perubahan harga, otorisasi void nota, reset PIN staf, dan verifikasi shift",
       meta: [
-        { label: "Total Log Tercatat", value: `${filteredLogs.length} Aktivitas` },
+        {
+          label: "Total Log Tercatat",
+          value: `${filteredLogs.length} Aktivitas`,
+        },
         { label: "Filter Aksi", value: actionFilter },
         { label: "Waktu Cetak", value: new Date().toLocaleString("id-ID") },
         { label: "Otorisator", value: "Muhammad Afrizal (Business Owner)" },
@@ -88,7 +100,13 @@ export function AdminAuditLogsView({ auditLogs = [] }: AdminAuditLogsViewProps) 
       tables: [
         {
           title: "Daftar Audit Trail",
-          headers: ["Waktu & Tanggal", "Tipe Aksi", "Pelaksana", "Rincian & Snapshot", "Alasan"],
+          headers: [
+            "Waktu & Tanggal",
+            "Tipe Aksi",
+            "Pelaksana",
+            "Rincian & Snapshot",
+            "Alasan",
+          ],
           rows: filteredLogs.map((log) => [
             `${log.time} · ${log.date}`,
             log.action,
@@ -109,31 +127,36 @@ export function AdminAuditLogsView({ auditLogs = [] }: AdminAuditLogsViewProps) 
         return {
           icon: RotateCcw,
           label: "Otorisasi Void",
-          classes: "bg-brand-coral-500/10 text-brand-coral-600 border-brand-coral-500/20",
+          classes:
+            "bg-brand-coral-500/10 text-brand-coral-600 border-brand-coral-500/20",
         };
       case "MENU_PRICE_CHANGE":
         return {
           icon: Tag,
           label: "Ubah Harga Menu",
-          classes: "bg-brand-yellow-500/15 text-brand-yellow-700 border-brand-yellow-500/30",
+          classes:
+            "bg-brand-yellow-500/15 text-brand-yellow-700 border-brand-yellow-500/30",
         };
       case "STAFF_PIN_RESET":
         return {
           icon: KeyRound,
           label: "Reset PIN Staf",
-          classes: "bg-brand-green-900/10 text-brand-green-950 border-brand-green-900/20",
+          classes:
+            "bg-brand-green-900/10 text-brand-green-950 border-brand-green-900/20",
         };
       case "SHIFT_FORCE_CLOSE":
         return {
           icon: CheckCircle2,
           label: "Verifikasi Shift",
-          classes: "bg-brand-green-800/15 text-brand-green-900 border-brand-green-800/25",
+          classes:
+            "bg-brand-green-800/15 text-brand-green-900 border-brand-green-800/25",
         };
       case "EXPENSE_RECORDED":
         return {
           icon: DollarSign,
           label: "Kas Kecil",
-          classes: "bg-brand-cream-200 text-brand-green-950 border-brand-green-900/15",
+          classes:
+            "bg-brand-cream-200 text-brand-green-950 border-brand-green-900/15",
         };
       default:
         return {
@@ -159,7 +182,8 @@ export function AdminAuditLogsView({ auditLogs = [] }: AdminAuditLogsViewProps) 
             Log Audit Aktivitas & Keamanan Outlet
           </h2>
           <p className="text-xs sm:text-sm text-neutral-600 mt-0.5">
-            Rekaman kronologis tak terhapus atas perubahan harga, pembatalan/void pesanan, reset PIN staf, dan persetujuan shift.
+            Rekaman kronologis tak terhapus atas perubahan harga,
+            pembatalan/void pesanan, reset PIN staf, dan persetujuan shift.
           </p>
         </div>
 
@@ -196,13 +220,18 @@ export function AdminAuditLogsView({ auditLogs = [] }: AdminAuditLogsViewProps) 
         {/* KPI 1: Total Log */}
         <div className="p-5 rounded-3xl bg-white border border-brand-green-900/10 shadow-xs space-y-2">
           <div className="flex items-center justify-between text-neutral-500">
-            <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">Total Log Tercatat</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">
+              Total Log Tercatat
+            </span>
             <span className="size-8 rounded-xl bg-brand-cream-100 text-brand-green-950 flex items-center justify-center">
               <FileText className="size-4" />
             </span>
           </div>
           <div className="font-display font-black text-2xl text-brand-green-950">
-            {auditLogs.length} <span className="text-xs font-normal text-neutral-500">peristiwa</span>
+            {auditLogs.length}{" "}
+            <span className="text-xs font-normal text-neutral-500">
+              peristiwa
+            </span>
           </div>
           <div className="text-[11px] text-neutral-500">
             {todayLogsCount} aktivitas dicatat hari ini
@@ -212,13 +241,18 @@ export function AdminAuditLogsView({ auditLogs = [] }: AdminAuditLogsViewProps) 
         {/* KPI 2: Otorisasi Void Nota */}
         <div className="p-5 rounded-3xl bg-white border border-brand-green-900/10 shadow-xs space-y-2">
           <div className="flex items-center justify-between text-neutral-500">
-            <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">Otorisasi Void Owner</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">
+              Otorisasi Void Owner
+            </span>
             <span className="size-8 rounded-xl bg-brand-coral-500/10 text-brand-coral-600 flex items-center justify-center">
               <RotateCcw className="size-4" />
             </span>
           </div>
           <div className="font-display font-black text-2xl text-brand-coral-600">
-            {voidCount} <span className="text-xs font-normal text-neutral-500">transaksi</span>
+            {voidCount}{" "}
+            <span className="text-xs font-normal text-neutral-500">
+              transaksi
+            </span>
           </div>
           <div className="text-[11px] text-neutral-500">
             Wajib menyertakan alasan pembatalan
@@ -228,13 +262,16 @@ export function AdminAuditLogsView({ auditLogs = [] }: AdminAuditLogsViewProps) 
         {/* KPI 3: Perubahan Harga Menu */}
         <div className="p-5 rounded-3xl bg-white border border-brand-green-900/10 shadow-xs space-y-2">
           <div className="flex items-center justify-between text-neutral-500">
-            <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">Perubahan Harga Menu</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">
+              Perubahan Harga Menu
+            </span>
             <span className="size-8 rounded-xl bg-brand-yellow-500/15 text-brand-yellow-700 flex items-center justify-center">
               <Tag className="size-4" />
             </span>
           </div>
           <div className="font-display font-black text-2xl text-brand-green-950">
-            {priceChangesCount} <span className="text-xs font-normal text-neutral-500">kali</span>
+            {priceChangesCount}{" "}
+            <span className="text-xs font-normal text-neutral-500">kali</span>
           </div>
           <div className="text-[11px] text-neutral-500">
             Snapshot harga lama tersimpan aman
@@ -244,13 +281,18 @@ export function AdminAuditLogsView({ auditLogs = [] }: AdminAuditLogsViewProps) 
         {/* KPI 4: Keamanan PIN Staf */}
         <div className="p-5 rounded-3xl bg-brand-green-950 text-white shadow-xs space-y-2">
           <div className="flex items-center justify-between text-brand-cream-100/70">
-            <span className="text-xs font-bold uppercase tracking-wider text-brand-yellow-400">Rotasi PIN Staf</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-brand-yellow-400">
+              Rotasi PIN Staf
+            </span>
             <span className="size-8 rounded-xl bg-white/10 text-brand-yellow-400 flex items-center justify-center">
               <KeyRound className="size-4" />
             </span>
           </div>
           <div className="font-display font-black text-2xl text-brand-yellow-400">
-            {pinResetsCount} <span className="text-xs font-normal text-brand-cream-100/70">reset</span>
+            {pinResetsCount}{" "}
+            <span className="text-xs font-normal text-brand-cream-100/70">
+              reset
+            </span>
           </div>
           <div className="text-[11px] text-brand-cream-100/80">
             Proteksi akses tablet kasir outlet
@@ -272,7 +314,9 @@ export function AdminAuditLogsView({ auditLogs = [] }: AdminAuditLogsViewProps) 
         </div>
 
         <div className="flex items-center gap-2 overflow-x-auto">
-          <span className="text-xs font-semibold text-neutral-500 whitespace-nowrap">Filter Aksi:</span>
+          <span className="text-xs font-semibold text-neutral-500 whitespace-nowrap">
+            Filter Aksi:
+          </span>
           <select
             value={actionFilter}
             onChange={(e) => setActionFilter(e.target.value)}
@@ -307,10 +351,15 @@ export function AdminAuditLogsView({ auditLogs = [] }: AdminAuditLogsViewProps) 
                 const BadgeIcon = badge.icon;
 
                 return (
-                  <tr key={log.id} className="hover:bg-neutral-50/60 transition-colors">
+                  <tr
+                    key={log.id}
+                    className="hover:bg-neutral-50/60 transition-colors"
+                  >
                     {/* Timestamp */}
                     <td className="py-3.5 px-4 sm:px-6 font-mono text-[11px] text-neutral-600 whitespace-nowrap">
-                      <span className="font-bold text-neutral-900 block">{log.time}</span>
+                      <span className="font-bold text-neutral-900 block">
+                        {log.time}
+                      </span>
                       <span className="text-neutral-500">{log.date}</span>
                     </td>
 
@@ -331,7 +380,9 @@ export function AdminAuditLogsView({ auditLogs = [] }: AdminAuditLogsViewProps) 
                           {log.performedBy.slice(0, 2).toUpperCase()}
                         </div>
                         <div>
-                          <strong className="text-neutral-900 font-semibold block">{log.performedBy}</strong>
+                          <strong className="text-neutral-900 font-semibold block">
+                            {log.performedBy}
+                          </strong>
                           <span
                             className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded border ${
                               log.userRole === "owner"
@@ -354,12 +405,14 @@ export function AdminAuditLogsView({ auditLogs = [] }: AdminAuditLogsViewProps) 
                         <div className="p-2 bg-neutral-50 rounded-xl border border-neutral-200/80 font-mono text-[10px] space-y-0.5">
                           {log.details.before && (
                             <div className="text-brand-coral-600 flex items-center gap-1">
-                              <span className="font-bold">Sebelum:</span> {log.details.before}
+                              <span className="font-bold">Sebelum:</span>{" "}
+                              {log.details.before}
                             </div>
                           )}
                           {log.details.after && (
                             <div className="text-brand-green-900 flex items-center gap-1">
-                              <span className="font-bold">Sesudah:</span> {log.details.after}
+                              <span className="font-bold">Sesudah:</span>{" "}
+                              {log.details.after}
                             </div>
                           )}
                         </div>

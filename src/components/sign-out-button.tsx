@@ -71,7 +71,13 @@ export function SignOutButton({
           Couldn’t sign out. Try again.
         </p>
       )}
-      <Button onClick={signOut} disabled={pending} variant="outline" size="sm" className={className}>
+      <Button
+        onClick={signOut}
+        disabled={pending}
+        variant="outline"
+        size="sm"
+        className={className}
+      >
         <LogOut aria-hidden="true" />
         {pending ? "Signing out…" : "Sign out"}
       </Button>

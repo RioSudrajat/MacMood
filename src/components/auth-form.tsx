@@ -29,7 +29,9 @@ export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
       const result = signingUp
         ? await authClient.signUp.email({
             ...credentials,
-            name: String(new FormData(event.currentTarget).get("name") || "").trim(),
+            name: String(
+              new FormData(event.currentTarget).get("name") || "",
+            ).trim(),
           })
         : await authClient.signIn.email(credentials);
       if (result.error) {

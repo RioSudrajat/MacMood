@@ -20,7 +20,11 @@ services:
     volumes:
       - macmood_prod_pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-macmood_user} -d ${POSTGRES_DB:-macmood}"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-macmood_user} -d ${POSTGRES_DB:-macmood}",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5

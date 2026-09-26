@@ -8,7 +8,11 @@ interface PosReceiptModalProps {
   isReprint?: boolean;
 }
 
-export function PosReceiptModal({ order, onClose, isReprint = false }: PosReceiptModalProps) {
+export function PosReceiptModal({
+  order,
+  onClose,
+  isReprint = false,
+}: PosReceiptModalProps) {
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
       {/* Thermal Print Stylesheet (58mm / 80mm) */}
@@ -60,15 +64,15 @@ export function PosReceiptModal({ order, onClose, isReprint = false }: PosReceip
                 order.status === "VOID"
                   ? "bg-red-100 text-red-800"
                   : isReprint
-                  ? "bg-neutral-100 text-neutral-700"
-                  : "bg-emerald-100 text-emerald-800"
+                    ? "bg-neutral-100 text-neutral-700"
+                    : "bg-emerald-100 text-emerald-800"
               }`}
             >
               {order.status === "VOID"
                 ? "DIBATALKAN / VOID"
                 : isReprint
-                ? "SALINAN STRUK (REPRINT)"
-                : "TRANSAKSI LUNAS"}
+                  ? "SALINAN STRUK (REPRINT)"
+                  : "TRANSAKSI LUNAS"}
             </span>
 
             <button
@@ -110,18 +114,25 @@ export function PosReceiptModal({ order, onClose, isReprint = false }: PosReceip
         {order.status === "VOID" && (
           <div className="p-2.5 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 space-y-0.5">
             <span className="font-bold block">Pesanan Dibatalkan (Void)</span>
-            <span className="text-[11px] text-red-600">Alasan: {order.voidReason || "Kesalahan transaksi kasir"}</span>
+            <span className="text-[11px] text-red-600">
+              Alasan: {order.voidReason || "Kesalahan transaksi kasir"}
+            </span>
           </div>
         )}
 
         {/* Items Breakdown */}
         <div className="space-y-2 text-xs max-h-48 overflow-y-auto py-1 divide-y divide-neutral-100">
           {order.items.map((it, idx) => (
-            <div key={idx} className="pt-2 first:pt-0 flex justify-between gap-2">
+            <div
+              key={idx}
+              className="pt-2 first:pt-0 flex justify-between gap-2"
+            >
               <div className="flex-1">
                 <div className="font-bold text-neutral-900">
                   {it.name}
-                  <span className="text-neutral-500 font-normal ml-1">× {it.quantity}</span>
+                  <span className="text-neutral-500 font-normal ml-1">
+                    × {it.quantity}
+                  </span>
                 </div>
                 {it.notes && (
                   <span className="block text-[10px] text-neutral-500 italic">
@@ -143,36 +154,58 @@ export function PosReceiptModal({ order, onClose, isReprint = false }: PosReceip
         <div className="pt-3 border-t border-dashed border-neutral-300 space-y-1.5 text-xs">
           <div className="flex justify-between text-neutral-600">
             <span>Subtotal</span>
-            <span className="font-medium text-neutral-800">{formatRupiah(order.subtotal)}</span>
+            <span className="font-medium text-neutral-800">
+              {formatRupiah(order.subtotal)}
+            </span>
           </div>
 
           {order.discount && order.discount > 0 ? (
             <div className="flex justify-between text-emerald-700 font-bold">
-              <span>Diskon {order.promoCode ? `(${order.promoCode})` : ""}</span>
+              <span>
+                Diskon {order.promoCode ? `(${order.promoCode})` : ""}
+              </span>
               <span className="font-mono">-{formatRupiah(order.discount)}</span>
             </div>
           ) : null}
 
           <div className="flex justify-between text-neutral-600">
             <span>Pajak Resto PB1 (10%)</span>
-            <span className="font-medium text-neutral-800">{formatRupiah(order.tax)}</span>
+            <span className="font-medium text-neutral-800">
+              {formatRupiah(order.tax)}
+            </span>
           </div>
           <div className="flex justify-between font-bold text-sm pt-1.5 border-t border-neutral-200 text-neutral-900">
-            <span className="font-display font-black text-brand-green-950">Total Pembayaran</span>
+            <span className="font-display font-black text-brand-green-950">
+              Total Pembayaran
+            </span>
             <span className="font-display font-black text-base text-brand-green-900">
               {formatRupiah(order.total)}
             </span>
           </div>
 
           <div className="flex justify-between text-neutral-600 text-[11px] pt-1">
-            <span>Metode: <strong className="text-neutral-800">{order.paymentMethod === "CASH" ? "Tunai (Cash)" : "QRIS Manual"}</strong></span>
-            <span>Diterima: <strong className="text-neutral-800">{formatRupiah(order.amountTendered)}</strong></span>
+            <span>
+              Metode:{" "}
+              <strong className="text-neutral-800">
+                {order.paymentMethod === "CASH"
+                  ? "Tunai (Cash)"
+                  : "QRIS Manual"}
+              </strong>
+            </span>
+            <span>
+              Diterima:{" "}
+              <strong className="text-neutral-800">
+                {formatRupiah(order.amountTendered)}
+              </strong>
+            </span>
           </div>
 
           {order.paymentMethod === "CASH" && (
             <div className="flex justify-between text-[11px] font-bold text-neutral-800">
               <span>Kembalian</span>
-              <span className="font-mono text-emerald-700">{formatRupiah(order.change)}</span>
+              <span className="font-mono text-emerald-700">
+                {formatRupiah(order.change)}
+              </span>
             </div>
           )}
         </div>
@@ -186,7 +219,9 @@ export function PosReceiptModal({ order, onClose, isReprint = false }: PosReceip
                 : "bg-amber-100 text-amber-800 border border-amber-200"
             }`}
           >
-            {order.syncStatus === "SYNCED" ? "✓ Tersinkron ke Server Cloud" : "Antrean Offline (Lokal)"}
+            {order.syncStatus === "SYNCED"
+              ? "✓ Tersinkron ke Server Cloud"
+              : "Antrean Offline (Lokal)"}
           </span>
         </div>
 

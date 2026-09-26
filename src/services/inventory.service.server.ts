@@ -2,7 +2,10 @@ import { db } from "@/db/index.server";
 import { rawMaterials, recipes, products } from "@/db/schema";
 import { ensureSeededData } from "./seed.service.server";
 import { asc, eq } from "drizzle-orm";
-import type { CreateRawMaterialInput, RestockMaterialInput } from "@/validators/inventory";
+import type {
+  CreateRawMaterialInput,
+  RestockMaterialInput,
+} from "@/validators/inventory";
 
 export async function listRawMaterials() {
   await ensureSeededData();
@@ -27,7 +30,11 @@ export async function createRawMaterial(input: CreateRawMaterialInput) {
 }
 
 export async function restockMaterial(id: string, input: RestockMaterialInput) {
-  const [material] = await db.select().from(rawMaterials).where(eq(rawMaterials.id, id)).limit(1);
+  const [material] = await db
+    .select()
+    .from(rawMaterials)
+    .where(eq(rawMaterials.id, id))
+    .limit(1);
   if (!material) throw new Error("Material not found");
 
   const current = Number(material.currentStock);
@@ -50,7 +57,10 @@ export async function restockMaterial(id: string, input: RestockMaterialInput) {
 export async function listProductRecipes() {
   await ensureSeededData();
 
-  const allProducts = await db.select().from(products).orderBy(asc(products.name));
+  const allProducts = await db
+    .select()
+    .from(products)
+    .orderBy(asc(products.name));
   const allRecipes = await db.select().from(recipes);
   const allMaterials = await db.select().from(rawMaterials);
 
@@ -109,7 +119,9 @@ export async function listProductRecipes() {
     }
 
     const grossMargin =
-      p.price > 0 ? Math.round(((p.price - calculatedHpp) / p.price) * 1000) / 10 : 0;
+      p.price > 0
+        ? Math.round(((p.price - calculatedHpp) / p.price) * 1000) / 10
+        : 0;
 
     return {
       productId: p.id,

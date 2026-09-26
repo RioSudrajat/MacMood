@@ -77,7 +77,8 @@ export function PosAppPage() {
       if (stored) return stored;
     }
     const email = session.user.email?.toLowerCase() || "";
-    if (email.includes("outlet2") || email.includes("margonda")) return "branch-2";
+    if (email.includes("outlet2") || email.includes("margonda"))
+      return "branch-2";
     if (email.includes("outlet3") || email.includes("tebet")) return "branch-3";
     return "branch-1";
   });
@@ -90,7 +91,8 @@ export function PosAppPage() {
   };
 
   const activeBranch =
-    INITIAL_BRANCHES.find((b) => b.id === currentBranchId) || INITIAL_BRANCHES[0];
+    INITIAL_BRANCHES.find((b) => b.id === currentBranchId) ||
+    INITIAL_BRANCHES[0];
 
   // Sidebar Collapse & Mobile Drawer States
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -101,7 +103,10 @@ export function PosAppPage() {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const tabParam = params.get("tab");
-      if (tabParam && ["pos", "orders", "shift", "sync", "notifications"].includes(tabParam)) {
+      if (
+        tabParam &&
+        ["pos", "orders", "shift", "sync", "notifications"].includes(tabParam)
+      ) {
         return tabParam as PosTab;
       }
     }
@@ -135,7 +140,8 @@ export function PosAppPage() {
     ...INITIAL_SHIFT,
     cashierName,
   });
-  const [pastShifts, setPastShifts] = useState<PastShift[]>(INITIAL_PAST_SHIFTS);
+  const [pastShifts, setPastShifts] =
+    useState<PastShift[]>(INITIAL_PAST_SHIFTS);
   const [syncQueue, setSyncQueue] = useState<SyncQueueItem[]>(() => {
     if (typeof window !== "undefined") {
       try {
@@ -147,7 +153,8 @@ export function PosAppPage() {
     }
     return INITIAL_SYNC_QUEUE;
   });
-  const [justCompletedOrder, setJustCompletedOrder] = useState<CompletedOrder | null>(null);
+  const [justCompletedOrder, setJustCompletedOrder] =
+    useState<CompletedOrder | null>(null);
   const [isSimulatedOffline, setIsSimulatedOffline] = useState(false);
 
   // Sync to localStorage whenever orders or syncQueue change
@@ -164,7 +171,10 @@ export function PosAppPage() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
-        localStorage.setItem("macmood_offline_sync_queue", JSON.stringify(syncQueue));
+        localStorage.setItem(
+          "macmood_offline_sync_queue",
+          JSON.stringify(syncQueue),
+        );
       } catch (e) {
         console.warn("Failed to save syncQueue to localStorage:", e);
       }
@@ -175,7 +185,7 @@ export function PosAppPage() {
   const rawIsOnline = useSyncExternalStore(
     subscribeNetwork,
     () => navigator.onLine,
-    () => true
+    () => true,
   );
 
   const effectiveIsOnline = isSimulatedOffline ? false : rawIsOnline;
@@ -195,25 +205,30 @@ export function PosAppPage() {
 
         if (prodRes.status === "fulfilled" && prodRes.value?.data?.length > 0) {
           setProducts(
-            (prodRes.value.data as Array<{
-              id: string;
-              name: string;
-              categorySlug: string;
-              price: number;
-              description?: string;
-              imageUrl?: string;
-              isAvailable: boolean;
-              currentStock: number;
-            }>).map((p) => ({
+            (
+              prodRes.value.data as Array<{
+                id: string;
+                name: string;
+                categorySlug: string;
+                price: number;
+                description?: string;
+                imageUrl?: string;
+                isAvailable: boolean;
+                currentStock: number;
+              }>
+            ).map((p) => ({
               id: p.id,
               name: p.name,
-              category: (p.categorySlug === "sides" || p.categorySlug === "drinks" ? p.categorySlug : "mac") as "mac" | "sides" | "drinks",
+              category: (p.categorySlug === "sides" ||
+              p.categorySlug === "drinks"
+                ? p.categorySlug
+                : "mac") as "mac" | "sides" | "drinks",
               price: p.price,
               description: p.description || "",
               image: p.imageUrl || "/assets/menu-super-mac-reference.png",
               isAvailable: p.isAvailable,
               stock: p.currentStock,
-            }))
+            })),
           );
         }
 
@@ -250,7 +265,11 @@ export function PosAppPage() {
               id: val.active.id,
               status: val.active.status as "OPEN" | "CLOSED",
               cashierName: val.active.staffName,
-              startTime: new Date(val.active.startTime).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB",
+              startTime:
+                new Date(val.active.startTime).toLocaleTimeString("id-ID", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }) + " WIB",
               initialCash: val.active.initialCash,
               cashSales: val.active.cashSales,
               qrisSales: val.active.qrisSales,
@@ -262,11 +281,24 @@ export function PosAppPage() {
             setPastShifts(
               val.past.map((s) => ({
                 id: s.id,
-                date: new Date(s.startTime).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }),
+                date: new Date(s.startTime).toLocaleDateString("id-ID", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                }),
                 cashierName: s.staffName,
                 shiftName: "Shift Reguler",
-                startTime: new Date(s.startTime).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB",
-                endTime: s.endTime ? new Date(s.endTime).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB" : "-",
+                startTime:
+                  new Date(s.startTime).toLocaleTimeString("id-ID", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }) + " WIB",
+                endTime: s.endTime
+                  ? new Date(s.endTime).toLocaleTimeString("id-ID", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }) + " WIB"
+                  : "-",
                 initialCash: s.initialCash,
                 cashSales: s.cashSales,
                 qrisSales: s.qrisSales,
@@ -275,38 +307,43 @@ export function PosAppPage() {
                 cashDifference: s.cashDifference,
                 status: "CLOSED" as const,
                 notes: s.notes || "",
-              }))
+              })),
             );
           }
         }
 
-        if (orderRes.status === "fulfilled" && orderRes.value?.data?.length > 0) {
+        if (
+          orderRes.status === "fulfilled" &&
+          orderRes.value?.data?.length > 0
+        ) {
           setOrders(
-            (orderRes.value.data as Array<{
-              id: string;
-              orderNumber: string;
-              items?: Array<{
-                productId?: string;
-                productName: string;
-                quantity: number;
-                price: number;
+            (
+              orderRes.value.data as Array<{
+                id: string;
+                orderNumber: string;
+                items?: Array<{
+                  productId?: string;
+                  productName: string;
+                  quantity: number;
+                  price: number;
+                  subtotal: number;
+                  notes?: string;
+                }>;
                 subtotal: number;
-                notes?: string;
-              }>;
-              subtotal: number;
-              discount?: number;
-              promoCode?: string;
-              promoName?: string;
-              tax: number;
-              total: number;
-              paymentMethod: PaymentMethod;
-              amountTendered?: number;
-              changeAmount?: number;
-              createdAt: string;
-              cashierName: string;
-              syncStatus?: "SYNCED" | "PENDING_SYNC";
-              paymentStatus?: "PAID" | "REFUNDED" | "VOID";
-            }>).map((o) => ({
+                discount?: number;
+                promoCode?: string;
+                promoName?: string;
+                tax: number;
+                total: number;
+                paymentMethod: PaymentMethod;
+                amountTendered?: number;
+                changeAmount?: number;
+                createdAt: string;
+                cashierName: string;
+                syncStatus?: "SYNCED" | "PENDING_SYNC";
+                paymentStatus?: "PAID" | "REFUNDED" | "VOID";
+              }>
+            ).map((o) => ({
               id: o.id,
               orderNumber: o.orderNumber,
               items: (o.items || []).map((it) => ({
@@ -326,12 +363,18 @@ export function PosAppPage() {
               paymentMethod: o.paymentMethod,
               amountTendered: o.amountTendered || o.total,
               change: o.changeAmount || 0,
-              timestamp: new Date(o.createdAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB",
+              timestamp:
+                new Date(o.createdAt).toLocaleTimeString("id-ID", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }) + " WIB",
               dateStr: new Date(o.createdAt).toISOString().slice(0, 10),
               cashierName: o.cashierName,
               syncStatus: o.syncStatus || "SYNCED",
-              status: (o.paymentStatus === "REFUNDED" ? "VOID" : o.paymentStatus || "PAID") as OrderStatus,
-            }))
+              status: (o.paymentStatus === "REFUNDED"
+                ? "VOID"
+                : o.paymentStatus || "PAID") as OrderStatus,
+            })),
           );
         }
       } catch (err) {
@@ -347,7 +390,14 @@ export function PosAppPage() {
 
   // Handlers
   const handleOrderComplete = (orderData: {
-    items: { productId: string; name: string; quantity: number; price: number; subtotal: number; notes?: string }[];
+    items: {
+      productId: string;
+      name: string;
+      quantity: number;
+      price: number;
+      subtotal: number;
+      notes?: string;
+    }[];
     subtotal: number;
     discount?: number;
     promoCode?: string;
@@ -359,7 +409,9 @@ export function PosAppPage() {
     change: number;
   }) => {
     const now = new Date();
-    const timeStr = now.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB";
+    const timeStr =
+      now.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) +
+      " WIB";
     const dateFormatted = now.toISOString().slice(0, 10);
     const orderNum = `MAC-${dateFormatted.replace(/-/g, "")}-${Math.floor(1000 + Math.random() * 9000)}`;
 
@@ -390,8 +442,12 @@ export function PosAppPage() {
     // Update Shift calculations
     setShift((prev) => {
       const isCash = orderData.paymentMethod === "CASH";
-      const newCashSales = isCash ? prev.cashSales + orderData.total : prev.cashSales;
-      const newQrisSales = !isCash ? prev.qrisSales + orderData.total : prev.qrisSales;
+      const newCashSales = isCash
+        ? prev.cashSales + orderData.total
+        : prev.cashSales;
+      const newQrisSales = !isCash
+        ? prev.qrisSales + orderData.total
+        : prev.qrisSales;
       return {
         ...prev,
         cashSales: newCashSales,
@@ -432,12 +488,17 @@ export function PosAppPage() {
           promoName: newOrder.promoName,
           tax: newOrder.tax,
           total: newOrder.total,
-          paymentMethod: newOrder.paymentMethod === "QRIS_MANUAL" ? "QRIS" : newOrder.paymentMethod,
+          paymentMethod:
+            newOrder.paymentMethod === "QRIS_MANUAL"
+              ? "QRIS"
+              : newOrder.paymentMethod,
           amountTendered: newOrder.amountTendered,
           changeAmount: newOrder.change,
           syncStatus: "SYNCED",
           items: newOrder.items.map((it) => ({
-            productId: it.productId?.startsWith("prod-") ? undefined : it.productId,
+            productId: it.productId?.startsWith("prod-")
+              ? undefined
+              : it.productId,
             productName: it.name,
             price: it.price,
             quantity: it.quantity,
@@ -466,22 +527,29 @@ export function PosAppPage() {
               status: "VOID",
               voidReason: reason,
             }
-          : ord
-      )
+          : ord,
+      ),
     );
 
     // Reconcile Shift if voided
     if (target.status === "PAID") {
       setShift((prev) => {
         const isCash = target.paymentMethod === "CASH";
-        const newCashSales = isCash ? prev.cashSales - target.total : prev.cashSales;
-        const newQrisSales = !isCash ? prev.qrisSales - target.total : prev.qrisSales;
+        const newCashSales = isCash
+          ? prev.cashSales - target.total
+          : prev.cashSales;
+        const newQrisSales = !isCash
+          ? prev.qrisSales - target.total
+          : prev.qrisSales;
         return {
           ...prev,
           cashSales: Math.max(0, newCashSales),
           qrisSales: Math.max(0, newQrisSales),
           orderCount: Math.max(0, prev.orderCount - 1),
-          expectedCash: Math.max(prev.initialCash, prev.initialCash + newCashSales),
+          expectedCash: Math.max(
+            prev.initialCash,
+            prev.initialCash + newCashSales,
+          ),
         };
       });
     }
@@ -489,7 +557,9 @@ export function PosAppPage() {
 
   const handleOpenShift = (initialCash: number) => {
     const now = new Date();
-    const timeStr = now.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB";
+    const timeStr =
+      now.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) +
+      " WIB";
     const dateFormatted = now.toISOString().slice(0, 10).replace(/-/g, "");
 
     setShift({
@@ -525,8 +595,14 @@ export function PosAppPage() {
 
   const handleCloseShift = (actualCash: number, notes: string) => {
     const now = new Date();
-    const timeStr = now.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB";
-    const dateStr = now.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+    const timeStr =
+      now.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) +
+      " WIB";
+    const dateStr = now.toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
     const diff = actualCash - shift.expectedCash;
 
     const archivedShift: PastShift = {
@@ -543,7 +619,9 @@ export function PosAppPage() {
       actualCash,
       cashDifference: diff,
       status: "CLOSED",
-      notes: notes || (diff === 0 ? "Tutup shift tanpa selisih kas." : `Selisih kas ${diff}`),
+      notes:
+        notes ||
+        (diff === 0 ? "Tutup shift tanpa selisih kas." : `Selisih kas ${diff}`),
     };
 
     setPastShifts((prev) => [archivedShift, ...prev]);
@@ -591,12 +669,15 @@ export function PosAppPage() {
             promoName: o.promoName,
             tax: o.tax,
             total: o.total,
-            paymentMethod: o.paymentMethod === "QRIS_MANUAL" ? "QRIS" : o.paymentMethod,
+            paymentMethod:
+              o.paymentMethod === "QRIS_MANUAL" ? "QRIS" : o.paymentMethod,
             amountTendered: o.amountTendered,
             changeAmount: o.change,
             syncStatus: "SYNCED",
             items: o.items.map((it) => ({
-              productId: it.productId?.startsWith("prod-") ? undefined : it.productId,
+              productId: it.productId?.startsWith("prod-")
+                ? undefined
+                : it.productId,
               productName: it.name,
               price: it.price,
               quantity: it.quantity,
@@ -613,18 +694,20 @@ export function PosAppPage() {
         ...item,
         syncStatus: "SYNCED",
         syncedAt: item.syncedAt || timeStr,
-      }))
+      })),
     );
 
     setOrders((prev) =>
       prev.map((ord) => ({
         ...ord,
         syncStatus: "SYNCED",
-      }))
+      })),
     );
   };
 
-  const pendingSyncCount = syncQueue.filter((i) => i.syncStatus === "PENDING_SYNC").length;
+  const pendingSyncCount = syncQueue.filter(
+    (i) => i.syncStatus === "PENDING_SYNC",
+  ).length;
 
   return (
     <div className="flex-1 flex h-screen w-screen overflow-hidden bg-brand-cream-50/50">
@@ -700,7 +783,9 @@ export function PosAppPage() {
                 title="Buka Rekap Kas Cabang"
               >
                 <Clock className="size-3 text-brand-green-800" />
-                <span>{shift.status === "OPEN" ? "Laci Buka" : "Laci Tutup"}</span>
+                <span>
+                  {shift.status === "OPEN" ? "Laci Buka" : "Laci Tutup"}
+                </span>
               </button>
 
               {/* Sync status indicator */}
@@ -722,7 +807,9 @@ export function PosAppPage() {
                 ) : (
                   <>
                     <WifiOff className="size-3 text-amber-600" />
-                    <span className="hidden sm:inline text-[11px]">{pendingSyncCount} Antrean</span>
+                    <span className="hidden sm:inline text-[11px]">
+                      {pendingSyncCount} Antrean
+                    </span>
                   </>
                 )}
               </button>
@@ -762,7 +849,9 @@ export function PosAppPage() {
               isOnline={effectiveIsOnline}
               syncQueue={syncQueue}
               onForceSync={handleForceSync}
-              onToggleSimulateOffline={() => setIsSimulatedOffline(!isSimulatedOffline)}
+              onToggleSimulateOffline={() =>
+                setIsSimulatedOffline(!isSimulatedOffline)
+              }
               isSimulatedOffline={isSimulatedOffline}
             />
           )}

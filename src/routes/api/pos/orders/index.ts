@@ -15,7 +15,6 @@ export const Route = createFileRoute("/api/pos/orders/")({
           const branchId = url.searchParams.get("branchId") || undefined;
           const data = await listOrders({ limit, offset, shiftId, branchId });
           return Response.json({ data });
-
         }),
       POST: ({ request }) =>
         withApiSession(request, async (session) => {

@@ -32,8 +32,12 @@ export function AdminPromosView({
   onTogglePromoStatus,
 }: AdminPromosViewProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [typeFilter, setTypeFilter] = useState<"ALL" | PromoDiscountType>("ALL");
-  const [statusFilter, setStatusFilter] = useState<"ALL" | "ACTIVE" | "INACTIVE">("ALL");
+  const [typeFilter, setTypeFilter] = useState<"ALL" | PromoDiscountType>(
+    "ALL",
+  );
+  const [statusFilter, setStatusFilter] = useState<
+    "ALL" | "ACTIVE" | "INACTIVE"
+  >("ALL");
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -42,7 +46,8 @@ export function AdminPromosView({
   // Form State
   const [code, setCode] = useState("");
   const [name, setName] = useState("");
-  const [discountType, setDiscountType] = useState<PromoDiscountType>("PERCENTAGE");
+  const [discountType, setDiscountType] =
+    useState<PromoDiscountType>("PERCENTAGE");
   const [discountValue, setDiscountValue] = useState<number>(10);
   const [maxDiscount, setMaxDiscount] = useState<number>(15000);
   const [minOrderAmount, setMinOrderAmount] = useState<number>(30000);
@@ -71,7 +76,10 @@ export function AdminPromosView({
   // Executive KPI Metrics
   const activePromoCount = promos.filter((p) => p.isActive).length;
   const totalUsedCount = promos.reduce((sum, p) => sum + p.usedCount, 0);
-  const totalAvailableQuota = promos.reduce((sum, p) => sum + Math.max(0, p.quota - p.usedCount), 0);
+  const totalAvailableQuota = promos.reduce(
+    (sum, p) => sum + Math.max(0, p.quota - p.usedCount),
+    0,
+  );
   const estimatedSavingsGiven = promos.reduce((sum, p) => {
     const avgEst = p.discountType === "PERCENTAGE" ? 6500 : p.discountValue;
     return sum + p.usedCount * avgEst;
@@ -116,7 +124,10 @@ export function AdminPromosView({
       name: name.trim(),
       discountType,
       discountValue: Number(discountValue) || 0,
-      maxDiscount: discountType === "PERCENTAGE" ? (Number(maxDiscount) || undefined) : undefined,
+      maxDiscount:
+        discountType === "PERCENTAGE"
+          ? Number(maxDiscount) || undefined
+          : undefined,
       minOrderAmount: Number(minOrderAmount) || 0,
       quota: Number(quota) || 1,
       startDate,
@@ -173,7 +184,10 @@ export function AdminPromosView({
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `MacMood-Promosi-${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute(
+      "download",
+      `MacMood-Promosi-${new Date().toISOString().slice(0, 10)}.csv`,
+    );
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -192,7 +206,8 @@ export function AdminPromosView({
             Diskon, Voucher & Promo Dinamis
           </h2>
           <p className="text-xs sm:text-sm text-neutral-600 max-w-2xl mt-0.5">
-            Kelola kode voucher persentase (%) dan nominal (Rp) per pesanan, minimal transaksi, kuota pemakaian, dan batas masa berlaku kampanye.
+            Kelola kode voucher persentase (%) dan nominal (Rp) per pesanan,
+            minimal transaksi, kuota pemakaian, dan batas masa berlaku kampanye.
           </p>
         </div>
 
@@ -221,12 +236,16 @@ export function AdminPromosView({
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div className="p-4 sm:p-5 rounded-2xl bg-white border border-brand-green-900/10 shadow-2xs">
           <div className="flex items-center justify-between text-neutral-500 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider">Promo Aktif</span>
+            <span className="text-xs font-bold uppercase tracking-wider">
+              Promo Aktif
+            </span>
             <Tag className="size-4 text-emerald-600" />
           </div>
           <div className="font-display font-black text-2xl sm:text-3xl text-brand-green-950">
             {activePromoCount}{" "}
-            <span className="text-xs font-bold text-neutral-500 font-sans">kode</span>
+            <span className="text-xs font-bold text-neutral-500 font-sans">
+              kode
+            </span>
           </div>
           <span className="text-[11px] text-emerald-700 font-semibold mt-1 block">
             Dapat langsung dipakai kasir di POS
@@ -235,12 +254,16 @@ export function AdminPromosView({
 
         <div className="p-4 sm:p-5 rounded-2xl bg-white border border-brand-green-900/10 shadow-2xs">
           <div className="flex items-center justify-between text-neutral-500 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider">Total Terpakai</span>
+            <span className="text-xs font-bold uppercase tracking-wider">
+              Total Terpakai
+            </span>
             <Ticket className="size-4 text-amber-600" />
           </div>
           <div className="font-display font-black text-2xl sm:text-3xl text-amber-900">
             {totalUsedCount}{" "}
-            <span className="text-xs font-bold text-neutral-500 font-sans">kali redeem</span>
+            <span className="text-xs font-bold text-neutral-500 font-sans">
+              kali redeem
+            </span>
           </div>
           <span className="text-[11px] text-neutral-500 mt-1 block">
             Dari {promos.length} kampanye voucher
@@ -249,12 +272,16 @@ export function AdminPromosView({
 
         <div className="p-4 sm:p-5 rounded-2xl bg-white border border-brand-green-900/10 shadow-2xs">
           <div className="flex items-center justify-between text-neutral-500 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider">Sisa Kuota Voucher</span>
+            <span className="text-xs font-bold uppercase tracking-wider">
+              Sisa Kuota Voucher
+            </span>
             <Percent className="size-4 text-blue-600" />
           </div>
           <div className="font-display font-black text-2xl sm:text-3xl text-blue-900">
             {totalAvailableQuota}{" "}
-            <span className="text-xs font-bold text-neutral-500 font-sans">tersedia</span>
+            <span className="text-xs font-bold text-neutral-500 font-sans">
+              tersedia
+            </span>
           </div>
           <span className="text-[11px] text-neutral-500 mt-1 block">
             Batas kuota terkontrol aman
@@ -263,7 +290,9 @@ export function AdminPromosView({
 
         <div className="p-4 sm:p-5 rounded-2xl bg-brand-green-950 text-white shadow-xs">
           <div className="flex items-center justify-between text-brand-yellow-400 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider">Potongan Diberikan</span>
+            <span className="text-xs font-bold uppercase tracking-wider">
+              Potongan Diberikan
+            </span>
             <Sparkles className="size-4" />
           </div>
           <div className="font-display font-black text-xl sm:text-2xl text-white">
@@ -295,7 +324,9 @@ export function AdminPromosView({
               type="button"
               onClick={() => setTypeFilter("ALL")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                typeFilter === "ALL" ? "bg-white text-emerald-950 shadow-2xs" : "text-neutral-600 hover:text-neutral-900"
+                typeFilter === "ALL"
+                  ? "bg-white text-emerald-950 shadow-2xs"
+                  : "text-neutral-600 hover:text-neutral-900"
               }`}
             >
               Semua Tipe
@@ -304,7 +335,9 @@ export function AdminPromosView({
               type="button"
               onClick={() => setTypeFilter("PERCENTAGE")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                typeFilter === "PERCENTAGE" ? "bg-white text-emerald-950 shadow-2xs" : "text-neutral-600 hover:text-neutral-900"
+                typeFilter === "PERCENTAGE"
+                  ? "bg-white text-emerald-950 shadow-2xs"
+                  : "text-neutral-600 hover:text-neutral-900"
               }`}
             >
               Persen (%)
@@ -313,7 +346,9 @@ export function AdminPromosView({
               type="button"
               onClick={() => setTypeFilter("FIXED_AMOUNT")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                typeFilter === "FIXED_AMOUNT" ? "bg-white text-emerald-950 shadow-2xs" : "text-neutral-600 hover:text-neutral-900"
+                typeFilter === "FIXED_AMOUNT"
+                  ? "bg-white text-emerald-950 shadow-2xs"
+                  : "text-neutral-600 hover:text-neutral-900"
               }`}
             >
               Nominal (Rp)
@@ -323,7 +358,9 @@ export function AdminPromosView({
           {/* Status Filter */}
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as "ALL" | "ACTIVE" | "INACTIVE")}
+            onChange={(e) =>
+              setStatusFilter(e.target.value as "ALL" | "ACTIVE" | "INACTIVE")
+            }
             className="h-10 px-3 rounded-xl border border-neutral-200 bg-white text-xs font-bold text-neutral-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 cursor-pointer"
           >
             <option value="ALL">Semua Status</option>
@@ -337,22 +374,30 @@ export function AdminPromosView({
       {filteredPromos.length === 0 ? (
         <div className="p-12 text-center rounded-3xl bg-white border border-dashed border-neutral-300">
           <Ticket className="size-12 text-neutral-300 mx-auto mb-3" />
-          <h4 className="font-display font-bold text-base text-neutral-800">Tidak ada kode promo ditemukan</h4>
+          <h4 className="font-display font-bold text-base text-neutral-800">
+            Tidak ada kode promo ditemukan
+          </h4>
           <p className="text-xs text-neutral-500 mt-1 max-w-sm mx-auto">
-            Coba ganti kata kunci pencarian atau buat kampanye voucher promo baru.
+            Coba ganti kata kunci pencarian atau buat kampanye voucher promo
+            baru.
           </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredPromos.map((promo) => {
-            const usagePercent = Math.min(100, Math.round((promo.usedCount / promo.quota) * 100));
+            const usagePercent = Math.min(
+              100,
+              Math.round((promo.usedCount / promo.quota) * 100),
+            );
             const isFull = promo.usedCount >= promo.quota;
 
             return (
               <div
                 key={promo.id}
                 className={`relative rounded-3xl border bg-white overflow-hidden shadow-2xs transition-all hover:shadow-md flex flex-col justify-between ${
-                  promo.isActive ? "border-emerald-600/25" : "border-neutral-200 opacity-75"
+                  promo.isActive
+                    ? "border-emerald-600/25"
+                    : "border-neutral-200 opacity-75"
                 }`}
               >
                 {/* Coupon Top Header */}
@@ -366,7 +411,9 @@ export function AdminPromosView({
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <span className="text-[10px] font-black uppercase tracking-widest text-brand-yellow-400 block mb-1">
-                        {promo.discountType === "PERCENTAGE" ? "VOUCHER DISKON PERSEN" : "POTONGAN NOMINAL TETAP"}
+                        {promo.discountType === "PERCENTAGE"
+                          ? "VOUCHER DISKON PERSEN"
+                          : "POTONGAN NOMINAL TETAP"}
                       </span>
                       <h3 className="font-display font-extrabold text-base sm:text-lg text-white leading-tight">
                         {promo.name}
@@ -387,13 +434,16 @@ export function AdminPromosView({
                   {/* Big Discount Value Display */}
                   <div className="mt-3 flex items-baseline gap-2">
                     <span className="font-display font-black text-2xl sm:text-3xl text-brand-yellow-300">
-                      {promo.discountType === "PERCENTAGE" ? `${promo.discountValue}% OFF` : formatRupiah(promo.discountValue)}
+                      {promo.discountType === "PERCENTAGE"
+                        ? `${promo.discountValue}% OFF`
+                        : formatRupiah(promo.discountValue)}
                     </span>
-                    {promo.discountType === "PERCENTAGE" && promo.maxDiscount && (
-                      <span className="text-[11px] text-emerald-200">
-                        (Maks. {formatRupiah(promo.maxDiscount)})
-                      </span>
-                    )}
+                    {promo.discountType === "PERCENTAGE" &&
+                      promo.maxDiscount && (
+                        <span className="text-[11px] text-emerald-200">
+                          (Maks. {formatRupiah(promo.maxDiscount)})
+                        </span>
+                      )}
                   </div>
                 </div>
 
@@ -436,19 +486,29 @@ export function AdminPromosView({
                     <div className="space-y-1.5 text-[11px] text-neutral-600 pt-1">
                       <div className="flex justify-between">
                         <span>Minimal Belanja:</span>
-                        <strong className="text-neutral-900">{formatRupiah(promo.minOrderAmount)}</strong>
+                        <strong className="text-neutral-900">
+                          {formatRupiah(promo.minOrderAmount)}
+                        </strong>
                       </div>
                       <div className="flex justify-between">
                         <span>Periode Berlaku:</span>
-                        <strong className="text-neutral-900">{promo.startDate} s/d {promo.endDate}</strong>
+                        <strong className="text-neutral-900">
+                          {promo.startDate} s/d {promo.endDate}
+                        </strong>
                       </div>
                     </div>
 
                     {/* Quota Progress */}
                     <div className="pt-2">
                       <div className="flex justify-between text-[11px] font-bold mb-1">
-                        <span className="text-neutral-600">Pemakaian Kuota</span>
-                        <span className={isFull ? "text-rose-600" : "text-emerald-700"}>
+                        <span className="text-neutral-600">
+                          Pemakaian Kuota
+                        </span>
+                        <span
+                          className={
+                            isFull ? "text-rose-600" : "text-emerald-700"
+                          }
+                        >
                           {promo.usedCount} / {promo.quota} ({usagePercent}%)
                         </span>
                       </div>
@@ -467,15 +527,21 @@ export function AdminPromosView({
                   <div className="pt-4 border-t border-neutral-100 flex items-center justify-between gap-2">
                     <button
                       type="button"
-                      onClick={() => onTogglePromoStatus(promo.id, promo.isActive)}
+                      onClick={() =>
+                        onTogglePromoStatus(promo.id, promo.isActive)
+                      }
                       className={`text-xs font-bold px-3 py-1.5 rounded-xl border transition-colors cursor-pointer flex items-center gap-1.5 ${
                         promo.isActive
                           ? "border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100"
                           : "border-neutral-300 bg-neutral-50 text-neutral-700 hover:bg-neutral-100"
                       }`}
                     >
-                      <span className={`size-2 rounded-full ${promo.isActive ? "bg-emerald-600" : "bg-neutral-400"}`} />
-                      <span>{promo.isActive ? "Aktif di POS" : "Dinonaktifkan"}</span>
+                      <span
+                        className={`size-2 rounded-full ${promo.isActive ? "bg-emerald-600" : "bg-neutral-400"}`}
+                      />
+                      <span>
+                        {promo.isActive ? "Aktif di POS" : "Dinonaktifkan"}
+                      </span>
                     </button>
 
                     <div className="flex items-center gap-1">
@@ -490,7 +556,11 @@ export function AdminPromosView({
                       <button
                         type="button"
                         onClick={() => {
-                          if (confirm(`Yakin ingin menghapus promo "${promo.code}"?`)) {
+                          if (
+                            confirm(
+                              `Yakin ingin menghapus promo "${promo.code}"?`,
+                            )
+                          ) {
                             onDeletePromo(promo.id);
                           }
                         }}
@@ -518,7 +588,9 @@ export function AdminPromosView({
                   {editingPromo ? "Perbarui Kupon" : "Buat Kampanye Baru"}
                 </span>
                 <h3 className="font-display font-extrabold text-lg text-white">
-                  {editingPromo ? "Edit Promo / Voucher" : "Tambah Voucher Promo Baru"}
+                  {editingPromo
+                    ? "Edit Promo / Voucher"
+                    : "Tambah Voucher Promo Baru"}
                 </h3>
               </div>
               <button
@@ -530,7 +602,10 @@ export function AdminPromosView({
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+            <form
+              onSubmit={handleSubmit}
+              className="p-6 space-y-4 max-h-[80vh] overflow-y-auto"
+            >
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-neutral-700 mb-1">
@@ -544,7 +619,9 @@ export function AdminPromosView({
                     placeholder="MISAL: HEMAT10K"
                     className="w-full h-10 px-3 rounded-xl border border-neutral-300 font-mono font-bold text-sm tracking-wider uppercase focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
                   />
-                  <span className="text-[10px] text-neutral-400 mt-0.5 block">Kode yang diinput kasir / pelanggan</span>
+                  <span className="text-[10px] text-neutral-400 mt-0.5 block">
+                    Kode yang diinput kasir / pelanggan
+                  </span>
                 </div>
 
                 <div>
@@ -600,7 +677,9 @@ export function AdminPromosView({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-neutral-700 mb-1">
-                    {discountType === "PERCENTAGE" ? "Besaran Diskon (%)" : "Nominal Potongan (Rp)"}{" "}
+                    {discountType === "PERCENTAGE"
+                      ? "Besaran Diskon (%)"
+                      : "Nominal Potongan (Rp)"}{" "}
                     <span className="text-rose-600">*</span>
                   </label>
                   <input
@@ -632,7 +711,8 @@ export function AdminPromosView({
                 ) : (
                   <div>
                     <label className="block text-xs font-bold text-neutral-700 mb-1">
-                      Minimal Belanja (Rp) <span className="text-rose-600">*</span>
+                      Minimal Belanja (Rp){" "}
+                      <span className="text-rose-600">*</span>
                     </label>
                     <input
                       type="number"
@@ -640,7 +720,9 @@ export function AdminPromosView({
                       step="1000"
                       required
                       value={minOrderAmount}
-                      onChange={(e) => setMinOrderAmount(Number(e.target.value))}
+                      onChange={(e) =>
+                        setMinOrderAmount(Number(e.target.value))
+                      }
                       className="w-full h-10 px-3 rounded-xl border border-neutral-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
                     />
                   </div>
@@ -650,7 +732,8 @@ export function AdminPromosView({
               {discountType === "PERCENTAGE" && (
                 <div>
                   <label className="block text-xs font-bold text-neutral-700 mb-1">
-                    Minimal Belanja (Rp) <span className="text-rose-600">*</span>
+                    Minimal Belanja (Rp){" "}
+                    <span className="text-rose-600">*</span>
                   </label>
                   <input
                     type="number"
@@ -662,7 +745,8 @@ export function AdminPromosView({
                     className="w-full h-10 px-3 rounded-xl border border-neutral-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
                   />
                   <span className="text-[10px] text-neutral-400 mt-0.5 block">
-                    Promo hanya bisa dipakai bila subtotal pesanan mencapai nilai ini
+                    Promo hanya bisa dipakai bila subtotal pesanan mencapai
+                    nilai ini
                   </span>
                 </div>
               )}
@@ -737,7 +821,9 @@ export function AdminPromosView({
                   type="submit"
                   className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
                 >
-                  {editingPromo ? "Simpan Perubahan" : "Simpan & Aktifkan Promo"}
+                  {editingPromo
+                    ? "Simpan Perubahan"
+                    : "Simpan & Aktifkan Promo"}
                 </button>
               </div>
             </form>

@@ -49,7 +49,9 @@
   --radius-xl: calc(var(--radius) + 6px);
   --radius-2xl: calc(var(--radius) + 12px);
 
-  --font-sans: "Inter", "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans:
+    "Inter", "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
   --font-display: "Manrope", "DM Sans", "Inter", sans-serif;
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
@@ -161,7 +163,8 @@
 }
 
 @keyframes steam-rise {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.2;
     transform: translateY(6px);
   }

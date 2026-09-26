@@ -1,5 +1,10 @@
 import { useState } from "react";
-import type { AdminProduct, StockLog, StockMutationReason, BranchOutlet } from "./types";
+import type {
+  AdminProduct,
+  StockLog,
+  StockMutationReason,
+  BranchOutlet,
+} from "./types";
 import {
   Package,
   AlertTriangle,
@@ -18,7 +23,12 @@ import {
   FileText,
 } from "lucide-react";
 import { INITIAL_BRANCHES } from "./mock-data";
-import { downloadCsv, printReportPdf, type ReportPrintKpi, type ReportPrintSection } from "@/lib/export-utils";
+import {
+  downloadCsv,
+  printReportPdf,
+  type ReportPrintKpi,
+  type ReportPrintSection,
+} from "@/lib/export-utils";
 
 interface AdminInventoryViewProps {
   products: AdminProduct[];
@@ -31,7 +41,7 @@ interface AdminInventoryViewProps {
     notes: string,
     staffName: string,
     branchId?: string,
-    branchName?: string
+    branchName?: string,
   ) => void;
 }
 
@@ -42,31 +52,44 @@ export function AdminInventoryView({
   onMutateStock,
 }: AdminInventoryViewProps) {
   const [activeSubTab, setActiveSubTab] = useState<"stock" | "logs">("stock");
-  const [selectedBranchId, setSelectedBranchId] = useState<"all" | string>("all");
+  const [selectedBranchId, setSelectedBranchId] = useState<"all" | string>(
+    "all",
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProductFilter, setSelectedProductFilter] = useState("all");
-  const [reasonFilter, setReasonFilter] = useState<"all" | StockMutationReason>("all");
+  const [reasonFilter, setReasonFilter] = useState<"all" | StockMutationReason>(
+    "all",
+  );
   const [exportNotice, setExportNotice] = useState<string | null>(null);
 
   // Modal State for New Stock Mutation
   const [isMutationModalOpen, setIsMutationModalOpen] = useState(false);
-  const [selectedProductForMutation, setSelectedProductForMutation] = useState<string>(
-    products[0]?.id || ""
+  const [selectedProductForMutation, setSelectedProductForMutation] =
+    useState<string>(products[0]?.id || "");
+  const [mutationBranchId, setMutationBranchId] = useState<string>(
+    branches[0]?.id || "branch-1",
   );
-  const [mutationBranchId, setMutationBranchId] = useState<string>(branches[0]?.id || "branch-1");
-  const [mutationReason, setMutationReason] = useState<StockMutationReason>("RESTOCK");
+  const [mutationReason, setMutationReason] =
+    useState<StockMutationReason>("RESTOCK");
   const [mutationQuantity, setMutationQuantity] = useState<number>(10);
   const [mutationNotes, setMutationNotes] = useState("");
   const [staffName, setStaffName] = useState("Muhammad Afrizal (Owner)");
 
   // Helper to get stock for a product depending on selected branch
-  const getProductStock = (p: AdminProduct, branchId: "all" | string): number => {
+  const getProductStock = (
+    p: AdminProduct,
+    branchId: "all" | string,
+  ): number => {
     if (branchId === "all") return p.currentStock;
     if (p.branchStocks && p.branchStocks[branchId] !== undefined) {
       return p.branchStocks[branchId];
     }
     // Fallback distribution if branchStocks missing
-    const weights: Record<string, number> = { "branch-1": 0.45, "branch-2": 0.32, "branch-3": 0.23 };
+    const weights: Record<string, number> = {
+      "branch-1": 0.45,
+      "branch-2": 0.32,
+      "branch-3": 0.23,
+    };
     const w = weights[branchId] || 0.33;
     return Math.round(p.currentStock * w);
   };
@@ -76,16 +99,25 @@ export function AdminInventoryView({
 
   const lowStockProducts = trackableProducts.filter((p) => {
     const stock = getProductStock(p, selectedBranchId);
-    const threshold = selectedBranchId === "all" ? p.lowStockThreshold : Math.max(3, Math.round(p.lowStockThreshold / 3));
+    const threshold =
+      selectedBranchId === "all"
+        ? p.lowStockThreshold
+        : Math.max(3, Math.round(p.lowStockThreshold / 3));
     return stock <= threshold;
   });
 
-  const selectedProduct = products.find((p) => p.id === selectedProductForMutation);
-  const currentBranchStock = selectedProduct ? getProductStock(selectedProduct, mutationBranchId) : 0;
+  const selectedProduct = products.find(
+    (p) => p.id === selectedProductForMutation,
+  );
+  const currentBranchStock = selectedProduct
+    ? getProductStock(selectedProduct, mutationBranchId)
+    : 0;
 
   // Effective delta based on reason
   const effectiveDelta =
-    mutationReason === "SPOILAGE" ? -Math.abs(mutationQuantity) : Math.abs(mutationQuantity);
+    mutationReason === "SPOILAGE"
+      ? -Math.abs(mutationQuantity)
+      : Math.abs(mutationQuantity);
   const projectedFinalStock = Math.max(0, currentBranchStock + effectiveDelta);
 
   const openMutationModal = (productId?: string) => {
@@ -94,7 +126,11 @@ export function AdminInventoryView({
     } else if (products.length > 0 && !selectedProductForMutation) {
       setSelectedProductForMutation(products[0].id);
     }
-    setMutationBranchId(selectedBranchId === "all" ? (branches[0]?.id || "branch-1") : selectedBranchId);
+    setMutationBranchId(
+      selectedBranchId === "all"
+        ? branches[0]?.id || "branch-1"
+        : selectedBranchId,
+    );
     setMutationQuantity(10);
     setMutationNotes("");
     setIsMutationModalOpen(true);
@@ -110,10 +146,13 @@ export function AdminInventoryView({
       selectedProductForMutation,
       effectiveDelta,
       mutationReason,
-      mutationNotes.trim() || (mutationReason === "RESTOCK" ? "Restock rutin bahan porsi" : "Pencatatan opname fisik"),
+      mutationNotes.trim() ||
+        (mutationReason === "RESTOCK"
+          ? "Restock rutin bahan porsi"
+          : "Pencatatan opname fisik"),
       staffName,
       mutationBranchId,
-      targetBranch?.name
+      targetBranch?.name,
     );
 
     setIsMutationModalOpen(false);
@@ -121,13 +160,18 @@ export function AdminInventoryView({
 
   // Filtered Stock Items
   const filteredStockProducts = trackableProducts.filter((p) =>
-    p.name.toLowerCase().includes(searchQuery.toLowerCase())
+    p.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   // Filtered Logs
   const filteredLogs = stockLogs.filter((log) => {
-    const matchBranch = selectedBranchId === "all" || !log.branchId || log.branchId === selectedBranchId;
-    const matchProd = selectedProductFilter === "all" || log.productId === selectedProductFilter;
+    const matchBranch =
+      selectedBranchId === "all" ||
+      !log.branchId ||
+      log.branchId === selectedBranchId;
+    const matchProd =
+      selectedProductFilter === "all" ||
+      log.productId === selectedProductFilter;
     const matchReason = reasonFilter === "all" || log.reason === reasonFilter;
     const matchSearch =
       log.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -138,15 +182,34 @@ export function AdminInventoryView({
 
   // Export CSV
   const handleExportCsv = () => {
-    const branchLabel = selectedBranchId === "all" ? "Semua_Cabang" : (branches.find((b) => b.id === selectedBranchId)?.branchCode || branches.find((b) => b.id === selectedBranchId)?.code || "Cabang");
+    const branchLabel =
+      selectedBranchId === "all"
+        ? "Semua_Cabang"
+        : branches.find((b) => b.id === selectedBranchId)?.branchCode ||
+          branches.find((b) => b.id === selectedBranchId)?.code ||
+          "Cabang";
     const filename = `MacMood_Inventori_Stok_${branchLabel}_${new Date().toISOString().slice(0, 10)}`;
 
     if (activeSubTab === "stock") {
-      const headers = ["ID Menu", "Nama Menu", "Kategori", "Terjual (Porsi)", "Sisa Stok (Porsi)", "Ambang Batas", "Status Stok"];
+      const headers = [
+        "ID Menu",
+        "Nama Menu",
+        "Kategori",
+        "Terjual (Porsi)",
+        "Sisa Stok (Porsi)",
+        "Ambang Batas",
+        "Status Stok",
+      ];
       const rows = filteredStockProducts.map((p) => {
         const stock = getProductStock(p, selectedBranchId);
-        const threshold = selectedBranchId === "all" ? p.lowStockThreshold : Math.max(3, Math.round(p.lowStockThreshold / 3));
-        const sold = selectedBranchId === "all" ? p.soldCount : (p.branchSoldCounts?.[selectedBranchId] ?? 0);
+        const threshold =
+          selectedBranchId === "all"
+            ? p.lowStockThreshold
+            : Math.max(3, Math.round(p.lowStockThreshold / 3));
+        const sold =
+          selectedBranchId === "all"
+            ? p.soldCount
+            : (p.branchSoldCounts?.[selectedBranchId] ?? 0);
         return [
           p.id,
           p.name,
@@ -159,7 +222,16 @@ export function AdminInventoryView({
       });
       downloadCsv(filename, headers, rows);
     } else {
-      const headers = ["Waktu", "Menu", "Jenis Mutasi", "Perubahan (Porsi)", "Stok Akhir", "Cabang", "Petugas", "Catatan"];
+      const headers = [
+        "Waktu",
+        "Menu",
+        "Jenis Mutasi",
+        "Perubahan (Porsi)",
+        "Stok Akhir",
+        "Cabang",
+        "Petugas",
+        "Catatan",
+      ];
       const rows = filteredLogs.map((l) => [
         l.timestamp,
         l.productName,
@@ -179,26 +251,68 @@ export function AdminInventoryView({
 
   // Export PDF
   const handlePrintPdf = () => {
-    const branchLabel = selectedBranchId === "all" ? "Konsolidasi Seluruh Cabang" : branches.find((b) => b.id === selectedBranchId)?.name || "Cabang";
+    const branchLabel =
+      selectedBranchId === "all"
+        ? "Konsolidasi Seluruh Cabang"
+        : branches.find((b) => b.id === selectedBranchId)?.name || "Cabang";
 
-    const totalStockPortions = filteredStockProducts.reduce((sum, p) => sum + getProductStock(p, selectedBranchId), 0);
-    const totalSoldPortions = filteredStockProducts.reduce((sum, p) => sum + (selectedBranchId === "all" ? p.soldCount : (p.branchSoldCounts?.[selectedBranchId] ?? 0)), 0);
+    const totalStockPortions = filteredStockProducts.reduce(
+      (sum, p) => sum + getProductStock(p, selectedBranchId),
+      0,
+    );
+    const totalSoldPortions = filteredStockProducts.reduce(
+      (sum, p) =>
+        sum +
+        (selectedBranchId === "all"
+          ? p.soldCount
+          : (p.branchSoldCounts?.[selectedBranchId] ?? 0)),
+      0,
+    );
 
     const kpis: ReportPrintKpi[] = [
-      { label: "Total Menu Terpantau", value: `${filteredStockProducts.length} Item`, sub: "Tracking porsi aktif" },
-      { label: "Total Terjual (Nota)", value: `${totalSoldPortions} Porsi`, sub: "Berdasarkan pesanan terbayar" },
-      { label: "Total Sisa Stok", value: `${totalStockPortions} Porsi`, sub: "Stok siap saji" },
-      { label: "Menu Batas Kritis", value: `${lowStockProducts.length} Item`, sub: lowStockProducts.length > 0 ? "Perlu restock" : "Semua aman" },
+      {
+        label: "Total Menu Terpantau",
+        value: `${filteredStockProducts.length} Item`,
+        sub: "Tracking porsi aktif",
+      },
+      {
+        label: "Total Terjual (Nota)",
+        value: `${totalSoldPortions} Porsi`,
+        sub: "Berdasarkan pesanan terbayar",
+      },
+      {
+        label: "Total Sisa Stok",
+        value: `${totalStockPortions} Porsi`,
+        sub: "Stok siap saji",
+      },
+      {
+        label: "Menu Batas Kritis",
+        value: `${lowStockProducts.length} Item`,
+        sub: lowStockProducts.length > 0 ? "Perlu restock" : "Semua aman",
+      },
     ];
 
     const sections: ReportPrintSection[] = [
       {
         title: "Daftar Saldo Stok Porsi Menu",
-        headers: ["Nama Menu", "Kategori", "Terjual", "Sisa Stok", "Batas Min.", "Status Stok"],
+        headers: [
+          "Nama Menu",
+          "Kategori",
+          "Terjual",
+          "Sisa Stok",
+          "Batas Min.",
+          "Status Stok",
+        ],
         rows: filteredStockProducts.map((p) => {
           const stock = getProductStock(p, selectedBranchId);
-          const threshold = selectedBranchId === "all" ? p.lowStockThreshold : Math.max(3, Math.round(p.lowStockThreshold / 3));
-          const sold = selectedBranchId === "all" ? `${p.soldCount} Porsi` : `${p.branchSoldCounts?.[selectedBranchId] ?? 0} Porsi`;
+          const threshold =
+            selectedBranchId === "all"
+              ? p.lowStockThreshold
+              : Math.max(3, Math.round(p.lowStockThreshold / 3));
+          const sold =
+            selectedBranchId === "all"
+              ? `${p.soldCount} Porsi`
+              : `${p.branchSoldCounts?.[selectedBranchId] ?? 0} Porsi`;
           return [
             p.name,
             p.categoryLabel,
@@ -211,22 +325,37 @@ export function AdminInventoryView({
       },
       {
         title: "Riwayat Mutasi Stok Terakhir (Log Opname)",
-        headers: ["Waktu", "Menu", "Jenis Mutasi", "Perubahan", "Stok Akhir", "Petugas PIC"],
-        rows: filteredLogs.slice(0, 15).map((l) => [
-          l.timestamp,
-          l.productName,
-          l.reasonLabel,
-          l.quantityChange > 0 ? `+${l.quantityChange} porsi` : `${l.quantityChange} porsi`,
-          `${l.finalStock} porsi`,
-          l.staffName,
-        ]),
+        headers: [
+          "Waktu",
+          "Menu",
+          "Jenis Mutasi",
+          "Perubahan",
+          "Stok Akhir",
+          "Petugas PIC",
+        ],
+        rows: filteredLogs
+          .slice(0, 15)
+          .map((l) => [
+            l.timestamp,
+            l.productName,
+            l.reasonLabel,
+            l.quantityChange > 0
+              ? `+${l.quantityChange} porsi`
+              : `${l.quantityChange} porsi`,
+            `${l.finalStock} porsi`,
+            l.staffName,
+          ]),
       },
     ];
 
     printReportPdf({
       title: "Laporan Inventori, Stok Porsi & Mutasi Bahan",
       subtitle: `Sistem Manajemen Bahan Baku & Stok Porsi MacMood (${branchLabel})`,
-      periodLabel: new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }),
+      periodLabel: new Date().toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }),
       outletName: branchLabel,
       printedBy: "Muhammad Afrizal (Business Owner)",
       kpis,
@@ -247,7 +376,8 @@ export function AdminInventoryView({
             Manajemen Stok & Opname Porsi
           </h2>
           <p className="text-xs sm:text-sm text-neutral-600 mt-0.5">
-            Pantau sisa kuota porsi per cabang, catat restock bahan, dan lacak audit opname fisik.
+            Pantau sisa kuota porsi per cabang, catat restock bahan, dan lacak
+            audit opname fisik.
           </p>
         </div>
 
@@ -333,11 +463,18 @@ export function AdminInventoryView({
             </span>
             <div>
               <strong className="text-sm font-display font-extrabold block text-brand-green-950">
-                Peringatan: {lowStockProducts.length} Menu Mendekati Batas Kritis!
+                Peringatan: {lowStockProducts.length} Menu Mendekati Batas
+                Kritis!
               </strong>
               <span className="text-xs text-neutral-700">
-                Item: {lowStockProducts.map((p) => `${p.name} (${getProductStock(p, selectedBranchId)} porsi)`).join(", ")}.
-                Segera lakukan restock atau persiapan dapur.
+                Item:{" "}
+                {lowStockProducts
+                  .map(
+                    (p) =>
+                      `${p.name} (${getProductStock(p, selectedBranchId)} porsi)`,
+                  )
+                  .join(", ")}
+                . Segera lakukan restock atau persiapan dapur.
               </span>
             </div>
           </div>
@@ -404,7 +541,9 @@ export function AdminInventoryView({
                   <th className="py-3 px-4">Kategori</th>
                   <th className="py-3 px-4 text-center">Batas Minimum</th>
                   <th className="py-3 px-4 text-center">
-                    {selectedBranchId === "all" ? "Total Konsolidasi" : "Stok Cabang"}
+                    {selectedBranchId === "all"
+                      ? "Total Konsolidasi"
+                      : "Stok Cabang"}
                   </th>
                   {selectedBranchId === "all" && (
                     <th className="py-3 px-4 text-center">Distribusi Cabang</th>
@@ -416,11 +555,17 @@ export function AdminInventoryView({
               <tbody className="divide-y divide-neutral-100 font-sans">
                 {filteredStockProducts.map((prod) => {
                   const stock = getProductStock(prod, selectedBranchId);
-                  const threshold = selectedBranchId === "all" ? prod.lowStockThreshold : Math.max(3, Math.round(prod.lowStockThreshold / 3));
+                  const threshold =
+                    selectedBranchId === "all"
+                      ? prod.lowStockThreshold
+                      : Math.max(3, Math.round(prod.lowStockThreshold / 3));
                   const isLow = stock <= threshold;
 
                   return (
-                    <tr key={prod.id} className="hover:bg-brand-cream-50/50 transition-colors">
+                    <tr
+                      key={prod.id}
+                      className="hover:bg-brand-cream-50/50 transition-colors"
+                    >
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
                           <img
@@ -467,20 +612,37 @@ export function AdminInventoryView({
                         >
                           {stock}
                         </span>
-                        <span className="text-[10px] text-neutral-500 ml-1">porsi</span>
+                        <span className="text-[10px] text-neutral-500 ml-1">
+                          porsi
+                        </span>
                       </td>
 
                       {selectedBranchId === "all" && (
                         <td className="py-3 px-4 text-center">
                           <div className="flex items-center justify-center gap-1.5 text-[10px]">
-                            <span className="bg-brand-cream-100 text-brand-green-900 px-1.5 py-0.5 rounded-md font-mono" title="Fatmawati">
-                              Fatma: {prod.branchStocks?.["branch-1"] ?? Math.round(prod.currentStock * 0.45)}
+                            <span
+                              className="bg-brand-cream-100 text-brand-green-900 px-1.5 py-0.5 rounded-md font-mono"
+                              title="Fatmawati"
+                            >
+                              Fatma:{" "}
+                              {prod.branchStocks?.["branch-1"] ??
+                                Math.round(prod.currentStock * 0.45)}
                             </span>
-                            <span className="bg-brand-cream-100 text-brand-green-900 px-1.5 py-0.5 rounded-md font-mono" title="Margonda">
-                              Margo: {prod.branchStocks?.["branch-2"] ?? Math.round(prod.currentStock * 0.32)}
+                            <span
+                              className="bg-brand-cream-100 text-brand-green-900 px-1.5 py-0.5 rounded-md font-mono"
+                              title="Margonda"
+                            >
+                              Margo:{" "}
+                              {prod.branchStocks?.["branch-2"] ??
+                                Math.round(prod.currentStock * 0.32)}
                             </span>
-                            <span className="bg-brand-cream-100 text-brand-green-900 px-1.5 py-0.5 rounded-md font-mono" title="Tebet">
-                              Tebet: {prod.branchStocks?.["branch-3"] ?? Math.round(prod.currentStock * 0.23)}
+                            <span
+                              className="bg-brand-cream-100 text-brand-green-900 px-1.5 py-0.5 rounded-md font-mono"
+                              title="Tebet"
+                            >
+                              Tebet:{" "}
+                              {prod.branchStocks?.["branch-3"] ??
+                                Math.round(prod.currentStock * 0.23)}
                             </span>
                           </div>
                         </td>
@@ -537,7 +699,9 @@ export function AdminInventoryView({
                 <button
                   key={rf.id}
                   type="button"
-                  onClick={() => setReasonFilter(rf.id as "all" | StockMutationReason)}
+                  onClick={() =>
+                    setReasonFilter(rf.id as "all" | StockMutationReason)
+                  }
                   className={`px-3 py-1 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
                     reasonFilter === rf.id
                       ? "bg-brand-green-900 text-brand-yellow-400 shadow-2xs"
@@ -584,7 +748,10 @@ export function AdminInventoryView({
                     const isPositive = log.quantityChange > 0;
 
                     return (
-                      <tr key={log.id} className="hover:bg-brand-cream-50/50 transition-colors">
+                      <tr
+                        key={log.id}
+                        className="hover:bg-brand-cream-50/50 transition-colors"
+                      >
                         <td className="py-3 px-4 font-mono text-neutral-600 whitespace-nowrap">
                           <span className="flex items-center gap-1.5">
                             <Clock className="size-3 text-neutral-400" />
@@ -622,8 +789,17 @@ export function AdminInventoryView({
                         </td>
 
                         <td className="py-3 px-4 text-center font-mono font-bold">
-                          <span className={isPositive ? "text-brand-green-900" : "text-brand-coral-600"}>
-                            {isPositive ? `+${log.quantityChange}` : log.quantityChange} porsi
+                          <span
+                            className={
+                              isPositive
+                                ? "text-brand-green-900"
+                                : "text-brand-coral-600"
+                            }
+                          >
+                            {isPositive
+                              ? `+${log.quantityChange}`
+                              : log.quantityChange}{" "}
+                            porsi
                           </span>
                         </td>
 
@@ -677,7 +853,8 @@ export function AdminInventoryView({
               {/* Branch Select */}
               <div>
                 <label className="text-xs font-bold text-neutral-700 block mb-1">
-                  Pilih Cabang Lokasi <span className="text-brand-coral-600">*</span>
+                  Pilih Cabang Lokasi{" "}
+                  <span className="text-brand-coral-600">*</span>
                 </label>
                 <select
                   value={mutationBranchId}
@@ -695,16 +872,20 @@ export function AdminInventoryView({
               {/* Product Select */}
               <div>
                 <label className="text-xs font-bold text-neutral-700 block mb-1">
-                  Pilih Menu / Bahan <span className="text-brand-coral-600">*</span>
+                  Pilih Menu / Bahan{" "}
+                  <span className="text-brand-coral-600">*</span>
                 </label>
                 <select
                   value={selectedProductForMutation}
-                  onChange={(e) => setSelectedProductForMutation(e.target.value)}
+                  onChange={(e) =>
+                    setSelectedProductForMutation(e.target.value)
+                  }
                   className="w-full h-10 px-3 rounded-2xl border border-neutral-200 text-xs bg-white focus:outline-none focus:border-brand-green-800"
                 >
                   {trackableProducts.map((p) => (
                     <option key={p.id} value={p.id}>
-                      {p.name} (Sisa di cabang: {getProductStock(p, mutationBranchId)} porsi)
+                      {p.name} (Sisa di cabang:{" "}
+                      {getProductStock(p, mutationBranchId)} porsi)
                     </option>
                   ))}
                 </select>
@@ -768,7 +949,9 @@ export function AdminInventoryView({
                     min="1"
                     required
                     value={mutationQuantity}
-                    onChange={(e) => setMutationQuantity(Math.max(1, Number(e.target.value)))}
+                    onChange={(e) =>
+                      setMutationQuantity(Math.max(1, Number(e.target.value)))
+                    }
                     className="flex-1 h-10 px-3 rounded-2xl border border-neutral-200 text-sm font-mono font-bold focus:outline-none focus:border-brand-green-800"
                   />
                   <div className="flex items-center gap-1">
@@ -789,11 +972,17 @@ export function AdminInventoryView({
               {/* Calculation Preview */}
               <div className="p-3 rounded-2xl bg-brand-cream-50 border border-brand-green-900/10 flex items-center justify-between text-xs">
                 <div>
-                  <span className="text-neutral-500 block text-[11px]">Stok Saat Ini (Cabang):</span>
-                  <strong className="font-mono text-neutral-800">{currentBranchStock} porsi</strong>
+                  <span className="text-neutral-500 block text-[11px]">
+                    Stok Saat Ini (Cabang):
+                  </span>
+                  <strong className="font-mono text-neutral-800">
+                    {currentBranchStock} porsi
+                  </strong>
                 </div>
                 <div className="text-right">
-                  <span className="text-neutral-500 block text-[11px]">Hasil Akhir Stok:</span>
+                  <span className="text-neutral-500 block text-[11px]">
+                    Hasil Akhir Stok:
+                  </span>
                   <strong className="font-mono text-base font-extrabold text-brand-green-950">
                     {projectedFinalStock} porsi
                   </strong>
@@ -802,7 +991,9 @@ export function AdminInventoryView({
 
               {/* PIC Staff */}
               <div>
-                <label className="text-xs font-bold text-neutral-700 block mb-1">Petugas PIC</label>
+                <label className="text-xs font-bold text-neutral-700 block mb-1">
+                  Petugas PIC
+                </label>
                 <input
                   type="text"
                   required
@@ -814,7 +1005,9 @@ export function AdminInventoryView({
 
               {/* Notes */}
               <div>
-                <label className="text-xs font-bold text-neutral-700 block mb-1">Catatan / Keterangan</label>
+                <label className="text-xs font-bold text-neutral-700 block mb-1">
+                  Catatan / Keterangan
+                </label>
                 <textarea
                   rows={2}
                   value={mutationNotes}

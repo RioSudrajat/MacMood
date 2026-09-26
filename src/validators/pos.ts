@@ -52,7 +52,6 @@ export const openShiftSchema = z
   })
   .strict();
 
-
 export const closeShiftSchema = z
   .object({
     actualCash: z.coerce.number().int().min(0),

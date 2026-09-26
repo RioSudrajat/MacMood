@@ -8,9 +8,21 @@ export const Route = createFileRoute("/api/pos/shifts/close")({
     handlers: {
       POST: ({ request }) =>
         withApiSession(request, async () => {
-          const body = (await readJson(request)) as { shiftId: string; actualCash: number; notes?: string };
+          const body = (await readJson(request)) as {
+            shiftId: string;
+            actualCash: number;
+            notes?: string;
+          };
           if (!body?.shiftId) {
-            return Response.json({ error: { code: "MISSING_SHIFT_ID", message: "shiftId is required" } }, { status: 400 });
+            return Response.json(
+              {
+                error: {
+                  code: "MISSING_SHIFT_ID",
+                  message: "shiftId is required",
+                },
+              },
+              { status: 400 },
+            );
           }
           const input = closeShiftSchema.parse({
             actualCash: body.actualCash,

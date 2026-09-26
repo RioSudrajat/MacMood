@@ -20,7 +20,10 @@ interface AdminExpensesViewProps {
   onAddExpense: (newExp: Omit<ExpenseRecord, "id">) => void;
 }
 
-export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpensesViewProps) {
+export function AdminExpensesView({
+  expenses = [],
+  onAddExpense,
+}: AdminExpensesViewProps) {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState("");
@@ -30,7 +33,9 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
   const [category, setCategory] = useState<ExpenseCategory>("BAHAN_BAKU");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState<number | "">("");
-  const [sourceOfFund, setSourceOfFund] = useState<"KAS_LACI" | "TRANSFER_OWNER">("KAS_LACI");
+  const [sourceOfFund, setSourceOfFund] = useState<
+    "KAS_LACI" | "TRANSFER_OWNER"
+  >("KAS_LACI");
   const [staffName, setStaffName] = useState("Kasir Operasional");
   const [receiptNumber, setReceiptNumber] = useState("");
   const [notes, setNotes] = useState("");
@@ -43,11 +48,13 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
 
   // Filtering
   const filteredExpenses = expenses.filter((e) => {
-    const matchesCat = categoryFilter === "ALL" || e.category === categoryFilter;
+    const matchesCat =
+      categoryFilter === "ALL" || e.category === categoryFilter;
     const matchesSearch =
       e.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
       e.staffName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (e.receiptNumber && e.receiptNumber.toLowerCase().includes(searchQuery.toLowerCase()));
+      (e.receiptNumber &&
+        e.receiptNumber.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesCat && matchesSearch;
   });
 
@@ -57,7 +64,7 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
       (e) =>
         e.date === todayFormatted ||
         e.date === "26 Sep 2026" ||
-        e.date.includes("26 Sep")
+        e.date.includes("26 Sep"),
     )
     .reduce((sum, e) => sum + e.amount, 0);
 
@@ -147,13 +154,26 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
       meta: [
         { label: "Total Pengeluaran", value: formatRupiah(allTotal) },
         { label: "Total Kas Laci", value: formatRupiah(cashDrawerTotal) },
-        { label: "Total Transfer Owner", value: formatRupiah(ownerTransferTotal) },
-        { label: "Jumlah Transaksi", value: `${filteredExpenses.length} Transaksi` },
+        {
+          label: "Total Transfer Owner",
+          value: formatRupiah(ownerTransferTotal),
+        },
+        {
+          label: "Jumlah Transaksi",
+          value: `${filteredExpenses.length} Transaksi`,
+        },
       ],
       tables: [
         {
           title: "Daftar Pengeluaran Operasional",
-          headers: ["Waktu & Tanggal", "Deskripsi", "Kategori", "Sumber Dana", "Staf / PIC", "Nominal"],
+          headers: [
+            "Waktu & Tanggal",
+            "Deskripsi",
+            "Kategori",
+            "Sumber Dana",
+            "Staf / PIC",
+            "Nominal",
+          ],
           rows: filteredExpenses.map((exp) => [
             `${exp.time} · ${exp.date}`,
             exp.description,
@@ -165,7 +185,9 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
         },
       ],
     });
-    setExportNotice("Dokumen PDF pengeluaran operasional siap dicetak / disimpan.");
+    setExportNotice(
+      "Dokumen PDF pengeluaran operasional siap dicetak / disimpan.",
+    );
     setTimeout(() => setExportNotice(null), 3000);
   };
 
@@ -181,7 +203,8 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
             Biaya Operasional Harian Outlet
           </h2>
           <p className="text-xs sm:text-sm text-neutral-600 mt-0.5">
-            Pencatatan kas kecil untuk pembelian es batu darurat, gas LPG, kantong kemasan takeaway, dan sanitasi.
+            Pencatatan kas kecil untuk pembelian es batu darurat, gas LPG,
+            kantong kemasan takeaway, dan sanitasi.
           </p>
         </div>
 
@@ -226,7 +249,9 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
         {/* KPI 1: Biaya Hari Ini */}
         <div className="p-5 rounded-3xl bg-white border border-brand-green-900/10 shadow-xs space-y-2">
           <div className="flex items-center justify-between text-neutral-500">
-            <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">Total Biaya Hari Ini</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">
+              Total Biaya Hari Ini
+            </span>
             <span className="size-8 rounded-xl bg-brand-coral-500/10 text-brand-coral-600 flex items-center justify-center">
               <Wallet className="size-4" />
             </span>
@@ -242,7 +267,9 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
         {/* KPI 2: Dari Kas Laci Kasir */}
         <div className="p-5 rounded-3xl bg-white border border-brand-green-900/10 shadow-xs space-y-2">
           <div className="flex items-center justify-between text-neutral-500">
-            <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">Dipakai dari Kas Laci</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">
+              Dipakai dari Kas Laci
+            </span>
             <span className="size-8 rounded-xl bg-brand-yellow-500/15 text-brand-yellow-700 flex items-center justify-center">
               <Banknote className="size-4" />
             </span>
@@ -258,7 +285,9 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
         {/* KPI 3: Dibayar Transfer Owner */}
         <div className="p-5 rounded-3xl bg-white border border-brand-green-900/10 shadow-xs space-y-2">
           <div className="flex items-center justify-between text-neutral-500">
-            <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">Transfer Mandiri Owner</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">
+              Transfer Mandiri Owner
+            </span>
             <span className="size-8 rounded-xl bg-brand-green-900/10 text-brand-green-950 flex items-center justify-center">
               <CreditCard className="size-4" />
             </span>
@@ -274,7 +303,9 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
         {/* KPI 4: Total Seluruh Biaya */}
         <div className="p-5 rounded-3xl bg-brand-green-950 text-white shadow-xs space-y-2">
           <div className="flex items-center justify-between text-brand-cream-100/70">
-            <span className="text-xs font-bold uppercase tracking-wider text-brand-yellow-400">Total Pengeluaran</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-brand-yellow-400">
+              Total Pengeluaran
+            </span>
             <span className="size-8 rounded-xl bg-white/10 text-brand-yellow-400 flex items-center justify-center">
               <Receipt className="size-4" />
             </span>
@@ -302,7 +333,9 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
         </div>
 
         <div className="flex items-center gap-2 overflow-x-auto">
-          <span className="text-xs font-semibold text-neutral-500 whitespace-nowrap">Kategori:</span>
+          <span className="text-xs font-semibold text-neutral-500 whitespace-nowrap">
+            Kategori:
+          </span>
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
@@ -335,16 +368,25 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
             </thead>
             <tbody className="divide-y divide-neutral-100">
               {filteredExpenses.map((exp) => (
-                <tr key={exp.id} className="hover:bg-neutral-50/60 transition-colors">
+                <tr
+                  key={exp.id}
+                  className="hover:bg-neutral-50/60 transition-colors"
+                >
                   <td className="py-3.5 px-4 sm:px-6 font-mono text-[11px] text-neutral-600">
-                    <span className="font-bold text-neutral-900 block">{exp.time}</span>
+                    <span className="font-bold text-neutral-900 block">
+                      {exp.time}
+                    </span>
                     <span className="text-neutral-500">{exp.date}</span>
                   </td>
 
                   <td className="py-3.5 px-4">
-                    <strong className="text-neutral-900 font-semibold block">{exp.description}</strong>
+                    <strong className="text-neutral-900 font-semibold block">
+                      {exp.description}
+                    </strong>
                     {exp.notes && (
-                      <span className="text-[11px] text-neutral-500 block">{exp.notes}</span>
+                      <span className="text-[11px] text-neutral-500 block">
+                        {exp.notes}
+                      </span>
                     )}
                   </td>
 
@@ -406,10 +448,14 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
 
             <form onSubmit={handleSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="font-bold text-neutral-700 block mb-1">Kategori Pengeluaran</label>
+                <label className="font-bold text-neutral-700 block mb-1">
+                  Kategori Pengeluaran
+                </label>
                 <select
                   value={category}
-                  onChange={(e) => setCategory(e.target.value as ExpenseCategory)}
+                  onChange={(e) =>
+                    setCategory(e.target.value as ExpenseCategory)
+                  }
                   className="w-full px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl font-medium outline-none focus:border-brand-green-900"
                 >
                   <option value="BAHAN_BAKU">Bahan Baku & Es Batu</option>
@@ -421,7 +467,9 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
               </div>
 
               <div>
-                <label className="font-bold text-neutral-700 block mb-1">Deskripsi Pengeluaran *</label>
+                <label className="font-bold text-neutral-700 block mb-1">
+                  Deskripsi Pengeluaran *
+                </label>
                 <input
                   type="text"
                   required
@@ -434,7 +482,9 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-neutral-700 block mb-1">Nominal (Rp) *</label>
+                  <label className="font-bold text-neutral-700 block mb-1">
+                    Nominal (Rp) *
+                  </label>
                   <input
                     type="number"
                     required
@@ -448,10 +498,16 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
                 </div>
 
                 <div>
-                  <label className="font-bold text-neutral-700 block mb-1">Sumber Dana</label>
+                  <label className="font-bold text-neutral-700 block mb-1">
+                    Sumber Dana
+                  </label>
                   <select
                     value={sourceOfFund}
-                    onChange={(e) => setSourceOfFund(e.target.value as "KAS_LACI" | "TRANSFER_OWNER")}
+                    onChange={(e) =>
+                      setSourceOfFund(
+                        e.target.value as "KAS_LACI" | "TRANSFER_OWNER",
+                      )
+                    }
                     className="w-full px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl font-medium outline-none focus:border-brand-green-900"
                   >
                     <option value="KAS_LACI">Kas Laci Kasir</option>
@@ -462,7 +518,9 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-neutral-700 block mb-1">Nama Pemohon / Staf</label>
+                  <label className="font-bold text-neutral-700 block mb-1">
+                    Nama Pemohon / Staf
+                  </label>
                   <input
                     type="text"
                     value={staffName}
@@ -472,7 +530,9 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
                 </div>
 
                 <div>
-                  <label className="font-bold text-neutral-700 block mb-1">No. Kuitansi / Bon (Opsional)</label>
+                  <label className="font-bold text-neutral-700 block mb-1">
+                    No. Kuitansi / Bon (Opsional)
+                  </label>
                   <input
                     type="text"
                     value={receiptNumber}
@@ -484,7 +544,9 @@ export function AdminExpensesView({ expenses = [], onAddExpense }: AdminExpenses
               </div>
 
               <div>
-                <label className="font-bold text-neutral-700 block mb-1">Catatan Tambahan</label>
+                <label className="font-bold text-neutral-700 block mb-1">
+                  Catatan Tambahan
+                </label>
                 <textarea
                   rows={2}
                   value={notes}

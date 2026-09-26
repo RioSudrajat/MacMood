@@ -11,7 +11,11 @@ export async function listBranches() {
 
 export async function getBranch(id: string) {
   await ensureSeededData();
-  const [branch] = await db.select().from(branches).where(eq(branches.id, id)).limit(1);
+  const [branch] = await db
+    .select()
+    .from(branches)
+    .where(eq(branches.id, id))
+    .limit(1);
   return branch || null;
 }
 
@@ -37,7 +41,13 @@ export async function createBranch(input: BranchInput) {
       qrisNmid: input.qrisNmid || null,
       bankAccount: input.bankAccount || null,
       bankName: input.bankName || "BCA",
-      openedAt: input.openedAt || new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }),
+      openedAt:
+        input.openedAt ||
+        new Date().toLocaleDateString("id-ID", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        }),
     })
     .returning();
 
@@ -52,18 +62,23 @@ export async function updateBranch(id: string, updates: UpdateBranchInput) {
   };
 
   if (updates.name !== undefined) patchData.name = updates.name;
-  if (updates.branchCode !== undefined) patchData.branchCode = updates.branchCode.toUpperCase();
+  if (updates.branchCode !== undefined)
+    patchData.branchCode = updates.branchCode.toUpperCase();
   if (updates.address !== undefined) patchData.address = updates.address;
   if (updates.city !== undefined) patchData.city = updates.city;
   if (updates.phone !== undefined) patchData.phone = updates.phone;
-  if (updates.email !== undefined) patchData.email = updates.email.toLowerCase();
+  if (updates.email !== undefined)
+    patchData.email = updates.email.toLowerCase();
   if (updates.pin !== undefined) patchData.pin = updates.pin;
   if (updates.isActive !== undefined) patchData.isActive = updates.isActive;
   if (updates.taxRate !== undefined) patchData.taxRate = updates.taxRate;
-  if (updates.serviceChargeRate !== undefined) patchData.serviceChargeRate = updates.serviceChargeRate;
-  if (updates.qrisMerchantName !== undefined) patchData.qrisMerchantName = updates.qrisMerchantName;
+  if (updates.serviceChargeRate !== undefined)
+    patchData.serviceChargeRate = updates.serviceChargeRate;
+  if (updates.qrisMerchantName !== undefined)
+    patchData.qrisMerchantName = updates.qrisMerchantName;
   if (updates.qrisNmid !== undefined) patchData.qrisNmid = updates.qrisNmid;
-  if (updates.bankAccount !== undefined) patchData.bankAccount = updates.bankAccount;
+  if (updates.bankAccount !== undefined)
+    patchData.bankAccount = updates.bankAccount;
   if (updates.bankName !== undefined) patchData.bankName = updates.bankName;
 
   const [updated] = await db
@@ -80,6 +95,9 @@ export async function deleteBranch(id: string) {
     throw new Error("Cabang Utama (Pusat) dilindungi dan tidak dapat dihapus");
   }
 
-  const [deleted] = await db.delete(branches).where(eq(branches.id, id)).returning();
+  const [deleted] = await db
+    .delete(branches)
+    .where(eq(branches.id, id))
+    .returning();
   return deleted || null;
 }

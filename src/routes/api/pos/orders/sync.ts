@@ -10,8 +10,15 @@ export const Route = createFileRoute("/api/pos/orders/sync")({
         withApiSession(request, async (session) => {
           const body = await readJson(request);
           const input = syncOfflineOrdersSchema.parse(body);
-          const results = await syncOfflineOrders(input.orders, session.user.id);
-          return Response.json({ success: true, count: results.length, data: results });
+          const results = await syncOfflineOrders(
+            input.orders,
+            session.user.id,
+          );
+          return Response.json({
+            success: true,
+            count: results.length,
+            data: results,
+          });
         }),
     },
   },

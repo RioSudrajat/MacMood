@@ -1,5 +1,13 @@
 import { useState, useCallback, useEffect } from "react";
-import { Lock, Unlock, Store, ArrowRight, X, ShieldAlert, CheckCircle2 } from "lucide-react";
+import {
+  Lock,
+  Unlock,
+  Store,
+  ArrowRight,
+  X,
+  ShieldAlert,
+  CheckCircle2,
+} from "lucide-react";
 import { motion } from "motion/react";
 import { useNavigate } from "@tanstack/react-router";
 import type { BranchOutlet } from "./types";
@@ -21,7 +29,9 @@ function AdminPosAccessModalContent({
   const [enteredPin, setEnteredPin] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
-  const [selectedBranchId, setSelectedBranchId] = useState<string>(branches[0]?.id || "branch-1");
+  const [selectedBranchId, setSelectedBranchId] = useState<string>(
+    branches[0]?.id || "branch-1",
+  );
 
   const validatePin = useCallback(
     (pin: string) => {
@@ -39,7 +49,7 @@ function AdminPosAccessModalContent({
         }, 700);
       }
     },
-    [ownerPin]
+    [ownerPin],
   );
 
   const handleDigit = useCallback(
@@ -53,7 +63,7 @@ function AdminPosAccessModalContent({
         validatePin(next);
       }
     },
-    [enteredPin, isVerifying, validatePin]
+    [enteredPin, isVerifying, validatePin],
   );
 
   const handleDelete = useCallback(() => {
@@ -239,7 +249,9 @@ function AdminPosAccessModalContent({
                       <h4 className="font-bold text-xs sm:text-sm">{b.name}</h4>
                       <p
                         className={`text-[11px] truncate max-w-[200px] ${
-                          isSelected ? "text-brand-cream-200" : "text-neutral-500"
+                          isSelected
+                            ? "text-brand-cream-200"
+                            : "text-neutral-500"
                         }`}
                       >
                         {b.address}

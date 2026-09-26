@@ -2,21 +2,27 @@ import { db } from "@/db/index.server";
 import { categories, products, orderItems, orders } from "@/db/schema";
 import { ensureSeededData } from "./seed.service.server";
 import { asc, eq, sql } from "drizzle-orm";
-import type { CreateProductInput, UpdateProductInput } from "@/validators/catalog";
+import type {
+  CreateProductInput,
+  UpdateProductInput,
+} from "@/validators/catalog";
 
 export async function listCategories() {
   await ensureSeededData();
   return db.select().from(categories).orderBy(asc(categories.sortOrder));
 }
 
-export async function listProducts(filter?: { categorySlug?: string; availableOnly?: boolean }) {
+export async function listProducts(filter?: {
+  categorySlug?: string;
+  availableOnly?: boolean;
+}) {
   await ensureSeededData();
   const query = db.select().from(products);
-  
+
   if (filter?.categorySlug && filter.categorySlug !== "all") {
     query.where(eq(products.categorySlug, filter.categorySlug));
   }
-  
+
   const prods = await query.orderBy(asc(products.name));
 
   // Compute sold counts directly from relational order_items and orders
@@ -32,13 +38,17 @@ export async function listProducts(filter?: { categorySlug?: string; availableOn
     .where(sql`${orders.paymentStatus} != 'REFUNDED'`)
     .groupBy(orderItems.productId, orderItems.productName, orders.branchId);
 
-  const salesMap = new Map<string, { total: number; byBranch: Record<string, number> }>();
+  const salesMap = new Map<
+    string,
+    { total: number; byBranch: Record<string, number> }
+  >();
   for (const row of salesRows) {
     const key = row.productId || row.productName;
     const cur = salesMap.get(key) || { total: 0, byBranch: {} };
     cur.total += row.totalQuantity;
     if (row.branchId) {
-      cur.byBranch[row.branchId] = (cur.byBranch[row.branchId] || 0) + row.totalQuantity;
+      cur.byBranch[row.branchId] =
+        (cur.byBranch[row.branchId] || 0) + row.totalQuantity;
     }
     salesMap.set(key, cur);
     if (row.productName && row.productName !== key) {
@@ -47,7 +57,8 @@ export async function listProducts(filter?: { categorySlug?: string; availableOn
   }
 
   const enriched = prods.map((p) => {
-    const sales = salesMap.get(p.id) || salesMap.get(p.name) || { total: 0, byBranch: {} };
+    const sales = salesMap.get(p.id) ||
+      salesMap.get(p.name) || { total: 0, byBranch: {} };
     return {
       ...p,
       soldCount: sales.total,
@@ -64,7 +75,11 @@ export async function listProducts(filter?: { categorySlug?: string; availableOn
 
 export async function getProduct(id: string) {
   await ensureSeededData();
-  const [product] = await db.select().from(products).where(eq(products.id, id)).limit(1);
+  const [product] = await db
+    .select()
+    .from(products)
+    .where(eq(products.id, id))
+    .limit(1);
   if (!product) return null;
 
   const salesRows = await db
@@ -75,7 +90,7 @@ export async function getProduct(id: string) {
     .from(orderItems)
     .innerJoin(orders, eq(orders.id, orderItems.orderId))
     .where(
-      sql`(${orderItems.productId} = ${id} OR ${orderItems.productName} = ${product.name}) AND ${orders.paymentStatus} != 'REFUNDED'`
+      sql`(${orderItems.productId} = ${id} OR ${orderItems.productName} = ${product.name}) AND ${orders.paymentStatus} != 'REFUNDED'`,
     )
     .groupBy(orders.branchId);
 
@@ -83,7 +98,8 @@ export async function getProduct(id: string) {
   const byBranch: Record<string, number> = {};
   for (const r of salesRows) {
     totalSold += r.totalQuantity;
-    if (r.branchId) byBranch[r.branchId] = (byBranch[r.branchId] || 0) + r.totalQuantity;
+    if (r.branchId)
+      byBranch[r.branchId] = (byBranch[r.branchId] || 0) + r.totalQuantity;
   }
 
   return {
@@ -125,7 +141,10 @@ export async function updateProduct(id: string, input: UpdateProductInput) {
   return updated;
 }
 
-export async function toggleProductAvailability(id: string, isAvailable: boolean) {
+export async function toggleProductAvailability(
+  id: string,
+  isAvailable: boolean,
+) {
   const [updated] = await db
     .update(products)
     .set({ isAvailable, updatedAt: new Date() })
@@ -135,6 +154,9 @@ export async function toggleProductAvailability(id: string, isAvailable: boolean
 }
 
 export async function deleteProduct(id: string) {
-  const [deleted] = await db.delete(products).where(eq(products.id, id)).returning({ id: products.id });
+  const [deleted] = await db
+    .delete(products)
+    .where(eq(products.id, id))
+    .returning({ id: products.id });
   return Boolean(deleted);
 }

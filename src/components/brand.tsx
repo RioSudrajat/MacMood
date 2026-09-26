@@ -9,8 +9,10 @@ export function Brand({
   className?: string;
   size?: "sm" | "md" | "lg";
 }) {
-  const imgSize = size === "sm" ? "size-8" : size === "lg" ? "size-12" : "size-10";
-  const titleSize = size === "sm" ? "text-sm" : size === "lg" ? "text-xl" : "text-base";
+  const imgSize =
+    size === "sm" ? "size-8" : size === "lg" ? "size-12" : "size-10";
+  const titleSize =
+    size === "sm" ? "text-sm" : size === "lg" ? "text-xl" : "text-base";
 
   return (
     <Link
@@ -24,7 +26,9 @@ export function Brand({
         className={`${imgSize} rounded-xl object-cover shadow-xs border border-brand-green-800/20`}
       />
       <div className="flex flex-col leading-tight">
-        <span className={`font-display font-extrabold tracking-wider text-brand-green-950 dark:text-brand-cream-50 ${titleSize}`}>
+        <span
+          className={`font-display font-extrabold tracking-wider text-brand-green-950 dark:text-brand-cream-50 ${titleSize}`}
+        >
           MACMOOD
         </span>
         {showSubtitle && (

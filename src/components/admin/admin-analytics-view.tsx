@@ -1,5 +1,10 @@
 import { useState, useMemo } from "react";
-import type { AdminDatePeriod, AdminProduct, ExpenseRecord, BranchOutlet } from "./types";
+import type {
+  AdminDatePeriod,
+  AdminProduct,
+  ExpenseRecord,
+  BranchOutlet,
+} from "./types";
 import { formatRupiah } from "@/components/pos/format";
 import {
   TrendingUp,
@@ -22,7 +27,12 @@ import {
 } from "lucide-react";
 import type { CompletedOrder } from "@/components/pos/types";
 import { INITIAL_BRANCHES } from "./mock-data";
-import { downloadCsv, printReportPdf, type ReportPrintKpi, type ReportPrintSection } from "@/lib/export-utils";
+import {
+  downloadCsv,
+  printReportPdf,
+  type ReportPrintKpi,
+  type ReportPrintSection,
+} from "@/lib/export-utils";
 
 interface AdminAnalyticsViewProps {
   orders?: CompletedOrder[];
@@ -38,9 +48,13 @@ export function AdminAnalyticsView({
   branches = INITIAL_BRANCHES,
 }: AdminAnalyticsViewProps = {}) {
   const [period, setPeriod] = useState<AdminDatePeriod>("today");
-  const [hoveredPointIndex, setHoveredPointIndex] = useState<number | null>(null);
+  const [hoveredPointIndex, setHoveredPointIndex] = useState<number | null>(
+    null,
+  );
   const [hoveredBarIndex, setHoveredBarIndex] = useState<number | null>(null);
-  const [selectedBranch, setSelectedBranch] = useState<BranchOutlet | null>(null);
+  const [selectedBranch, setSelectedBranch] = useState<BranchOutlet | null>(
+    null,
+  );
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [exportNotice, setExportNotice] = useState<string | null>(null);
 
@@ -50,7 +64,7 @@ export function AdminAnalyticsView({
   const todayDateStr = new Date().toISOString().slice(0, 10);
   const paidOrders = useMemo(
     () => (orders || []).filter((o) => o.status === "PAID"),
-    [orders]
+    [orders],
   );
 
   // Live orders placed in POS (today)
@@ -59,8 +73,10 @@ export function AdminAnalyticsView({
       (o) =>
         o.dateStr === todayDateStr ||
         o.dateStr?.startsWith("2026-09-26") ||
-        (o.createdAt && new Date(o.createdAt).toISOString().slice(0, 10) === todayDateStr) ||
-        (o.createdAt && new Date(o.createdAt).toISOString().slice(0, 10) === "2026-09-26")
+        (o.createdAt &&
+          new Date(o.createdAt).toISOString().slice(0, 10) === todayDateStr) ||
+        (o.createdAt &&
+          new Date(o.createdAt).toISOString().slice(0, 10) === "2026-09-26"),
     );
     // If today matches exist, use them; otherwise fallback to paidOrders so dashboard is never empty
     return todayMatches.length > 0 ? todayMatches : paidOrders;
@@ -123,7 +139,11 @@ export function AdminAnalyticsView({
         { label: "23 Sep (Rab)", sales: 3450000, orders: 79 },
         { label: "24 Sep (Kam)", sales: 3600000, orders: 82 },
         { label: "25 Sep (Jum)", sales: 4450000, orders: 102 },
-        { label: "26 Sep (Hari Ini)", sales: liveTodaySales || 466400, orders: liveTodayCount || 10 },
+        {
+          label: "26 Sep (Hari Ini)",
+          sales: liveTodaySales || 466400,
+          orders: liveTodayCount || 10,
+        },
       ];
     }
 
@@ -133,7 +153,11 @@ export function AdminAnalyticsView({
         { label: "Minggu 1 (1-7 Sep)", sales: 22400000, orders: 510 },
         { label: "Minggu 2 (8-14 Sep)", sales: 24800000, orders: 565 },
         { label: "Minggu 3 (15-21 Sep)", sales: 25600000, orders: 580 },
-        { label: "Minggu 4 (22-26 Sep)", sales: 21800000 + liveTodaySales, orders: 495 + liveTodayCount },
+        {
+          label: "Minggu 4 (22-26 Sep)",
+          sales: 21800000 + liveTodaySales,
+          orders: 495 + liveTodayCount,
+        },
       ];
     }
 
@@ -147,18 +171,22 @@ export function AdminAnalyticsView({
       { label: "Jun", sales: 47200000, orders: 1080 },
       { label: "Jul", sales: 51000000, orders: 1160 },
       { label: "Agu", sales: 53500000, orders: 1220 },
-      { label: "Sep", sales: 94600000 + liveTodaySales, orders: 2150 + liveTodayCount },
+      {
+        label: "Sep",
+        sales: 94600000 + liveTodaySales,
+        orders: 2150 + liveTodayCount,
+      },
     ];
   }, [period, liveTodayOrders, liveTodaySales, liveTodayCount]);
 
   // Derived KPIs: 100% mathematically equal to sum of timelineData
   const currentNetSales = useMemo(
     () => timelineData.reduce((acc, d) => acc + d.sales, 0),
-    [timelineData]
+    [timelineData],
   );
   const currentOrderCount = useMemo(
     () => timelineData.reduce((acc, d) => acc + d.orders, 0),
-    [timelineData]
+    [timelineData],
   );
   const currentCash = useMemo(() => {
     if (period === "today") {
@@ -172,7 +200,10 @@ export function AdminAnalyticsView({
   const currentQris = useMemo(() => {
     if (period === "today") {
       return liveTodayOrders
-        .filter((o) => o.paymentMethod === "QRIS" || o.paymentMethod === "QRIS_MANUAL")
+        .filter(
+          (o) =>
+            o.paymentMethod === "QRIS" || o.paymentMethod === "QRIS_MANUAL",
+        )
         .reduce((sum, o) => sum + o.total, 0);
     }
     return currentNetSales - currentCash;
@@ -180,7 +211,7 @@ export function AdminAnalyticsView({
 
   const currentAov = useMemo(
     () => Math.round(currentNetSales / Math.max(1, currentOrderCount)),
-    [currentNetSales, currentOrderCount]
+    [currentNetSales, currentOrderCount],
   );
   const currentDiscounts = useMemo(() => {
     if (period === "today") {
@@ -193,21 +224,22 @@ export function AdminAnalyticsView({
 
   const currentGrossSales = useMemo(
     () => currentNetSales + currentDiscounts,
-    [currentNetSales, currentDiscounts]
+    [currentNetSales, currentDiscounts],
   );
 
   const currentCogs = useMemo(
     () => Math.round(currentNetSales * 0.45),
-    [currentNetSales]
+    [currentNetSales],
   );
   const currentGrossProfit = useMemo(
     () => currentNetSales - currentCogs,
-    [currentNetSales, currentCogs]
+    [currentNetSales, currentCogs],
   );
   const currentGrossMargin = 55.0;
 
   const periodExpenses = useMemo(() => {
-    if (period === "today") return (expenses || []).reduce((s, e) => s + e.amount, 0);
+    if (period === "today")
+      return (expenses || []).reduce((s, e) => s + e.amount, 0);
     if (period === "week") return 345000;
     if (period === "month") return 1450000;
     return 5200000;
@@ -215,7 +247,7 @@ export function AdminAnalyticsView({
 
   const currentNetProfit = useMemo(
     () => Math.max(0, currentGrossProfit - periodExpenses),
-    [currentGrossProfit, periodExpenses]
+    [currentGrossProfit, periodExpenses],
   );
 
   const periodLabels: Record<AdminDatePeriod, string> = {
@@ -249,8 +281,10 @@ export function AdminAnalyticsView({
     return Math.ceil(peak * 1.15);
   }, [timelineData]);
 
-  const getX = (idx: number) => padLeft + (idx / Math.max(1, timelineData.length - 1)) * graphWidth;
-  const getY = (val: number) => padTop + graphHeight - (Math.min(val, maxSales) / maxSales) * graphHeight;
+  const getX = (idx: number) =>
+    padLeft + (idx / Math.max(1, timelineData.length - 1)) * graphWidth;
+  const getY = (val: number) =>
+    padTop + graphHeight - (Math.min(val, maxSales) / maxSales) * graphHeight;
 
   const createSmoothPath = (values: number[]) => {
     const points = values.map((val, idx) => ({ x: getX(idx), y: getY(val) }));
@@ -295,10 +329,22 @@ export function AdminAnalyticsView({
   // 4. PERFORMA ANTAR CABANG (Relational Multi-Branch Attribution)
   // ---------------------------------------------------------------------------
   const branchPerformance = useMemo(() => {
-    const baseConfig: Record<string, { weight: number; color: { fill: string; border: string } }> = {
-      "branch-1": { weight: 0.46, color: { fill: "#123b2d", border: "border-brand-green-900" } },
-      "branch-2": { weight: 0.32, color: { fill: "#194735", border: "border-brand-green-800" } },
-      "branch-3": { weight: 0.22, color: { fill: "#245842", border: "border-brand-green-700" } },
+    const baseConfig: Record<
+      string,
+      { weight: number; color: { fill: string; border: string } }
+    > = {
+      "branch-1": {
+        weight: 0.46,
+        color: { fill: "#123b2d", border: "border-brand-green-900" },
+      },
+      "branch-2": {
+        weight: 0.32,
+        color: { fill: "#194735", border: "border-brand-green-800" },
+      },
+      "branch-3": {
+        weight: 0.22,
+        color: { fill: "#245842", border: "border-brand-green-700" },
+      },
     };
 
     return branches.map((b) => {
@@ -306,31 +352,49 @@ export function AdminAnalyticsView({
       const branchOrders = liveTodayOrders.filter(
         (o) =>
           o.branchId === b.id ||
-          o.branchName?.toLowerCase().includes(b.name.toLowerCase().split(" ")[1] || "")
+          o.branchName
+            ?.toLowerCase()
+            .includes(b.name.toLowerCase().split(" ")[1] || ""),
       );
       const liveBranchSales = branchOrders.reduce((s, o) => s + o.total, 0);
       const liveBranchOrders = branchOrders.length;
 
-      const conf = baseConfig[b.id] || { weight: 0.2, color: { fill: "#123b2d", border: "border-brand-green-900" } };
-      const totalSales = period === "today" ? liveBranchSales : Math.round(currentNetSales * conf.weight);
-      const orderCount = period === "today" ? liveBranchOrders : Math.max(1, Math.round(currentOrderCount * conf.weight));
+      const conf = baseConfig[b.id] || {
+        weight: 0.2,
+        color: { fill: "#123b2d", border: "border-brand-green-900" },
+      };
+      const totalSales =
+        period === "today"
+          ? liveBranchSales
+          : Math.round(currentNetSales * conf.weight);
+      const orderCount =
+        period === "today"
+          ? liveBranchOrders
+          : Math.max(1, Math.round(currentOrderCount * conf.weight));
       const aov = orderCount > 0 ? Math.round(totalSales / orderCount) : 0;
 
       return {
         ...b,
         code: b.branchCode || b.code || "MAC-01",
-        email: b.email || `${(b.branchCode || "cabang").toLowerCase()}@macmood.id`,
+        email:
+          b.email || `${(b.branchCode || "cabang").toLowerCase()}@macmood.id`,
         managerName: b.email || b.phone || "Cabang",
         totalSales,
         orderCount,
         aov,
-        share: currentNetSales > 0 ? Math.round((totalSales / currentNetSales) * 1000) / 10 : 0,
+        share:
+          currentNetSales > 0
+            ? Math.round((totalSales / currentNetSales) * 1000) / 10
+            : 0,
         color: conf.color,
       };
     });
   }, [branches, period, currentNetSales, currentOrderCount, liveTodayOrders]);
 
-  const maxBranchSales = Math.max(...branchPerformance.map((b) => b.totalSales), 1);
+  const maxBranchSales = Math.max(
+    ...branchPerformance.map((b) => b.totalSales),
+    1,
+  );
 
   // ---------------------------------------------------------------------------
   // 5. DONUT CHARTS: KATEGORI & KANAL PEMBAYARAN (Strict Design System)
@@ -349,7 +413,11 @@ export function AdminAnalyticsView({
         if (name.includes("mac")) {
           macRev += it.subtotal;
           macPortions += it.quantity;
-        } else if (name.includes("katsu") || name.includes("fries") || name.includes("camilan")) {
+        } else if (
+          name.includes("katsu") ||
+          name.includes("fries") ||
+          name.includes("camilan")
+        ) {
           sidesRev += it.subtotal;
           sidesPortions += it.quantity;
         } else {
@@ -430,7 +498,10 @@ export function AdminAnalyticsView({
   // 6. TOP SELLERS RANKING
   // ---------------------------------------------------------------------------
   const topProducts = useMemo(() => {
-    const itemMap = new Map<string, { name: string; category: string; sold: number; revenue: number }>();
+    const itemMap = new Map<
+      string,
+      { name: string; category: string; sold: number; revenue: number }
+    >();
 
     paidOrders.forEach((o) => {
       (o.items || []).forEach((it) => {
@@ -439,7 +510,8 @@ export function AdminAnalyticsView({
           name: it.name,
           category: it.name.toLowerCase().includes("mac")
             ? "Mac & Cheese"
-            : it.name.toLowerCase().includes("tea") || it.name.toLowerCase().includes("mineral")
+            : it.name.toLowerCase().includes("tea") ||
+                it.name.toLowerCase().includes("mineral")
               ? "Minuman"
               : "Add-on",
           sold: 0,
@@ -465,7 +537,8 @@ export function AdminAnalyticsView({
       });
     }
 
-    const totalRev = Array.from(itemMap.values()).reduce((s, it) => s + it.revenue, 0) || 1;
+    const totalRev =
+      Array.from(itemMap.values()).reduce((s, it) => s + it.revenue, 0) || 1;
 
     return Array.from(itemMap.values())
       .sort((a, b) => b.revenue - a.revenue)
@@ -497,19 +570,55 @@ export function AdminAnalyticsView({
     const headers = ["Metrik / Pos Finansial", "Nilai", "Keterangan / Rasio"];
     const rows = [
       ["Periode Laporan", periodLabels[period], "Data Terkonsolidasi"],
-      ["Omzet Bersih (Net Sales)", formatRupiah(currentNetSales), periodGrowthText[period]],
-      ["Omzet Kotor (Gross Sales)", formatRupiah(currentGrossSales), `Diskon/Promo: -${formatRupiah(currentDiscounts)}`],
-      ["Jumlah Transaksi Nota", `${currentOrderCount} nota`, `AOV: ${formatRupiah(currentAov)}`],
-      ["Laba Bersih (Net Profit)", formatRupiah(currentNetProfit), `Beban Operasional: -${formatRupiah(periodExpenses)}`],
-      ["Laba Kotor (Gross Profit)", formatRupiah(currentGrossProfit), `Margin ${currentGrossMargin}%`],
-      ["Modal Bahan Baku (HPP)", formatRupiah(currentCogs), "Rasio ~45.0% dari Omzet"],
-      ["Total Kas Terkumpul (Tunai + QRIS)", formatRupiah(currentCash + currentQris), "Tunai Laci + QRIS Bank"],
+      [
+        "Omzet Bersih (Net Sales)",
+        formatRupiah(currentNetSales),
+        periodGrowthText[period],
+      ],
+      [
+        "Omzet Kotor (Gross Sales)",
+        formatRupiah(currentGrossSales),
+        `Diskon/Promo: -${formatRupiah(currentDiscounts)}`,
+      ],
+      [
+        "Jumlah Transaksi Nota",
+        `${currentOrderCount} nota`,
+        `AOV: ${formatRupiah(currentAov)}`,
+      ],
+      [
+        "Laba Bersih (Net Profit)",
+        formatRupiah(currentNetProfit),
+        `Beban Operasional: -${formatRupiah(periodExpenses)}`,
+      ],
+      [
+        "Laba Kotor (Gross Profit)",
+        formatRupiah(currentGrossProfit),
+        `Margin ${currentGrossMargin}%`,
+      ],
+      [
+        "Modal Bahan Baku (HPP)",
+        formatRupiah(currentCogs),
+        "Rasio ~45.0% dari Omzet",
+      ],
+      [
+        "Total Kas Terkumpul (Tunai + QRIS)",
+        formatRupiah(currentCash + currentQris),
+        "Tunai Laci + QRIS Bank",
+      ],
       ["---", "---", "---"],
       ["Peringkat Menu", "Porsi Terjual", "Total Omzet Menu"],
-      ...topProducts.map((p, i) => [`#${i + 1} ${p.name} (${p.category})`, `${p.sold} porsi`, formatRupiah(p.revenue)]),
+      ...topProducts.map((p, i) => [
+        `#${i + 1} ${p.name} (${p.category})`,
+        `${p.sold} porsi`,
+        formatRupiah(p.revenue),
+      ]),
       ["---", "---", "---"],
       ["Performa Cabang", "Jumlah Nota", "Total Omzet Cabang"],
-      ...branchPerformance.map((b) => [`${b.name} (${b.code})`, `${b.orderCount} nota`, formatRupiah(b.totalSales)]),
+      ...branchPerformance.map((b) => [
+        `${b.name} (${b.code})`,
+        `${b.orderCount} nota`,
+        formatRupiah(b.totalSales),
+      ]),
     ];
 
     downloadCsv(filename, headers, rows);
@@ -519,27 +628,78 @@ export function AdminAnalyticsView({
 
   const handlePrintPdf = () => {
     const kpis: ReportPrintKpi[] = [
-      { label: "Omzet Bersih", value: formatRupiah(currentNetSales), sub: periodGrowthText[period] },
-      { label: "Omzet Kotor", value: formatRupiah(currentGrossSales), sub: `Diskon: -${formatRupiah(currentDiscounts)}` },
-      { label: "Jumlah Nota", value: `${currentOrderCount} Nota`, sub: `AOV: ${formatRupiah(currentAov)}` },
-      { label: "Laba Bersih", value: formatRupiah(currentNetProfit), sub: "Setelah beban operasional" },
-      { label: "Laba Kotor", value: formatRupiah(currentGrossProfit), sub: `Margin ${currentGrossMargin}%` },
-      { label: "Modal Bahan (HPP)", value: formatRupiah(currentCogs), sub: "45.0% dari omzet" },
+      {
+        label: "Omzet Bersih",
+        value: formatRupiah(currentNetSales),
+        sub: periodGrowthText[period],
+      },
+      {
+        label: "Omzet Kotor",
+        value: formatRupiah(currentGrossSales),
+        sub: `Diskon: -${formatRupiah(currentDiscounts)}`,
+      },
+      {
+        label: "Jumlah Nota",
+        value: `${currentOrderCount} Nota`,
+        sub: `AOV: ${formatRupiah(currentAov)}`,
+      },
+      {
+        label: "Laba Bersih",
+        value: formatRupiah(currentNetProfit),
+        sub: "Setelah beban operasional",
+      },
+      {
+        label: "Laba Kotor",
+        value: formatRupiah(currentGrossProfit),
+        sub: `Margin ${currentGrossMargin}%`,
+      },
+      {
+        label: "Modal Bahan (HPP)",
+        value: formatRupiah(currentCogs),
+        sub: "45.0% dari omzet",
+      },
     ];
 
     const sections: ReportPrintSection[] = [
       {
         title: "Ringkasan Penerimaan Kas & Metode Pembayaran",
-        headers: ["Kanal Pembayaran", "Porsi Pembayaran", "Total Nominal", "Status Rekonsiliasi"],
+        headers: [
+          "Kanal Pembayaran",
+          "Porsi Pembayaran",
+          "Total Nominal",
+          "Status Rekonsiliasi",
+        ],
         rows: [
-          ["Tunai (Cash Drawer)", `${paymentBreakdown[0].percentage}%`, formatRupiah(currentCash), "100% Cocok Kas Fisik"],
-          ["QRIS Outlet (Bank)", `${paymentBreakdown[1].percentage}%`, formatRupiah(currentQris), "Otomatis Settlement"],
-          ["Total Konsolidasi", "100.0%", formatRupiah(currentNetSales), "Seimbang & Terverifikasi"],
+          [
+            "Tunai (Cash Drawer)",
+            `${paymentBreakdown[0].percentage}%`,
+            formatRupiah(currentCash),
+            "100% Cocok Kas Fisik",
+          ],
+          [
+            "QRIS Outlet (Bank)",
+            `${paymentBreakdown[1].percentage}%`,
+            formatRupiah(currentQris),
+            "Otomatis Settlement",
+          ],
+          [
+            "Total Konsolidasi",
+            "100.0%",
+            formatRupiah(currentNetSales),
+            "Seimbang & Terverifikasi",
+          ],
         ],
       },
       {
         title: "Performa & Kontribusi Penjualan per Cabang Outlet",
-        headers: ["Nama Cabang", "Kode", "Kota / Lokasi", "Total Nota", "Total Omset", "Kontribusi"],
+        headers: [
+          "Nama Cabang",
+          "Kode",
+          "Kota / Lokasi",
+          "Total Nota",
+          "Total Omset",
+          "Kontribusi",
+        ],
         rows: branchPerformance.map((b) => [
           b.name,
           b.code,
@@ -552,7 +712,14 @@ export function AdminAnalyticsView({
       },
       {
         title: "Peringkat Menu Terlaris (Top Sellers Ranking)",
-        headers: ["Peringkat", "Nama Produk", "Kategori", "Porsi Terjual", "Total Omzet", "Kontribusi"],
+        headers: [
+          "Peringkat",
+          "Nama Produk",
+          "Kategori",
+          "Porsi Terjual",
+          "Total Omzet",
+          "Kontribusi",
+        ],
         rows: topProducts.map((p, idx) => [
           `#${idx + 1}`,
           p.name,
@@ -566,7 +733,8 @@ export function AdminAnalyticsView({
 
     printReportPdf({
       title: "Laporan Eksekutif Analitik & Penjualan MacMood",
-      subtitle: "Ikhtisar Komprehensif Finansial Multi-Cabang & Pergerakan Menu",
+      subtitle:
+        "Ikhtisar Komprehensif Finansial Multi-Cabang & Pergerakan Menu",
       periodLabel: periodLabels[period],
       outletName: "Konsolidasi Multi-Cabang (Pusat & Seluruh Outlet)",
       printedBy: "Muhammad Afrizal (Business Owner)",
@@ -590,7 +758,8 @@ export function AdminAnalyticsView({
             Performa Finansial & Analitik Outlet
           </h2>
           <p className="text-xs sm:text-sm text-neutral-600 mt-0.5">
-            Pantau omzet riil, kas total, margin laba kotor, perbandingan antar cabang, dan kontribusi menu terlaris.
+            Pantau omzet riil, kas total, margin laba kotor, perbandingan antar
+            cabang, dan kontribusi menu terlaris.
           </p>
         </div>
 
@@ -598,26 +767,28 @@ export function AdminAnalyticsView({
         <div className="flex items-center gap-2.5 flex-wrap">
           {/* Period Tabs */}
           <div className="flex items-center bg-white p-1 rounded-2xl border border-neutral-200 shadow-2xs">
-            {(["today", "week", "month", "year"] as AdminDatePeriod[]).map((p) => (
-              <button
-                key={p}
-                type="button"
-                onClick={() => setPeriod(p)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  period === p
-                    ? "bg-brand-green-900 text-brand-yellow-400 shadow-2xs"
-                    : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100"
-                }`}
-              >
-                {p === "today"
-                  ? "Hari Ini"
-                  : p === "week"
-                    ? "7 Hari"
-                    : p === "month"
-                      ? "Bulan Ini"
-                      : "Tahun Ini"}
-              </button>
-            ))}
+            {(["today", "week", "month", "year"] as AdminDatePeriod[]).map(
+              (p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => setPeriod(p)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    period === p
+                      ? "bg-brand-green-900 text-brand-yellow-400 shadow-2xs"
+                      : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100"
+                  }`}
+                >
+                  {p === "today"
+                    ? "Hari Ini"
+                    : p === "week"
+                      ? "7 Hari"
+                      : p === "month"
+                        ? "Bulan Ini"
+                        : "Tahun Ini"}
+                </button>
+              ),
+            )}
           </div>
 
           {/* Export CSV */}
@@ -658,7 +829,9 @@ export function AdminAnalyticsView({
         {/* KPI 1: Omzet Bersih - WARNA HIJAU */}
         <div className="p-5 rounded-3xl bg-brand-green-950 text-white shadow-xs space-y-2">
           <div className="flex items-center justify-between text-brand-cream-100/70">
-            <span className="text-xs font-bold uppercase tracking-wider text-brand-yellow-400">Omzet Bersih</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-brand-yellow-400">
+              Omzet Bersih
+            </span>
             <span className="size-8 rounded-xl bg-white/10 text-brand-yellow-400 flex items-center justify-center">
               <DollarSign className="size-4" />
             </span>
@@ -675,7 +848,9 @@ export function AdminAnalyticsView({
         {/* KPI 2: Omzet Kotor - WARNA PUTIH */}
         <div className="p-5 rounded-3xl bg-white border border-brand-green-900/10 shadow-xs space-y-2">
           <div className="flex items-center justify-between text-neutral-500">
-            <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">Omzet Kotor</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">
+              Omzet Kotor
+            </span>
             <span className="size-8 rounded-xl bg-brand-cream-100 text-brand-green-900 flex items-center justify-center">
               <Receipt className="size-4" />
             </span>
@@ -691,13 +866,18 @@ export function AdminAnalyticsView({
         {/* KPI 3: Jumlah Nota - WARNA HIJAU */}
         <div className="p-5 rounded-3xl bg-brand-green-950 text-white shadow-xs space-y-2">
           <div className="flex items-center justify-between text-brand-cream-100/70">
-            <span className="text-xs font-bold uppercase tracking-wider text-brand-yellow-400">Jumlah Nota</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-brand-yellow-400">
+              Jumlah Nota
+            </span>
             <span className="size-8 rounded-xl bg-white/10 text-brand-yellow-400 flex items-center justify-center">
               <ShoppingBag className="size-4" />
             </span>
           </div>
           <div className="font-display font-black text-xl lg:text-2xl text-brand-yellow-400 tracking-tight font-mono">
-            {currentOrderCount} <span className="text-xs font-normal text-brand-cream-100/70">nota</span>
+            {currentOrderCount}{" "}
+            <span className="text-xs font-normal text-brand-cream-100/70">
+              nota
+            </span>
           </div>
           <div className="text-[11px] text-brand-cream-100/80 font-medium truncate">
             Rata-rata Nota: {formatRupiah(currentAov)}
@@ -707,7 +887,9 @@ export function AdminAnalyticsView({
         {/* KPI 4: Laba Bersih - WARNA PUTIH */}
         <div className="p-5 rounded-3xl bg-white border border-brand-green-900/10 shadow-xs space-y-2">
           <div className="flex items-center justify-between text-neutral-500">
-            <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">Laba Bersih</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">
+              Laba Bersih
+            </span>
             <span className="size-8 rounded-xl bg-brand-cream-100 text-brand-green-900 flex items-center justify-center">
               <Wallet className="size-4" />
             </span>
@@ -723,7 +905,9 @@ export function AdminAnalyticsView({
         {/* KPI 5: Laba Kotor - WARNA PUTIH */}
         <div className="p-5 rounded-3xl bg-white border border-brand-green-900/10 shadow-xs space-y-2">
           <div className="flex items-center justify-between text-neutral-500">
-            <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">Laba Kotor</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">
+              Laba Kotor
+            </span>
             <span className="size-8 rounded-xl bg-brand-cream-100 text-brand-green-900 flex items-center justify-center">
               <Coins className="size-4" />
             </span>
@@ -733,14 +917,21 @@ export function AdminAnalyticsView({
           </div>
           <div className="text-[11px] text-neutral-600 font-medium flex items-center gap-1">
             <Percent className="size-3 text-brand-green-800" />
-            <span>Margin: <strong className="text-brand-green-950 font-bold">{currentGrossMargin}%</strong></span>
+            <span>
+              Margin:{" "}
+              <strong className="text-brand-green-950 font-bold">
+                {currentGrossMargin}%
+              </strong>
+            </span>
           </div>
         </div>
 
         {/* KPI 6: HPP - WARNA PUTIH */}
         <div className="p-5 rounded-3xl bg-white border border-brand-green-900/10 shadow-xs space-y-2">
           <div className="flex items-center justify-between text-neutral-500">
-            <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">HPP (Modal Bahan)</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">
+              HPP (Modal Bahan)
+            </span>
             <span className="size-8 rounded-xl bg-brand-yellow-400/20 text-amber-800 flex items-center justify-center">
               <Receipt className="size-4" />
             </span>
@@ -767,7 +958,11 @@ export function AdminAnalyticsView({
               </h3>
             </div>
             <p className="text-xs text-neutral-500 mt-0.5">
-              Distribusi omzet riil multi-cabang {periodLabels[period]} · Total omzet: <strong className="text-brand-green-950 font-bold">{formatRupiah(currentNetSales)}</strong>
+              Distribusi omzet riil multi-cabang {periodLabels[period]} · Total
+              omzet:{" "}
+              <strong className="text-brand-green-950 font-bold">
+                {formatRupiah(currentNetSales)}
+              </strong>
             </p>
           </div>
 
@@ -784,7 +979,13 @@ export function AdminAnalyticsView({
             className="w-full h-56 sm:h-64 select-none"
           >
             <defs>
-              <linearGradient id="brandAreaGradient" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient
+                id="brandAreaGradient"
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
                 <stop offset="0%" stopColor="#123b2d" stopOpacity="0.25" />
                 <stop offset="100%" stopColor="#123b2d" stopOpacity="0.0" />
               </linearGradient>
@@ -794,7 +995,10 @@ export function AdminAnalyticsView({
             {[0, 0.25, 0.5, 0.75, 1].map((pct, i) => {
               const y = padTop + graphHeight * (1 - pct);
               const val = pct * maxSales;
-              const label = val >= 1000000 ? `${(val / 1000000).toFixed(1)}jt` : `${Math.round(val / 1000)}rb`;
+              const label =
+                val >= 1000000
+                  ? `${(val / 1000000).toFixed(1)}jt`
+                  : `${Math.round(val / 1000)}rb`;
               return (
                 <g key={i}>
                   <line
@@ -869,7 +1073,9 @@ export function AdminAnalyticsView({
                     y={svgHeight - 10}
                     textAnchor="middle"
                     className={`text-[10px] sm:text-[11px] font-mono transition-colors ${
-                      isHovered ? "fill-brand-green-950 font-bold" : "fill-neutral-500"
+                      isHovered
+                        ? "fill-brand-green-950 font-bold"
+                        : "fill-neutral-500"
                     }`}
                   >
                     {d.label}
@@ -889,16 +1095,25 @@ export function AdminAnalyticsView({
             >
               <div className="font-bold text-brand-yellow-400 flex items-center justify-between gap-4 pb-1 border-b border-white/10">
                 <span>{timelineData[hoveredPointIndex].label}</span>
-                <span className="text-[10px] text-brand-cream-100/70">Slot Waktu</span>
+                <span className="text-[10px] text-brand-cream-100/70">
+                  Slot Waktu
+                </span>
               </div>
               <div className="flex items-center justify-between gap-4">
-                <span className="text-brand-cream-100/80">Omzet Penjualan:</span>
+                <span className="text-brand-cream-100/80">
+                  Omzet Penjualan:
+                </span>
                 <strong className="text-white font-mono">
                   {formatRupiah(timelineData[hoveredPointIndex].sales)}
                 </strong>
               </div>
               <div className="text-[10px] text-brand-yellow-400 font-bold pt-0.5">
-                {Math.round((timelineData[hoveredPointIndex].sales / Math.max(1, currentNetSales)) * 1000) / 10}% dari total periode
+                {Math.round(
+                  (timelineData[hoveredPointIndex].sales /
+                    Math.max(1, currentNetSales)) *
+                    1000,
+                ) / 10}
+                % dari total periode
               </div>
             </div>
           )}
@@ -918,7 +1133,11 @@ export function AdminAnalyticsView({
               </h3>
             </div>
             <p className="text-xs text-neutral-500 mt-0.5">
-              Frekuensi dan jumlah nota yang berhasil dicetak {periodLabels[period]} · Total volume: <strong className="text-amber-800 font-bold">{currentOrderCount} nota</strong>
+              Frekuensi dan jumlah nota yang berhasil dicetak{" "}
+              {periodLabels[period]} · Total volume:{" "}
+              <strong className="text-amber-800 font-bold">
+                {currentOrderCount} nota
+              </strong>
             </p>
           </div>
 
@@ -966,7 +1185,10 @@ export function AdminAnalyticsView({
               const slotW = barGraphWidth / timelineData.length;
               const barW = Math.min(44, Math.max(18, slotW * 0.55));
               const bx = barPadLeft + idx * slotW + (slotW - barW) / 2;
-              const bHeight = Math.max(4, (d.orders / Math.max(1, maxOrders)) * barGraphHeight);
+              const bHeight = Math.max(
+                4,
+                (d.orders / Math.max(1, maxOrders)) * barGraphHeight,
+              );
               const by = barPadTop + barGraphHeight - bHeight;
               const isHovered = hoveredBarIndex === idx;
 
@@ -1016,7 +1238,9 @@ export function AdminAnalyticsView({
                     y={barSvgHeight - 10}
                     textAnchor="middle"
                     className={`text-[10px] sm:text-[11px] font-mono transition-colors ${
-                      isHovered ? "fill-amber-950 font-bold" : "fill-neutral-500"
+                      isHovered
+                        ? "fill-amber-950 font-bold"
+                        : "fill-neutral-500"
                     }`}
                   >
                     {d.label}
@@ -1036,18 +1260,29 @@ export function AdminAnalyticsView({
             >
               <div className="font-bold text-brand-yellow-400 flex items-center justify-between gap-4 pb-1 border-b border-white/10">
                 <span>{timelineData[hoveredBarIndex].label}</span>
-                <span className="text-[10px] text-brand-cream-100/70">Frekuensi Nota</span>
+                <span className="text-[10px] text-brand-cream-100/70">
+                  Frekuensi Nota
+                </span>
               </div>
               <div className="flex items-center justify-between gap-4">
-                <span className="text-brand-cream-100/80">Jumlah Transaksi:</span>
+                <span className="text-brand-cream-100/80">
+                  Jumlah Transaksi:
+                </span>
                 <strong className="text-white font-mono">
                   {timelineData[hoveredBarIndex].orders} nota
                 </strong>
               </div>
               <div className="flex items-center justify-between gap-4">
-                <span className="text-brand-cream-100/80">Rata-rata Nota (AOV):</span>
+                <span className="text-brand-cream-100/80">
+                  Rata-rata Nota (AOV):
+                </span>
                 <strong className="text-brand-yellow-400 font-mono">
-                  {formatRupiah(Math.round(timelineData[hoveredBarIndex].sales / Math.max(1, timelineData[hoveredBarIndex].orders)))}
+                  {formatRupiah(
+                    Math.round(
+                      timelineData[hoveredBarIndex].sales /
+                        Math.max(1, timelineData[hoveredBarIndex].orders),
+                    ),
+                  )}
                 </strong>
               </div>
             </div>
@@ -1069,7 +1304,8 @@ export function AdminAnalyticsView({
                 Perbandingan Performa Antar Cabang Outlet
               </h3>
               <p className="text-xs text-neutral-500">
-                Klik pada kartu cabang untuk membuka ringkasan operasional dan PIC outlet.
+                Klik pada kartu cabang untuk membuka ringkasan operasional dan
+                PIC outlet.
               </p>
             </div>
           </div>
@@ -1153,9 +1389,12 @@ export function AdminAnalyticsView({
                 <Store className="size-5 text-brand-yellow-400" />
                 <div>
                   <h4 className="font-display font-black text-base text-white">
-                    Detail Cabang: {selectedBranch.name} ({selectedBranch.branchCode || selectedBranch.code})
+                    Detail Cabang: {selectedBranch.name} (
+                    {selectedBranch.branchCode || selectedBranch.code})
                   </h4>
-                  <p className="text-xs text-brand-cream-100/70">{selectedBranch.address}, {selectedBranch.city}</p>
+                  <p className="text-xs text-brand-cream-100/70">
+                    {selectedBranch.address}, {selectedBranch.city}
+                  </p>
                 </div>
               </div>
               <button
@@ -1170,37 +1409,65 @@ export function AdminAnalyticsView({
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
-                <span className="text-brand-cream-100/60 block text-[11px]">Akun & Kontak Cabang</span>
-                <strong className="text-white font-bold text-xs block mt-0.5 font-mono">{selectedBranch.email || `${selectedBranch.branchCode?.toLowerCase()}@macmood.id`}</strong>
+                <span className="text-brand-cream-100/60 block text-[11px]">
+                  Akun & Kontak Cabang
+                </span>
+                <strong className="text-white font-bold text-xs block mt-0.5 font-mono">
+                  {selectedBranch.email ||
+                    `${selectedBranch.branchCode?.toLowerCase()}@macmood.id`}
+                </strong>
                 <span className="text-[11px] text-brand-yellow-400 flex items-center gap-1 mt-1 font-mono">
                   <Phone className="size-3" /> {selectedBranch.phone}
                 </span>
               </div>
               <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
-                <span className="text-brand-cream-100/60 block text-[11px]">Kontribusi Omset</span>
+                <span className="text-brand-cream-100/60 block text-[11px]">
+                  Kontribusi Omset
+                </span>
                 <strong className="text-brand-yellow-400 font-bold text-sm block mt-0.5">
-                  {formatRupiah(branchPerformance.find((b) => b.id === selectedBranch.id)?.totalSales || 0)}
+                  {formatRupiah(
+                    branchPerformance.find((b) => b.id === selectedBranch.id)
+                      ?.totalSales || 0,
+                  )}
                 </strong>
                 <span className="text-[11px] text-white/80 mt-1 block">
-                  {branchPerformance.find((b) => b.id === selectedBranch.id)?.share}% total outlet
+                  {
+                    branchPerformance.find((b) => b.id === selectedBranch.id)
+                      ?.share
+                  }
+                  % total outlet
                 </span>
               </div>
               <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
-                <span className="text-brand-cream-100/60 block text-[11px]">Trafik Pesanan</span>
+                <span className="text-brand-cream-100/60 block text-[11px]">
+                  Trafik Pesanan
+                </span>
                 <strong className="text-white font-bold text-sm block mt-0.5">
-                  {branchPerformance.find((b) => b.id === selectedBranch.id)?.orderCount || 0} Nota
+                  {branchPerformance.find((b) => b.id === selectedBranch.id)
+                    ?.orderCount || 0}{" "}
+                  Nota
                 </strong>
                 <span className="text-[11px] text-white/80 mt-1 block">
-                  AOV: {formatRupiah(branchPerformance.find((b) => b.id === selectedBranch.id)?.aov || 0)}
+                  AOV:{" "}
+                  {formatRupiah(
+                    branchPerformance.find((b) => b.id === selectedBranch.id)
+                      ?.aov || 0,
+                  )}
                 </span>
               </div>
               <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
-                <span className="text-brand-cream-100/60 block text-[11px]">Status Operasional</span>
+                <span className="text-brand-cream-100/60 block text-[11px]">
+                  Status Operasional
+                </span>
                 <div className="flex items-center gap-1.5 mt-1">
                   <span className="size-2 rounded-full bg-brand-yellow-400 animate-pulse" />
-                  <strong className="text-white font-bold text-sm">Buka & Melayani</strong>
+                  <strong className="text-white font-bold text-sm">
+                    Buka & Melayani
+                  </strong>
                 </div>
-                <span className="text-[11px] text-brand-cream-100/70 mt-1 block">08:00 - 22:00 WIB</span>
+                <span className="text-[11px] text-brand-cream-100/70 mt-1 block">
+                  08:00 - 22:00 WIB
+                </span>
               </div>
             </div>
           </div>
@@ -1220,17 +1487,28 @@ export function AdminAnalyticsView({
                 <h3 className="font-display font-extrabold text-base text-brand-green-950">
                   Distribusi Omzet per Kategori Menu
                 </h3>
-                <p className="text-[11px] text-neutral-500">Klik baris kategori untuk melihat rincian produk.</p>
+                <p className="text-[11px] text-neutral-500">
+                  Klik baris kategori untuk melihat rincian produk.
+                </p>
               </div>
             </div>
-            <span className="text-xs text-neutral-500 font-medium">Katalog Menu</span>
+            <span className="text-xs text-neutral-500 font-medium">
+              Katalog Menu
+            </span>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center gap-6 pt-2">
             {/* SVG Donut */}
             <div className="relative size-44 flex-shrink-0 flex items-center justify-center">
               <svg viewBox="0 0 100 100" className="size-full -rotate-90">
-                <circle cx="50" cy="50" r="38" fill="none" stroke="#f1f5f9" strokeWidth="16" />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="38"
+                  fill="none"
+                  stroke="#f1f5f9"
+                  strokeWidth="16"
+                />
                 {/* Arc 1: Mac & Cheese */}
                 <circle
                   cx="50"
@@ -1240,7 +1518,9 @@ export function AdminAnalyticsView({
                   stroke="#123b2d"
                   strokeWidth="16"
                   strokeDasharray="238.7"
-                  strokeDashoffset={238.7 * (1 - categoryBreakdown[0].percentage / 100)}
+                  strokeDashoffset={
+                    238.7 * (1 - categoryBreakdown[0].percentage / 100)
+                  }
                 />
                 {/* Arc 2: Add-on */}
                 <circle
@@ -1251,7 +1531,9 @@ export function AdminAnalyticsView({
                   stroke="#d97706"
                   strokeWidth="16"
                   strokeDasharray="238.7"
-                  strokeDashoffset={238.7 * (1 - categoryBreakdown[1].percentage / 100)}
+                  strokeDashoffset={
+                    238.7 * (1 - categoryBreakdown[1].percentage / 100)
+                  }
                   style={{
                     transform: `rotate(${categoryBreakdown[0].percentage * 3.6}deg)`,
                     transformOrigin: "50% 50%",
@@ -1266,7 +1548,9 @@ export function AdminAnalyticsView({
                   stroke="#245842"
                   strokeWidth="16"
                   strokeDasharray="238.7"
-                  strokeDashoffset={238.7 * (1 - categoryBreakdown[2].percentage / 100)}
+                  strokeDashoffset={
+                    238.7 * (1 - categoryBreakdown[2].percentage / 100)
+                  }
                   style={{
                     transform: `rotate(${(categoryBreakdown[0].percentage + categoryBreakdown[1].percentage) * 3.6}deg)`,
                     transformOrigin: "50% 50%",
@@ -1275,7 +1559,9 @@ export function AdminAnalyticsView({
               </svg>
               {/* Center Info */}
               <div className="absolute text-center flex flex-col items-center">
-                <span className="text-[10px] text-neutral-500 uppercase font-bold tracking-wider">Total</span>
+                <span className="text-[10px] text-neutral-500 uppercase font-bold tracking-wider">
+                  Total
+                </span>
                 <span className="text-xs font-display font-black text-brand-green-950">
                   {formatRupiah(currentNetSales)}
                 </span>
@@ -1289,7 +1575,9 @@ export function AdminAnalyticsView({
                 return (
                   <div
                     key={cat.id}
-                    onClick={() => setSelectedCategory(isSelected ? null : cat.id)}
+                    onClick={() =>
+                      setSelectedCategory(isSelected ? null : cat.id)
+                    }
                     className={`p-2.5 rounded-2xl border transition-all cursor-pointer ${
                       isSelected
                         ? "bg-brand-cream-100 border-brand-green-900 shadow-2xs"
@@ -1302,10 +1590,14 @@ export function AdminAnalyticsView({
                           className="size-3 rounded-full flex-shrink-0"
                           style={{ backgroundColor: cat.color }}
                         />
-                        <strong className="text-neutral-800">{cat.label}</strong>
+                        <strong className="text-neutral-800">
+                          {cat.label}
+                        </strong>
                       </div>
                       <div className="text-right font-mono">
-                        <strong className="text-neutral-900">{formatRupiah(cat.amount)}</strong>
+                        <strong className="text-neutral-900">
+                          {formatRupiah(cat.amount)}
+                        </strong>
                         <span className="text-[11px] text-neutral-500 ml-1.5 font-bold">
                           ({cat.percentage}%)
                         </span>
@@ -1314,7 +1606,10 @@ export function AdminAnalyticsView({
                     <div className="w-full h-2 rounded-full bg-neutral-100 overflow-hidden mt-1.5">
                       <div
                         className="h-full rounded-full"
-                        style={{ width: `${cat.percentage}%`, backgroundColor: cat.color }}
+                        style={{
+                          width: `${cat.percentage}%`,
+                          backgroundColor: cat.color,
+                        }}
                       />
                     </div>
                   </div>
@@ -1333,17 +1628,28 @@ export function AdminAnalyticsView({
                 <h3 className="font-display font-extrabold text-base text-brand-green-950">
                   Kanal Pembayaran (Tunai vs QRIS)
                 </h3>
-                <p className="text-[11px] text-neutral-500">Rekonsiliasi uang laci kas vs rekening bank.</p>
+                <p className="text-[11px] text-neutral-500">
+                  Rekonsiliasi uang laci kas vs rekening bank.
+                </p>
               </div>
             </div>
-            <span className="text-xs text-neutral-500 font-medium">Metode Kasir</span>
+            <span className="text-xs text-neutral-500 font-medium">
+              Metode Kasir
+            </span>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center gap-6 pt-2">
             {/* SVG Donut */}
             <div className="relative size-44 flex-shrink-0 flex items-center justify-center">
               <svg viewBox="0 0 100 100" className="size-full -rotate-90">
-                <circle cx="50" cy="50" r="38" fill="none" stroke="#f1f5f9" strokeWidth="16" />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="38"
+                  fill="none"
+                  stroke="#f1f5f9"
+                  strokeWidth="16"
+                />
                 {/* Arc 1: Tunai */}
                 <circle
                   cx="50"
@@ -1353,7 +1659,9 @@ export function AdminAnalyticsView({
                   stroke="#123b2d"
                   strokeWidth="16"
                   strokeDasharray="238.7"
-                  strokeDashoffset={238.7 * (1 - paymentBreakdown[0].percentage / 100)}
+                  strokeDashoffset={
+                    238.7 * (1 - paymentBreakdown[0].percentage / 100)
+                  }
                 />
                 {/* Arc 2: QRIS */}
                 <circle
@@ -1364,7 +1672,9 @@ export function AdminAnalyticsView({
                   stroke="#d97706"
                   strokeWidth="16"
                   strokeDasharray="238.7"
-                  strokeDashoffset={238.7 * (1 - paymentBreakdown[1].percentage / 100)}
+                  strokeDashoffset={
+                    238.7 * (1 - paymentBreakdown[1].percentage / 100)
+                  }
                   style={{
                     transform: `rotate(${paymentBreakdown[0].percentage * 3.6}deg)`,
                     transformOrigin: "50% 50%",
@@ -1373,7 +1683,9 @@ export function AdminAnalyticsView({
               </svg>
               {/* Center Info */}
               <div className="absolute text-center flex flex-col items-center">
-                <span className="text-[10px] text-neutral-500 uppercase font-bold tracking-wider">Kas Total</span>
+                <span className="text-[10px] text-neutral-500 uppercase font-bold tracking-wider">
+                  Kas Total
+                </span>
                 <span className="text-xs font-display font-black text-brand-green-950 font-mono">
                   {formatRupiah(currentCash + currentQris)}
                 </span>
@@ -1396,7 +1708,9 @@ export function AdminAnalyticsView({
                       <strong className="text-neutral-800">{pay.label}</strong>
                     </div>
                     <div className="text-right font-mono">
-                      <strong className="text-neutral-900">{formatRupiah(pay.amount)}</strong>
+                      <strong className="text-neutral-900">
+                        {formatRupiah(pay.amount)}
+                      </strong>
                       <span className="text-[11px] text-neutral-500 ml-1.5 font-bold">
                         ({pay.percentage}%)
                       </span>
@@ -1405,7 +1719,10 @@ export function AdminAnalyticsView({
                   <div className="w-full h-2 rounded-full bg-neutral-100 overflow-hidden mt-1.5">
                     <div
                       className="h-full rounded-full"
-                      style={{ width: `${pay.percentage}%`, backgroundColor: pay.color }}
+                      style={{
+                        width: `${pay.percentage}%`,
+                        backgroundColor: pay.color,
+                      }}
                     />
                   </div>
                 </div>
@@ -1425,7 +1742,8 @@ export function AdminAnalyticsView({
               Peringkat Menu Terlaris (Top Sellers Ranking)
             </h3>
             <p className="text-xs text-neutral-500 mt-0.5">
-              Menu terlaris diurutkan berdasarkan kontribusi omzet riil dan volume porsi terjual.
+              Menu terlaris diurutkan berdasarkan kontribusi omzet riil dan
+              volume porsi terjual.
             </p>
           </div>
           <span className="text-xs font-bold text-brand-green-900 bg-brand-cream-100 px-3 py-1 rounded-full border border-brand-green-900/10">
@@ -1456,11 +1774,15 @@ export function AdminAnalyticsView({
               <div className="space-y-1.5 pt-2 border-t border-neutral-200/50 text-xs">
                 <div className="flex justify-between text-neutral-600">
                   <span>Porsi Terjual:</span>
-                  <strong className="text-neutral-900 font-mono font-bold">{p.sold} porsi</strong>
+                  <strong className="text-neutral-900 font-mono font-bold">
+                    {p.sold} porsi
+                  </strong>
                 </div>
                 <div className="flex justify-between text-neutral-600">
                   <span>Total Omzet:</span>
-                  <strong className="text-brand-green-950 font-mono font-bold">{formatRupiah(p.revenue)}</strong>
+                  <strong className="text-brand-green-950 font-mono font-bold">
+                    {formatRupiah(p.revenue)}
+                  </strong>
                 </div>
                 <div className="w-full h-1.5 rounded-full bg-neutral-200 overflow-hidden mt-1">
                   <div

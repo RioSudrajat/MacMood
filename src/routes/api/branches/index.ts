@@ -14,7 +14,10 @@ export const Route = createFileRoute("/api/branches/")({
       POST: ({ request }) =>
         withApiSession(request, async (session) => {
           if (session.user.role !== "admin") {
-            return Response.json({ error: "Hanya Owner/Admin yang diizinkan menambah cabang" }, { status: 403 });
+            return Response.json(
+              { error: "Hanya Owner/Admin yang diizinkan menambah cabang" },
+              { status: 403 },
+            );
           }
           const body = await readJson(request);
           const input = branchInputSchema.parse(body);

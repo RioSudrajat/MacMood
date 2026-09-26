@@ -6,7 +6,10 @@ export interface ModelViewerElement extends HTMLElement {
   cameraTarget?: string;
 }
 
-export interface ModelViewerAttributes extends DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement> {
+export interface ModelViewerAttributes extends DetailedHTMLProps<
+  HTMLAttributes<HTMLElement>,
+  HTMLElement
+> {
   class?: string;
   className?: string;
   src?: string;

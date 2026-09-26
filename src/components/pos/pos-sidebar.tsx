@@ -114,7 +114,11 @@ export function PosSidebar({
             aria-label={collapsed ? "Buka Navigasi" : "Sembunyikan Navigasi"}
             title={collapsed ? "Perluas Sidebar" : "Ciutkan Sidebar"}
           >
-            {collapsed ? <ChevronRight className="size-4" /> : <ChevronLeft className="size-4" />}
+            {collapsed ? (
+              <ChevronRight className="size-4" />
+            ) : (
+              <ChevronLeft className="size-4" />
+            )}
           </button>
         )}
 
@@ -163,7 +167,10 @@ export function PosSidebar({
 
             if (collapsed) {
               return (
-                <div key={item.id} className="relative group flex justify-center">
+                <div
+                  key={item.id}
+                  className="relative group flex justify-center"
+                >
                   <button
                     type="button"
                     onClick={() => onTabChange(item.id)}
@@ -248,8 +255,8 @@ export function PosSidebar({
         {/* Bottom Section: Role Switcher & Sign Out */}
         <div className="p-3 border-t border-brand-green-900/10 space-y-2">
           {/* Lock Screen / Ganti Kasir (Fast PIN) */}
-          {onLockScreen && (
-            collapsed ? (
+          {onLockScreen &&
+            (collapsed ? (
               <div className="flex justify-center group relative">
                 <button
                   type="button"
@@ -271,18 +278,19 @@ export function PosSidebar({
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <Lock className="size-4 text-amber-700 flex-shrink-0" />
-                  <span className="text-xs font-bold truncate">Kunci Layar / PIN</span>
+                  <span className="text-xs font-bold truncate">
+                    Kunci Layar / PIN
+                  </span>
                 </div>
                 <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-200/80 text-amber-900">
                   Lock
                 </span>
               </button>
-            )
-          )}
+            ))}
 
           {/* Switch to Owner Dashboard (Only visible for Owner/Admin role) */}
-          {isOwner && (
-            collapsed ? (
+          {isOwner &&
+            (collapsed ? (
               <div className="flex justify-center group relative">
                 <Link
                   to="/admin"
@@ -302,12 +310,13 @@ export function PosSidebar({
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <ShieldCheck className="size-4 text-brand-green-800 flex-shrink-0" />
-                  <span className="text-xs font-bold truncate">Dashboard Owner</span>
+                  <span className="text-xs font-bold truncate">
+                    Dashboard Owner
+                  </span>
                 </div>
                 <ArrowUpRight className="size-3.5 text-neutral-400" />
               </Link>
-            )
-          )}
+            ))}
 
           {/* Sign Out Button (User requested: "lalu sign out juga diletakkan di sidebar") */}
           <div className={collapsed ? "flex justify-center" : ""}>

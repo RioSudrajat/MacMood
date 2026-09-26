@@ -1,4 +1,11 @@
-import { boolean, integer, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  integer,
+  pgTable,
+  text,
+  timestamp,
+  varchar,
+} from "drizzle-orm/pg-core";
 
 export const branches = pgTable("branches", {
   id: varchar("id", { length: 50 }).primaryKey(),
@@ -17,7 +24,9 @@ export const branches = pgTable("branches", {
   bankAccount: varchar("bank_account", { length: 100 }),
   bankName: varchar("bank_name", { length: 100 }),
   openedAt: varchar("opened_at", { length: 100 }),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .defaultNow()
     .$onUpdate(() => new Date())

@@ -20,11 +20,19 @@ interface PosOrdersHistoryViewProps {
   onVoidOrder: (orderId: string, reason: string) => void;
 }
 
-export function PosOrdersHistoryView({ orders, onVoidOrder }: PosOrdersHistoryViewProps) {
+export function PosOrdersHistoryView({
+  orders,
+  onVoidOrder,
+}: PosOrdersHistoryViewProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [paymentFilter, setPaymentFilter] = useState<"ALL" | "CASH" | "QRIS_MANUAL">("ALL");
-  const [statusFilter, setStatusFilter] = useState<"ALL" | "PAID" | "VOID">("ALL");
-  const [selectedOrderForReceipt, setSelectedOrderForReceipt] = useState<CompletedOrder | null>(null);
+  const [paymentFilter, setPaymentFilter] = useState<
+    "ALL" | "CASH" | "QRIS_MANUAL"
+  >("ALL");
+  const [statusFilter, setStatusFilter] = useState<"ALL" | "PAID" | "VOID">(
+    "ALL",
+  );
+  const [selectedOrderForReceipt, setSelectedOrderForReceipt] =
+    useState<CompletedOrder | null>(null);
   const [orderToVoid, setOrderToVoid] = useState<CompletedOrder | null>(null);
   const [voidReasonInput, setVoidReasonInput] = useState("");
 
@@ -48,10 +56,14 @@ export function PosOrdersHistoryView({ orders, onVoidOrder }: PosOrdersHistoryVi
     return orders.filter((order) => {
       const matchSearch =
         order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.items.some((i) => i.name.toLowerCase().includes(searchQuery.toLowerCase()));
+        order.items.some((i) =>
+          i.name.toLowerCase().includes(searchQuery.toLowerCase()),
+        );
 
-      const matchPayment = paymentFilter === "ALL" || order.paymentMethod === paymentFilter;
-      const matchStatus = statusFilter === "ALL" || order.status === statusFilter;
+      const matchPayment =
+        paymentFilter === "ALL" || order.paymentMethod === paymentFilter;
+      const matchStatus =
+        statusFilter === "ALL" || order.status === statusFilter;
 
       return matchSearch && matchPayment && matchStatus;
     });
@@ -77,7 +89,9 @@ export function PosOrdersHistoryView({ orders, onVoidOrder }: PosOrdersHistoryVi
             <div className="font-display font-black text-2xl text-brand-green-950">
               {kpi.totalTransactions}
             </div>
-            <span className="text-[11px] text-neutral-400 font-medium">Transaksi lunas</span>
+            <span className="text-[11px] text-neutral-400 font-medium">
+              Transaksi lunas
+            </span>
           </div>
 
           <div className="p-4 rounded-2xl bg-white border border-brand-green-900/10 shadow-xs">
@@ -88,7 +102,9 @@ export function PosOrdersHistoryView({ orders, onVoidOrder }: PosOrdersHistoryVi
             <div className="font-display font-black text-2xl text-emerald-800">
               {formatRupiah(kpi.totalRevenue)}
             </div>
-            <span className="text-[11px] text-neutral-400 font-medium">Shift berlangsung</span>
+            <span className="text-[11px] text-neutral-400 font-medium">
+              Shift berlangsung
+            </span>
           </div>
 
           <div className="p-4 rounded-2xl bg-white border border-brand-green-900/10 shadow-xs">
@@ -99,7 +115,9 @@ export function PosOrdersHistoryView({ orders, onVoidOrder }: PosOrdersHistoryVi
             <div className="font-display font-black text-xl text-neutral-900">
               {formatRupiah(kpi.cashTotal)}
             </div>
-            <span className="text-[11px] text-neutral-400 font-medium">Uang masuk laci</span>
+            <span className="text-[11px] text-neutral-400 font-medium">
+              Uang masuk laci
+            </span>
           </div>
 
           <div className="p-4 rounded-2xl bg-white border border-brand-green-900/10 shadow-xs">
@@ -110,7 +128,9 @@ export function PosOrdersHistoryView({ orders, onVoidOrder }: PosOrdersHistoryVi
             <div className="font-display font-black text-xl text-neutral-900">
               {formatRupiah(kpi.qrisTotal)}
             </div>
-            <span className="text-[11px] text-neutral-400 font-medium">Rekening outlet</span>
+            <span className="text-[11px] text-neutral-400 font-medium">
+              Rekening outlet
+            </span>
           </div>
         </div>
 
@@ -226,8 +246,12 @@ export function PosOrdersHistoryView({ orders, onVoidOrder }: PosOrdersHistoryVi
           {filteredOrders.length === 0 ? (
             <div className="text-center py-12 p-4 text-neutral-400">
               <FileText className="size-10 mx-auto mb-2 text-neutral-300" />
-              <p className="font-bold text-sm text-neutral-600">Tidak ada pesanan yang sesuai</p>
-              <p className="text-xs text-neutral-400 mt-1">Coba ubah kata kunci pencarian atau filter.</p>
+              <p className="font-bold text-sm text-neutral-600">
+                Tidak ada pesanan yang sesuai
+              </p>
+              <p className="text-xs text-neutral-400 mt-1">
+                Coba ubah kata kunci pencarian atau filter.
+              </p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -266,7 +290,9 @@ export function PosOrdersHistoryView({ orders, onVoidOrder }: PosOrdersHistoryVi
                                 : "bg-amber-100 text-amber-800"
                             }`}
                           >
-                            {order.syncStatus === "SYNCED" ? "Tersinkron" : "Lokal"}
+                            {order.syncStatus === "SYNCED"
+                              ? "Tersinkron"
+                              : "Lokal"}
                           </span>
                         </td>
 
@@ -281,10 +307,16 @@ export function PosOrdersHistoryView({ orders, onVoidOrder }: PosOrdersHistoryVi
                         {/* Items summary */}
                         <td className="py-3 px-4 max-w-xs">
                           <div className="text-neutral-800 font-medium truncate">
-                            {order.items.map((it) => `${it.name} (x${it.quantity})`).join(", ")}
+                            {order.items
+                              .map((it) => `${it.name} (x${it.quantity})`)
+                              .join(", ")}
                           </div>
                           <span className="text-[10px] text-neutral-400">
-                            {order.items.reduce((acc, i) => acc + i.quantity, 0)} porsi total
+                            {order.items.reduce(
+                              (acc, i) => acc + i.quantity,
+                              0,
+                            )}{" "}
+                            porsi total
                           </span>
                         </td>
 
@@ -315,14 +347,17 @@ export function PosOrdersHistoryView({ orders, onVoidOrder }: PosOrdersHistoryVi
                         <td className="py-3 px-4 text-right whitespace-nowrap">
                           <strong
                             className={`font-display font-black text-sm block ${
-                              isVoid ? "line-through text-neutral-400" : "text-brand-green-900"
+                              isVoid
+                                ? "line-through text-neutral-400"
+                                : "text-brand-green-900"
                             }`}
                           >
                             {formatRupiah(order.total)}
                           </strong>
                           {order.discount && order.discount > 0 && (
                             <span className="text-[10px] text-emerald-700 font-bold block">
-                              Hemat: -{formatRupiah(order.discount)} {order.promoCode ? `(${order.promoCode})` : ""}
+                              Hemat: -{formatRupiah(order.discount)}{" "}
+                              {order.promoCode ? `(${order.promoCode})` : ""}
                             </span>
                           )}
                         </td>
@@ -411,10 +446,13 @@ export function PosOrdersHistoryView({ orders, onVoidOrder }: PosOrdersHistoryVi
               <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 space-y-1.5 text-neutral-700">
                 <div className="flex justify-between font-mono font-bold text-neutral-900">
                   <span>{orderToVoid.orderNumber}</span>
-                  <span className="text-brand-coral-600">{formatRupiah(orderToVoid.total)}</span>
+                  <span className="text-brand-coral-600">
+                    {formatRupiah(orderToVoid.total)}
+                  </span>
                 </div>
                 <p className="text-[11px] text-neutral-600">
-                  Pembatalan transaksi akan tercatat dalam audit log dan mengurangi total omzet kasir shift ini.
+                  Pembatalan transaksi akan tercatat dalam audit log dan
+                  mengurangi total omzet kasir shift ini.
                 </p>
               </div>
 

@@ -1,10 +1,19 @@
-import { integer, pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import {
+  integer,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { branches } from "./branches";
 import { user } from "./user";
 
 export const expenses = pgTable("expenses", {
   id: uuid("id").defaultRandom().primaryKey(),
-  branchId: varchar("branch_id", { length: 50 }).references(() => branches.id, { onDelete: "set null" }),
+  branchId: varchar("branch_id", { length: 50 }).references(() => branches.id, {
+    onDelete: "set null",
+  }),
   branchName: varchar("branch_name", { length: 150 }),
   userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
   title: varchar("title", { length: 150 }).notNull(),
@@ -15,5 +24,7 @@ export const expenses = pgTable("expenses", {
   staffName: varchar("staff_name", { length: 100 }).notNull(),
   receiptNumber: varchar("receipt_number", { length: 100 }),
   notes: text("notes"),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
 });

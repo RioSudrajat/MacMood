@@ -18,14 +18,46 @@ import {
 } from "lucide-react";
 
 export const MENU_IMAGE_PRESETS = [
-  { label: "Super Mac (Katsu)", url: "/assets/menu-super-mac-reference.png", category: "mac" },
-  { label: "Potato Mac (Kentang)", url: "/assets/menu-potato-mac-reference.png", category: "mac" },
-  { label: "Classic Mac (Original)", url: "/assets/menu-classic-mac-reference.png", category: "mac" },
-  { label: "Chicken Katsu", url: "/assets/menu-chicken-katsu.png", category: "sides" },
-  { label: "French Fries", url: "/assets/menu-french-fries.png", category: "sides" },
-  { label: "Es Lemon Tea", url: "/assets/menu-es-lemon-tea.png", category: "drinks" },
-  { label: "Es Teh Manis", url: "/assets/menu-es-teh-manis.png", category: "drinks" },
-  { label: "Air Mineral", url: "/assets/menu-air-mineral.png", category: "drinks" },
+  {
+    label: "Super Mac (Katsu)",
+    url: "/assets/menu-super-mac-reference.png",
+    category: "mac",
+  },
+  {
+    label: "Potato Mac (Kentang)",
+    url: "/assets/menu-potato-mac-reference.png",
+    category: "mac",
+  },
+  {
+    label: "Classic Mac (Original)",
+    url: "/assets/menu-classic-mac-reference.png",
+    category: "mac",
+  },
+  {
+    label: "Chicken Katsu",
+    url: "/assets/menu-chicken-katsu.png",
+    category: "sides",
+  },
+  {
+    label: "French Fries",
+    url: "/assets/menu-french-fries.png",
+    category: "sides",
+  },
+  {
+    label: "Es Lemon Tea",
+    url: "/assets/menu-es-lemon-tea.png",
+    category: "drinks",
+  },
+  {
+    label: "Es Teh Manis",
+    url: "/assets/menu-es-teh-manis.png",
+    category: "drinks",
+  },
+  {
+    label: "Air Mineral",
+    url: "/assets/menu-air-mineral.png",
+    category: "drinks",
+  },
 ];
 
 interface AdminProductsViewProps {
@@ -43,12 +75,18 @@ export function AdminProductsView({
 }: AdminProductsViewProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [statusFilter, setStatusFilter] = useState<"all" | "available" | "unavailable">("all");
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "available" | "unavailable"
+  >("all");
 
   // Modal States
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<AdminProduct | null>(null);
-  const [imageInputMode, setImageInputMode] = useState<"preset" | "upload" | "url">("preset");
+  const [editingProduct, setEditingProduct] = useState<AdminProduct | null>(
+    null,
+  );
+  const [imageInputMode, setImageInputMode] = useState<
+    "preset" | "upload" | "url"
+  >("preset");
 
   // Form State for Add / Edit
   const [formData, setFormData] = useState({
@@ -71,7 +109,10 @@ export function AdminProductsView({
     const reader = new FileReader();
     reader.onload = (event) => {
       if (typeof event.target?.result === "string") {
-        setFormData((prev) => ({ ...prev, image: event.target!.result as string }));
+        setFormData((prev) => ({
+          ...prev,
+          image: event.target!.result as string,
+        }));
       }
     };
     reader.readAsDataURL(file);
@@ -165,7 +206,8 @@ export function AdminProductsView({
     const matchSearch =
       p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchCategory = selectedCategory === "all" || p.category === selectedCategory;
+    const matchCategory =
+      selectedCategory === "all" || p.category === selectedCategory;
     const matchStatus =
       statusFilter === "all" ||
       (statusFilter === "available" && p.isAvailable) ||
@@ -180,13 +222,19 @@ export function AdminProductsView({
   const unavailableCount = totalProducts - availableCount;
   const avgMargin =
     products.reduce((acc, p) => {
-      const margin = p.price > 0 ? ((p.price - p.costPrice) / p.price) * 100 : 0;
+      const margin =
+        p.price > 0 ? ((p.price - p.costPrice) / p.price) * 100 : 0;
       return acc + margin;
     }, 0) / (totalProducts || 1);
 
   // Form Margin Calculation
   const formMarginPercent =
-    formData.price > 0 ? (((formData.price - formData.costPrice) / formData.price) * 100).toFixed(1) : "0";
+    formData.price > 0
+      ? (
+          ((formData.price - formData.costPrice) / formData.price) *
+          100
+        ).toFixed(1)
+      : "0";
   const formProfitNominal = Math.max(0, formData.price - formData.costPrice);
 
   return (
@@ -202,7 +250,8 @@ export function AdminProductsView({
             Daftar Menu Outlet
           </h2>
           <p className="text-xs sm:text-sm text-neutral-600 mt-0.5">
-            Kelola varian menu, harga jual, margin HPP, serta status ketersediaan item secara langsung.
+            Kelola varian menu, harga jual, margin HPP, serta status
+            ketersediaan item secara langsung.
           </p>
         </div>
 
@@ -219,15 +268,21 @@ export function AdminProductsView({
       {/* Mini Stats Summary */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         <div className="p-4 rounded-2xl bg-white border border-brand-green-900/10 shadow-2xs">
-          <span className="text-[11px] font-semibold text-neutral-500 block">Total Menu</span>
+          <span className="text-[11px] font-semibold text-neutral-500 block">
+            Total Menu
+          </span>
           <span className="font-display font-black text-2xl text-brand-green-950">
             {totalProducts}
           </span>
-          <span className="text-[10px] text-neutral-400 block mt-0.5">Terdaftar di POS</span>
+          <span className="text-[10px] text-neutral-400 block mt-0.5">
+            Terdaftar di POS
+          </span>
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-brand-green-900/10 shadow-2xs">
-          <span className="text-[11px] font-semibold text-neutral-500 block">Menu Tersedia</span>
+          <span className="text-[11px] font-semibold text-neutral-500 block">
+            Menu Tersedia
+          </span>
           <span className="font-display font-black text-2xl text-emerald-700">
             {availableCount}
           </span>
@@ -237,7 +292,9 @@ export function AdminProductsView({
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-brand-green-900/10 shadow-2xs">
-          <span className="text-[11px] font-semibold text-neutral-500 block">Menu Habis</span>
+          <span className="text-[11px] font-semibold text-neutral-500 block">
+            Menu Habis
+          </span>
           <span className="font-display font-black text-2xl text-neutral-500">
             {unavailableCount}
           </span>
@@ -247,7 +304,9 @@ export function AdminProductsView({
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-brand-green-900/10 shadow-2xs">
-          <span className="text-[11px] font-semibold text-neutral-500 block">Rata-rata Margin</span>
+          <span className="text-[11px] font-semibold text-neutral-500 block">
+            Rata-rata Margin
+          </span>
           <span className="font-display font-black text-2xl text-brand-green-900">
             {avgMargin.toFixed(1)}%
           </span>
@@ -299,7 +358,11 @@ export function AdminProductsView({
           {/* Status Dropdown/Selector */}
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as "all" | "available" | "unavailable")}
+            onChange={(e) =>
+              setStatusFilter(
+                e.target.value as "all" | "available" | "unavailable",
+              )
+            }
             className="h-9 px-3 rounded-xl border border-neutral-200 text-xs bg-white font-medium text-neutral-700 focus:outline-none focus:border-brand-green-800 cursor-pointer"
           >
             <option value="all">Semua Status</option>
@@ -328,7 +391,12 @@ export function AdminProductsView({
             <tbody className="divide-y divide-neutral-100 font-sans">
               {filteredProducts.map((prod) => {
                 const marginPercent =
-                  prod.price > 0 ? (((prod.price - prod.costPrice) / prod.price) * 100).toFixed(1) : "0";
+                  prod.price > 0
+                    ? (
+                        ((prod.price - prod.costPrice) / prod.price) *
+                        100
+                      ).toFixed(1)
+                    : "0";
                 const profitNominal = prod.price - prod.costPrice;
 
                 return (
@@ -401,7 +469,9 @@ export function AdminProductsView({
                           <span>{prod.currentStock} porsi</span>
                         </span>
                       ) : (
-                        <span className="text-[11px] text-neutral-400 italic">Tanpa Kuota</span>
+                        <span className="text-[11px] text-neutral-400 italic">
+                          Tanpa Kuota
+                        </span>
                       )}
                     </td>
 
@@ -453,7 +523,9 @@ export function AdminProductsView({
       <div className="grid grid-cols-1 gap-3 md:hidden">
         {filteredProducts.map((prod) => {
           const marginPercent =
-            prod.price > 0 ? (((prod.price - prod.costPrice) / prod.price) * 100).toFixed(1) : "0";
+            prod.price > 0
+              ? (((prod.price - prod.costPrice) / prod.price) * 100).toFixed(1)
+              : "0";
 
           return (
             <div
@@ -490,13 +562,17 @@ export function AdminProductsView({
                   <h4 className="font-display font-extrabold text-sm text-neutral-900 truncate">
                     {prod.name}
                   </h4>
-                  <p className="text-[11px] text-neutral-500 line-clamp-1">{prod.description}</p>
+                  <p className="text-[11px] text-neutral-500 line-clamp-1">
+                    {prod.description}
+                  </p>
                 </div>
               </div>
 
               <div className="grid grid-cols-3 gap-2 pt-2 border-t border-neutral-100 text-center">
                 <div className="bg-neutral-50 p-1.5 rounded-lg">
-                  <span className="text-[9px] text-neutral-500 block">Harga</span>
+                  <span className="text-[9px] text-neutral-500 block">
+                    Harga
+                  </span>
                   <strong className="font-display font-bold text-xs text-brand-green-950">
                     {formatRupiah(prod.price)}
                   </strong>
@@ -508,8 +584,12 @@ export function AdminProductsView({
                   </span>
                 </div>
                 <div className="bg-emerald-50 p-1.5 rounded-lg">
-                  <span className="text-[9px] text-emerald-800 block font-semibold">Margin</span>
-                  <span className="font-bold text-xs text-emerald-700">+{marginPercent}%</span>
+                  <span className="text-[9px] text-emerald-800 block font-semibold">
+                    Margin
+                  </span>
+                  <span className="font-bold text-xs text-emerald-700">
+                    +{marginPercent}%
+                  </span>
                 </div>
               </div>
 
@@ -526,7 +606,9 @@ export function AdminProductsView({
                       Stok: <strong>{prod.currentStock} porsi</strong>
                     </span>
                   ) : (
-                    <span className="text-neutral-400 italic">Tanpa lacak kuota</span>
+                    <span className="text-neutral-400 italic">
+                      Tanpa lacak kuota
+                    </span>
                   )}
                 </div>
 
@@ -552,7 +634,11 @@ export function AdminProductsView({
             <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
               <div className="flex items-center gap-2">
                 <div className="size-8 rounded-xl bg-brand-green-900 text-brand-yellow-400 flex items-center justify-center font-display font-black text-xs">
-                  {editingProduct ? <Edit2 className="size-4" /> : <Plus className="size-4" />}
+                  {editingProduct ? (
+                    <Edit2 className="size-4" />
+                  ) : (
+                    <Plus className="size-4" />
+                  )}
                 </div>
                 <h3 className="font-display font-extrabold text-base text-brand-green-950">
                   {editingProduct ? "Edit Informasi Menu" : "Tambah Menu Baru"}
@@ -581,7 +667,9 @@ export function AdminProductsView({
                   type="text"
                   required
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                   placeholder="Misal: Spicy Truffle Mac"
                   className="w-full h-10 px-3 rounded-xl border border-neutral-200 text-xs focus:outline-none focus:border-brand-green-800"
                 />
@@ -678,7 +766,9 @@ export function AdminProductsView({
                       <div>
                         <select
                           value={formData.image}
-                          onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                          onChange={(e) =>
+                            setFormData({ ...formData, image: e.target.value })
+                          }
                           className="w-full h-9 px-2.5 rounded-xl border border-neutral-200 text-xs bg-white focus:outline-none focus:border-brand-green-800"
                         >
                           {MENU_IMAGE_PRESETS.map((preset) => (
@@ -718,7 +808,12 @@ export function AdminProductsView({
                           <input
                             type="url"
                             value={formData.image}
-                            onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                image: e.target.value,
+                              })
+                            }
                             placeholder="https://..."
                             className="w-full h-9 pl-8 pr-2.5 rounded-xl border border-neutral-200 text-xs bg-white focus:outline-none focus:border-brand-green-800 font-mono"
                           />
@@ -744,14 +839,20 @@ export function AdminProductsView({
                     step="500"
                     required
                     value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        price: Number(e.target.value),
+                      })
+                    }
                     className="w-full h-10 px-3 rounded-xl border border-neutral-200 text-xs font-mono font-bold focus:outline-none focus:border-brand-green-800"
                   />
                 </div>
 
                 <div>
                   <label className="text-xs font-bold text-neutral-700 block mb-1">
-                    HPP / Modal Bahan (Rp) <span className="text-red-500">*</span>
+                    HPP / Modal Bahan (Rp){" "}
+                    <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="number"
@@ -759,7 +860,12 @@ export function AdminProductsView({
                     step="500"
                     required
                     value={formData.costPrice}
-                    onChange={(e) => setFormData({ ...formData, costPrice: Number(e.target.value) })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        costPrice: Number(e.target.value),
+                      })
+                    }
                     className="w-full h-10 px-3 rounded-xl border border-neutral-200 text-xs font-mono font-bold focus:outline-none focus:border-brand-green-800"
                   />
                 </div>
@@ -768,13 +874,17 @@ export function AdminProductsView({
               {/* Live Margin Calculation Card */}
               <div className="p-3 rounded-xl bg-brand-cream-50 border border-brand-green-900/10 flex items-center justify-between text-xs">
                 <div>
-                  <span className="text-neutral-500 block text-[11px]">Proyeksi Laba Kotor:</span>
+                  <span className="text-neutral-500 block text-[11px]">
+                    Proyeksi Laba Kotor:
+                  </span>
                   <strong className="text-brand-green-950 font-bold">
                     {formatRupiah(formProfitNominal)} / porsi
                   </strong>
                 </div>
                 <div className="text-right">
-                  <span className="text-neutral-500 block text-[11px]">Estimasi Margin:</span>
+                  <span className="text-neutral-500 block text-[11px]">
+                    Estimasi Margin:
+                  </span>
                   <span className="inline-flex items-center gap-1 font-bold text-emerald-700 font-mono">
                     <Percent className="size-3" />
                     {formMarginPercent}%
@@ -790,7 +900,9 @@ export function AdminProductsView({
                 <textarea
                   rows={2}
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
                   placeholder="Deskripsi singkat keunikan rasa, saus, dan porsi..."
                   className="w-full p-3 rounded-xl border border-neutral-200 text-xs focus:outline-none focus:border-brand-green-800 resize-none"
                 />
@@ -810,7 +922,9 @@ export function AdminProductsView({
                   <input
                     type="checkbox"
                     checked={formData.trackStock}
-                    onChange={(e) => setFormData({ ...formData, trackStock: e.target.checked })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, trackStock: e.target.checked })
+                    }
                     className="size-4 accent-brand-green-900 rounded cursor-pointer"
                   />
                 </div>
@@ -826,7 +940,10 @@ export function AdminProductsView({
                         min="0"
                         value={formData.currentStock}
                         onChange={(e) =>
-                          setFormData({ ...formData, currentStock: Number(e.target.value) })
+                          setFormData({
+                            ...formData,
+                            currentStock: Number(e.target.value),
+                          })
                         }
                         className="w-full h-8 px-2 rounded-lg border border-neutral-200 text-xs font-mono"
                       />
@@ -840,7 +957,10 @@ export function AdminProductsView({
                         min="1"
                         value={formData.lowStockThreshold}
                         onChange={(e) =>
-                          setFormData({ ...formData, lowStockThreshold: Number(e.target.value) })
+                          setFormData({
+                            ...formData,
+                            lowStockThreshold: Number(e.target.value),
+                          })
                         }
                         className="w-full h-8 px-2 rounded-lg border border-neutral-200 text-xs font-mono"
                       />
@@ -851,10 +971,17 @@ export function AdminProductsView({
 
               {/* Availability Switch */}
               <div className="flex items-center justify-between p-3 rounded-xl border border-neutral-200">
-                <span className="text-xs font-bold text-neutral-700">Status Menu di POS</span>
+                <span className="text-xs font-bold text-neutral-700">
+                  Status Menu di POS
+                </span>
                 <button
                   type="button"
-                  onClick={() => setFormData({ ...formData, isAvailable: !formData.isAvailable })}
+                  onClick={() =>
+                    setFormData({
+                      ...formData,
+                      isAvailable: !formData.isAvailable,
+                    })
+                  }
                   className={`px-3 py-1 rounded-full text-xs font-bold transition-colors cursor-pointer ${
                     formData.isAvailable
                       ? "bg-emerald-100 text-emerald-800"

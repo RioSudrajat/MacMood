@@ -16,13 +16,17 @@ import { sql } from "drizzle-orm";
 
 export async function ensureSeededData() {
   // Check if categories or products already seeded
-  const existingProducts = await db.select({ count: sql<number>`count(*)::int` }).from(products);
+  const existingProducts = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(products);
   if (!existingProducts[0]?.count || existingProducts[0].count === 0) {
     await seedMasterCatalog();
   }
 
   // Check if branches already seeded
-  const existingBranches = await db.select({ count: sql<number>`count(*)::int` }).from(branches);
+  const existingBranches = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(branches);
   if (!existingBranches[0]?.count || existingBranches[0].count === 0) {
     await reseedAllTransactionalData();
   }
@@ -48,16 +52,106 @@ export async function seedMasterCatalog() {
   await db
     .insert(rawMaterials)
     .values([
-      { sku: "RM-MAC-01", name: "Makaroni Elbow Kering", category: "STAPLE", unit: "kg", currentStock: "25.0", minStock: "5.0", costPerUnit: 22000, supplierName: "CV Pangan Makmur" },
-      { sku: "RM-CHS-01", name: "Keju Cheddar Olahan", category: "DAIRY", unit: "kg", currentStock: "12.0", minStock: "3.0", costPerUnit: 68000, supplierName: "PT Sumber Dairy Sejahtera" },
-      { sku: "RM-CHS-02", name: "Keju Mozzarella Grated", category: "DAIRY", unit: "kg", currentStock: "7.0", minStock: "2.0", costPerUnit: 95000, supplierName: "PT Sumber Dairy Sejahtera" },
-      { sku: "RM-CRM-01", name: "Cooking Cream Cair", category: "DAIRY", unit: "ml", currentStock: "10000.0", minStock: "2000.0", costPerUnit: 48, supplierName: "PT Fonterra Dairy" },
-      { sku: "RM-CKN-01", name: "Dada Ayam Fillet Boneless", category: "MEAT", unit: "kg", currentStock: "15.0", minStock: "4.0", costPerUnit: 52000, supplierName: "Rumah Potong Unggas Berkah" },
-      { sku: "RM-POT-01", name: "Kentang Fries Shoestring", category: "STAPLE", unit: "kg", currentStock: "18.0", minStock: "4.0", costPerUnit: 32000, supplierName: "CV Frozen Food Prima" },
-      { sku: "RM-TEA-01", name: "Daun Teh Hitam Melati", category: "BEVERAGE", unit: "g", currentStock: "2000.0", minStock: "500.0", costPerUnit: 35, supplierName: "Kebun Teh Puncak Sari" },
-      { sku: "RM-LMN-01", name: "Sari Buah Lemon Murni", category: "BEVERAGE", unit: "ml", currentStock: "3000.0", minStock: "1000.0", costPerUnit: 45, supplierName: "Petani Lemon Lembang" },
-      { sku: "RM-BOX-01", name: "Paper Box MacMood 500ml", category: "PACKAGING", unit: "pcs", currentStock: "350.0", minStock: "100.0", costPerUnit: 850, supplierName: "Percetakan Karton Indah" },
-      { sku: "RM-UTN-01", name: "Sendok Garpu Kayu Steril", category: "PACKAGING", unit: "pcs", currentStock: "420.0", minStock: "100.0", costPerUnit: 250, supplierName: "Eco Packaging Nusantara" },
+      {
+        sku: "RM-MAC-01",
+        name: "Makaroni Elbow Kering",
+        category: "STAPLE",
+        unit: "kg",
+        currentStock: "25.0",
+        minStock: "5.0",
+        costPerUnit: 22000,
+        supplierName: "CV Pangan Makmur",
+      },
+      {
+        sku: "RM-CHS-01",
+        name: "Keju Cheddar Olahan",
+        category: "DAIRY",
+        unit: "kg",
+        currentStock: "12.0",
+        minStock: "3.0",
+        costPerUnit: 68000,
+        supplierName: "PT Sumber Dairy Sejahtera",
+      },
+      {
+        sku: "RM-CHS-02",
+        name: "Keju Mozzarella Grated",
+        category: "DAIRY",
+        unit: "kg",
+        currentStock: "7.0",
+        minStock: "2.0",
+        costPerUnit: 95000,
+        supplierName: "PT Sumber Dairy Sejahtera",
+      },
+      {
+        sku: "RM-CRM-01",
+        name: "Cooking Cream Cair",
+        category: "DAIRY",
+        unit: "ml",
+        currentStock: "10000.0",
+        minStock: "2000.0",
+        costPerUnit: 48,
+        supplierName: "PT Fonterra Dairy",
+      },
+      {
+        sku: "RM-CKN-01",
+        name: "Dada Ayam Fillet Boneless",
+        category: "MEAT",
+        unit: "kg",
+        currentStock: "15.0",
+        minStock: "4.0",
+        costPerUnit: 52000,
+        supplierName: "Rumah Potong Unggas Berkah",
+      },
+      {
+        sku: "RM-POT-01",
+        name: "Kentang Fries Shoestring",
+        category: "STAPLE",
+        unit: "kg",
+        currentStock: "18.0",
+        minStock: "4.0",
+        costPerUnit: 32000,
+        supplierName: "CV Frozen Food Prima",
+      },
+      {
+        sku: "RM-TEA-01",
+        name: "Daun Teh Hitam Melati",
+        category: "BEVERAGE",
+        unit: "g",
+        currentStock: "2000.0",
+        minStock: "500.0",
+        costPerUnit: 35,
+        supplierName: "Kebun Teh Puncak Sari",
+      },
+      {
+        sku: "RM-LMN-01",
+        name: "Sari Buah Lemon Murni",
+        category: "BEVERAGE",
+        unit: "ml",
+        currentStock: "3000.0",
+        minStock: "1000.0",
+        costPerUnit: 45,
+        supplierName: "Petani Lemon Lembang",
+      },
+      {
+        sku: "RM-BOX-01",
+        name: "Paper Box MacMood 500ml",
+        category: "PACKAGING",
+        unit: "pcs",
+        currentStock: "350.0",
+        minStock: "100.0",
+        costPerUnit: 850,
+        supplierName: "Percetakan Karton Indah",
+      },
+      {
+        sku: "RM-UTN-01",
+        name: "Sendok Garpu Kayu Steril",
+        category: "PACKAGING",
+        unit: "pcs",
+        currentStock: "420.0",
+        minStock: "100.0",
+        costPerUnit: 250,
+        supplierName: "Eco Packaging Nusantara",
+      },
     ])
     .onConflictDoNothing();
 
@@ -65,7 +159,7 @@ export async function seedMasterCatalog() {
   const getRm = (sku: string) => allRawMaterials.find((r) => r.sku === sku)?.id;
 
   // 3. Seed Products
-  const productRows = await db
+  await db
     .insert(products)
     .values([
       {
@@ -98,7 +192,8 @@ export async function seedMasterCatalog() {
         name: "Classic Mac",
         categoryId: macCat?.id,
         categorySlug: "mac",
-        description: "Comfort food klasik makaroni dengan lelehan saus keju lembut.",
+        description:
+          "Comfort food klasik makaroni dengan lelehan saus keju lembut.",
         price: 10000,
         costPrice: 4800,
         imageUrl: "/assets/menu-classic-mac-reference.png",
@@ -110,7 +205,8 @@ export async function seedMasterCatalog() {
         name: "Spicy Smokey Mac",
         categoryId: macCat?.id,
         categorySlug: "mac",
-        description: "Makaroni saus keju dengan aroma smoky dan sensasi pedas mantap.",
+        description:
+          "Makaroni saus keju dengan aroma smoky dan sensasi pedas mantap.",
         price: 18000,
         costPrice: 8600,
         imageUrl: "/assets/menu-super-mac-reference.png",
@@ -123,7 +219,8 @@ export async function seedMasterCatalog() {
         name: "Chicken Katsu Ala Carte",
         categoryId: sidesCat?.id,
         categorySlug: "sides",
-        description: "Fillet dada ayam krispi berbalut tepung roti renyah keemasan.",
+        description:
+          "Fillet dada ayam krispi berbalut tepung roti renyah keemasan.",
         price: 12000,
         costPrice: 5800,
         imageUrl: "/assets/menu-chicken-katsu.png",
@@ -199,13 +296,55 @@ export async function seedMasterCatalog() {
     const rmPot = getRm("RM-POT-01");
     const rmBox = getRm("RM-BOX-01");
 
-    if (rmMak) recipeList.push({ productId: superMac.id, rawMaterialId: rmMak, amount: "80.0", unit: "g" });
-    if (rmChd) recipeList.push({ productId: superMac.id, rawMaterialId: rmChd, amount: "35.0", unit: "g" });
-    if (rmMoz) recipeList.push({ productId: superMac.id, rawMaterialId: rmMoz, amount: "25.0", unit: "g" });
-    if (rmCrm) recipeList.push({ productId: superMac.id, rawMaterialId: rmCrm, amount: "40.0", unit: "ml" });
-    if (rmCkn) recipeList.push({ productId: superMac.id, rawMaterialId: rmCkn, amount: "60.0", unit: "g" });
-    if (rmPot) recipeList.push({ productId: superMac.id, rawMaterialId: rmPot, amount: "40.0", unit: "g" });
-    if (rmBox) recipeList.push({ productId: superMac.id, rawMaterialId: rmBox, amount: "1.0", unit: "pcs" });
+    if (rmMak)
+      recipeList.push({
+        productId: superMac.id,
+        rawMaterialId: rmMak,
+        amount: "80.0",
+        unit: "g",
+      });
+    if (rmChd)
+      recipeList.push({
+        productId: superMac.id,
+        rawMaterialId: rmChd,
+        amount: "35.0",
+        unit: "g",
+      });
+    if (rmMoz)
+      recipeList.push({
+        productId: superMac.id,
+        rawMaterialId: rmMoz,
+        amount: "25.0",
+        unit: "g",
+      });
+    if (rmCrm)
+      recipeList.push({
+        productId: superMac.id,
+        rawMaterialId: rmCrm,
+        amount: "40.0",
+        unit: "ml",
+      });
+    if (rmCkn)
+      recipeList.push({
+        productId: superMac.id,
+        rawMaterialId: rmCkn,
+        amount: "60.0",
+        unit: "g",
+      });
+    if (rmPot)
+      recipeList.push({
+        productId: superMac.id,
+        rawMaterialId: rmPot,
+        amount: "40.0",
+        unit: "g",
+      });
+    if (rmBox)
+      recipeList.push({
+        productId: superMac.id,
+        rawMaterialId: rmBox,
+        amount: "1.0",
+        unit: "pcs",
+      });
   }
 
   if (potatoMac) {
@@ -214,10 +353,34 @@ export async function seedMasterCatalog() {
     const rmPot = getRm("RM-POT-01");
     const rmBox = getRm("RM-BOX-01");
 
-    if (rmMak) recipeList.push({ productId: potatoMac.id, rawMaterialId: rmMak, amount: "80.0", unit: "g" });
-    if (rmChd) recipeList.push({ productId: potatoMac.id, rawMaterialId: rmChd, amount: "35.0", unit: "g" });
-    if (rmPot) recipeList.push({ productId: potatoMac.id, rawMaterialId: rmPot, amount: "60.0", unit: "g" });
-    if (rmBox) recipeList.push({ productId: potatoMac.id, rawMaterialId: rmBox, amount: "1.0", unit: "pcs" });
+    if (rmMak)
+      recipeList.push({
+        productId: potatoMac.id,
+        rawMaterialId: rmMak,
+        amount: "80.0",
+        unit: "g",
+      });
+    if (rmChd)
+      recipeList.push({
+        productId: potatoMac.id,
+        rawMaterialId: rmChd,
+        amount: "35.0",
+        unit: "g",
+      });
+    if (rmPot)
+      recipeList.push({
+        productId: potatoMac.id,
+        rawMaterialId: rmPot,
+        amount: "60.0",
+        unit: "g",
+      });
+    if (rmBox)
+      recipeList.push({
+        productId: potatoMac.id,
+        rawMaterialId: rmBox,
+        amount: "1.0",
+        unit: "pcs",
+      });
   }
 
   if (classicMac) {
@@ -225,9 +388,27 @@ export async function seedMasterCatalog() {
     const rmChd = getRm("RM-CHS-01");
     const rmBox = getRm("RM-BOX-01");
 
-    if (rmMak) recipeList.push({ productId: classicMac.id, rawMaterialId: rmMak, amount: "80.0", unit: "g" });
-    if (rmChd) recipeList.push({ productId: classicMac.id, rawMaterialId: rmChd, amount: "45.0", unit: "g" });
-    if (rmBox) recipeList.push({ productId: classicMac.id, rawMaterialId: rmBox, amount: "1.0", unit: "pcs" });
+    if (rmMak)
+      recipeList.push({
+        productId: classicMac.id,
+        rawMaterialId: rmMak,
+        amount: "80.0",
+        unit: "g",
+      });
+    if (rmChd)
+      recipeList.push({
+        productId: classicMac.id,
+        rawMaterialId: rmChd,
+        amount: "45.0",
+        unit: "g",
+      });
+    if (rmBox)
+      recipeList.push({
+        productId: classicMac.id,
+        rawMaterialId: rmBox,
+        amount: "1.0",
+        unit: "pcs",
+      });
   }
 
   if (recipeList.length > 0) {
@@ -241,7 +422,8 @@ export async function seedMasterCatalog() {
       {
         code: "MACMOOD10",
         name: "Promo Opening Mac & Cheese 10%",
-        description: "Diskon 10% s.d Rp 10.000 untuk minimal belanja Rp 30.000.",
+        description:
+          "Diskon 10% s.d Rp 10.000 untuk minimal belanja Rp 30.000.",
         discountType: "PERCENTAGE",
         discountValue: 10,
         maxDiscount: 10000,
@@ -439,8 +621,19 @@ export async function reseedAllTransactionalData() {
       syncStatus: "SYNCED",
       createdAt: new Date("2026-09-26T08:30:00+07:00"),
       items: [
-        { productName: "Super Mac", quantity: 2, price: 20000, subtotal: 40000, notes: "Extra saus keju" },
-        { productName: "Es Lemon Tea", quantity: 2, price: 6000, subtotal: 12000 },
+        {
+          productName: "Super Mac",
+          quantity: 2,
+          price: 20000,
+          subtotal: 40000,
+          notes: "Extra saus keju",
+        },
+        {
+          productName: "Es Lemon Tea",
+          quantity: 2,
+          price: 6000,
+          subtotal: 12000,
+        },
       ],
     },
     {
@@ -462,9 +655,24 @@ export async function reseedAllTransactionalData() {
       syncStatus: "SYNCED",
       createdAt: new Date("2026-09-26T09:15:00+07:00"),
       items: [
-        { productName: "Potato Mac", quantity: 1, price: 15000, subtotal: 15000 },
-        { productName: "Crispy French Fries", quantity: 1, price: 8000, subtotal: 8000 },
-        { productName: "Es Teh Manis", quantity: 1, price: 4000, subtotal: 4000 },
+        {
+          productName: "Potato Mac",
+          quantity: 1,
+          price: 15000,
+          subtotal: 15000,
+        },
+        {
+          productName: "Crispy French Fries",
+          quantity: 1,
+          price: 8000,
+          subtotal: 8000,
+        },
+        {
+          productName: "Es Teh Manis",
+          quantity: 1,
+          price: 4000,
+          subtotal: 4000,
+        },
       ],
     },
     {
@@ -486,9 +694,25 @@ export async function reseedAllTransactionalData() {
       syncStatus: "SYNCED",
       createdAt: new Date("2026-09-26T10:20:00+07:00"),
       items: [
-        { productName: "Spicy Smokey Mac", quantity: 1, price: 18000, subtotal: 18000, notes: "Pedas mantap" },
-        { productName: "Chicken Katsu Ala Carte", quantity: 1, price: 12000, subtotal: 12000 },
-        { productName: "Es Lemon Tea", quantity: 1, price: 6000, subtotal: 6000 },
+        {
+          productName: "Spicy Smokey Mac",
+          quantity: 1,
+          price: 18000,
+          subtotal: 18000,
+          notes: "Pedas mantap",
+        },
+        {
+          productName: "Chicken Katsu Ala Carte",
+          quantity: 1,
+          price: 12000,
+          subtotal: 12000,
+        },
+        {
+          productName: "Es Lemon Tea",
+          quantity: 1,
+          price: 6000,
+          subtotal: 6000,
+        },
       ],
     },
     {
@@ -510,8 +734,18 @@ export async function reseedAllTransactionalData() {
       syncStatus: "SYNCED",
       createdAt: new Date("2026-09-26T11:45:00+07:00"),
       items: [
-        { productName: "Classic Mac", quantity: 2, price: 10000, subtotal: 20000 },
-        { productName: "Es Teh Manis", quantity: 2, price: 4000, subtotal: 8000 },
+        {
+          productName: "Classic Mac",
+          quantity: 2,
+          price: 10000,
+          subtotal: 20000,
+        },
+        {
+          productName: "Es Teh Manis",
+          quantity: 2,
+          price: 4000,
+          subtotal: 8000,
+        },
       ],
     },
     {
@@ -535,9 +769,24 @@ export async function reseedAllTransactionalData() {
       syncStatus: "SYNCED",
       createdAt: new Date("2026-09-26T12:30:00+07:00"),
       items: [
-        { productName: "Super Mac", quantity: 2, price: 20000, subtotal: 40000 },
-        { productName: "Crispy French Fries", quantity: 1, price: 8000, subtotal: 8000 },
-        { productName: "Es Lemon Tea", quantity: 2, price: 6000, subtotal: 12000 },
+        {
+          productName: "Super Mac",
+          quantity: 2,
+          price: 20000,
+          subtotal: 40000,
+        },
+        {
+          productName: "Crispy French Fries",
+          quantity: 1,
+          price: 8000,
+          subtotal: 8000,
+        },
+        {
+          productName: "Es Lemon Tea",
+          quantity: 2,
+          price: 6000,
+          subtotal: 12000,
+        },
       ],
     },
 
@@ -561,8 +810,18 @@ export async function reseedAllTransactionalData() {
       syncStatus: "SYNCED",
       createdAt: new Date("2026-09-26T09:40:00+07:00"),
       items: [
-        { productName: "Potato Mac", quantity: 2, price: 15000, subtotal: 30000 },
-        { productName: "Es Teh Manis", quantity: 2, price: 4000, subtotal: 8000 },
+        {
+          productName: "Potato Mac",
+          quantity: 2,
+          price: 15000,
+          subtotal: 30000,
+        },
+        {
+          productName: "Es Teh Manis",
+          quantity: 2,
+          price: 4000,
+          subtotal: 8000,
+        },
       ],
     },
     {
@@ -584,9 +843,24 @@ export async function reseedAllTransactionalData() {
       syncStatus: "SYNCED",
       createdAt: new Date("2026-09-26T10:50:00+07:00"),
       items: [
-        { productName: "Super Mac", quantity: 1, price: 20000, subtotal: 20000 },
-        { productName: "Chicken Katsu Ala Carte", quantity: 1, price: 12000, subtotal: 12000 },
-        { productName: "Air Mineral Botol", quantity: 1, price: 3000, subtotal: 3000 },
+        {
+          productName: "Super Mac",
+          quantity: 1,
+          price: 20000,
+          subtotal: 20000,
+        },
+        {
+          productName: "Chicken Katsu Ala Carte",
+          quantity: 1,
+          price: 12000,
+          subtotal: 12000,
+        },
+        {
+          productName: "Air Mineral Botol",
+          quantity: 1,
+          price: 3000,
+          subtotal: 3000,
+        },
       ],
     },
     {
@@ -608,9 +882,24 @@ export async function reseedAllTransactionalData() {
       syncStatus: "SYNCED",
       createdAt: new Date("2026-09-26T12:15:00+07:00"),
       items: [
-        { productName: "Spicy Smokey Mac", quantity: 2, price: 18000, subtotal: 36000 },
-        { productName: "Crispy French Fries", quantity: 1, price: 8000, subtotal: 8000 },
-        { productName: "Es Teh Manis", quantity: 2, price: 4000, subtotal: 8000 },
+        {
+          productName: "Spicy Smokey Mac",
+          quantity: 2,
+          price: 18000,
+          subtotal: 36000,
+        },
+        {
+          productName: "Crispy French Fries",
+          quantity: 1,
+          price: 8000,
+          subtotal: 8000,
+        },
+        {
+          productName: "Es Teh Manis",
+          quantity: 2,
+          price: 4000,
+          subtotal: 8000,
+        },
       ],
     },
 
@@ -634,8 +923,18 @@ export async function reseedAllTransactionalData() {
       syncStatus: "SYNCED",
       createdAt: new Date("2026-09-26T10:10:00+07:00"),
       items: [
-        { productName: "Classic Mac", quantity: 3, price: 10000, subtotal: 30000 },
-        { productName: "Es Teh Manis", quantity: 3, price: 4000, subtotal: 12000 },
+        {
+          productName: "Classic Mac",
+          quantity: 3,
+          price: 10000,
+          subtotal: 30000,
+        },
+        {
+          productName: "Es Teh Manis",
+          quantity: 3,
+          price: 4000,
+          subtotal: 12000,
+        },
       ],
     },
     {
@@ -657,9 +956,24 @@ export async function reseedAllTransactionalData() {
       syncStatus: "SYNCED",
       createdAt: new Date("2026-09-26T11:25:00+07:00"),
       items: [
-        { productName: "Super Mac", quantity: 2, price: 20000, subtotal: 40000 },
-        { productName: "Crispy French Fries", quantity: 1, price: 8000, subtotal: 8000 },
-        { productName: "Es Lemon Tea", quantity: 2, price: 6000, subtotal: 12000 },
+        {
+          productName: "Super Mac",
+          quantity: 2,
+          price: 20000,
+          subtotal: 40000,
+        },
+        {
+          productName: "Crispy French Fries",
+          quantity: 1,
+          price: 8000,
+          subtotal: 8000,
+        },
+        {
+          productName: "Es Lemon Tea",
+          quantity: 2,
+          price: 6000,
+          subtotal: 12000,
+        },
       ],
     },
   ];
@@ -697,7 +1011,8 @@ export async function reseedAllTransactionalData() {
       paymentSource: "CASH_DRAWER",
       staffName: "Kasir Fatmawati",
       receiptNumber: "NOTA-ES-882",
-      notes: "Kebutuhan es batu mendesak untuk es teh & lemon tea cabang Fatmawati.",
+      notes:
+        "Kebutuhan es batu mendesak untuk es teh & lemon tea cabang Fatmawati.",
       createdAt: new Date("2026-09-26T09:30:00+07:00"),
     },
     {

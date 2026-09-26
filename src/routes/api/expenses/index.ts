@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { readJson, withApiSession } from "@/lib/api.server";
-import { createExpense, listExpenses } from "@/services/expenses.service.server";
+import {
+  createExpense,
+  listExpenses,
+} from "@/services/expenses.service.server";
 import { createExpenseSchema } from "@/validators/expenses";
 
 export const Route = createFileRoute("/api/expenses/")({

@@ -29,7 +29,8 @@ export const INITIAL_NOTIFICATIONS: NotificationItem[] = [
     id: "notif-1",
     category: "order",
     title: "Pesanan Baru Masuk & Lunas",
-    description: "Nota MAC-20260924-1005 senilai Rp 30.800 (Tunai) berhasil diproses kasir Budi Santoso.",
+    description:
+      "Nota MAC-20260924-1005 senilai Rp 30.800 (Tunai) berhasil diproses kasir Budi Santoso.",
     timestamp: "5 menit yang lalu · 09:20 WIB",
     isRead: false,
     priority: "NORMAL",
@@ -40,7 +41,8 @@ export const INITIAL_NOTIFICATIONS: NotificationItem[] = [
     id: "notif-2",
     category: "stock",
     title: "Peringatan Stok Porsi Kritis",
-    description: "Stok Spicy Smokey Mac tersisa 14 porsi, berada di bawah batas minimum (20 porsi). Harap lakukan restock.",
+    description:
+      "Stok Spicy Smokey Mac tersisa 14 porsi, berada di bawah batas minimum (20 porsi). Harap lakukan restock.",
     timestamp: "18 menit yang lalu · 09:07 WIB",
     isRead: false,
     priority: "HIGH",
@@ -51,7 +53,8 @@ export const INITIAL_NOTIFICATIONS: NotificationItem[] = [
     id: "notif-3",
     category: "shift",
     title: "Shift Pagi Kasir Dibuka",
-    description: "Kasir Budi Santoso telah membuka shift baru dengan modal uang laci (cash float) Rp 300.000.",
+    description:
+      "Kasir Budi Santoso telah membuka shift baru dengan modal uang laci (cash float) Rp 300.000.",
     timestamp: "1 jam yang lalu · 08:00 WIB",
     isRead: true,
     priority: "NORMAL",
@@ -62,7 +65,8 @@ export const INITIAL_NOTIFICATIONS: NotificationItem[] = [
     id: "notif-4",
     category: "system",
     title: "Sinkronisasi Offline Selesai",
-    description: "Seluruh antrean nota offline lokal telah berhasil disinkronkan ke server cloud.",
+    description:
+      "Seluruh antrean nota offline lokal telah berhasil disinkronkan ke server cloud.",
     timestamp: "2 jam yang lalu · 07:15 WIB",
     isRead: true,
     priority: "NORMAL",
@@ -73,7 +77,8 @@ export const INITIAL_NOTIFICATIONS: NotificationItem[] = [
     id: "notif-5",
     category: "stock",
     title: "Restock Bahan Masuk Dapur",
-    description: "Owner Ahmad Fauzi mencatat penambahan 50 porsi Super Mac dari kiriman dapur pusat.",
+    description:
+      "Owner Ahmad Fauzi mencatat penambahan 50 porsi Super Mac dari kiriman dapur pusat.",
     timestamp: "3 jam yang lalu · 06:30 WIB",
     isRead: true,
     priority: "MEDIUM",
@@ -94,9 +99,11 @@ export function NotificationsView({
   onClose,
 }: NotificationsViewProps) {
   const [notifications, setNotifications] = useState<NotificationItem[]>(
-    initialPropsNotifs || INITIAL_NOTIFICATIONS
+    initialPropsNotifs || INITIAL_NOTIFICATIONS,
   );
-  const [categoryFilter, setCategoryFilter] = useState<"all" | "order" | "stock" | "shift" | "system">("all");
+  const [categoryFilter, setCategoryFilter] = useState<
+    "all" | "order" | "stock" | "shift" | "system"
+  >("all");
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
@@ -110,7 +117,7 @@ export function NotificationsView({
 
   const toggleRead = (id: string) => {
     setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, isRead: !n.isRead } : n))
+      prev.map((n) => (n.id === id ? { ...n, isRead: !n.isRead } : n)),
     );
   };
 
@@ -132,7 +139,8 @@ export function NotificationsView({
             Pemberitahuan Outlet
           </h2>
           <p className="text-xs sm:text-sm text-neutral-600 mt-0.5">
-            Dapatkan informasi terkini mengenai pesanan baru, batas stok menipis, pergantian shift, dan status sistem.
+            Dapatkan informasi terkini mengenai pesanan baru, batas stok
+            menipis, pergantian shift, dan status sistem.
           </p>
         </div>
 
@@ -210,7 +218,8 @@ export function NotificationsView({
             Tidak ada notifikasi aktif
           </h3>
           <p className="text-xs text-neutral-500 max-w-sm mx-auto">
-            Semua aktivitas outlet telah dibaca dan berjalan normal tanpa kendala.
+            Semua aktivitas outlet telah dibaca dan berjalan normal tanpa
+            kendala.
           </p>
         </div>
       ) : (

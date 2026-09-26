@@ -129,11 +129,7 @@ export interface ShiftRecord {
 // Model Pengeluaran Operasional / Biaya Kas Kecil (PRD Fase 2)
 // -------------------------------------------------------------
 export type ExpenseCategory =
-  | "BAHAN_BAKU"
-  | "UTILITAS_GAS"
-  | "KEMASAN"
-  | "KEBERSIHAN"
-  | "OPERASIONAL_LAIN";
+  "BAHAN_BAKU" | "UTILITAS_GAS" | "KEMASAN" | "KEBERSIHAN" | "OPERASIONAL_LAIN";
 
 export interface ExpenseRecord {
   id: string;
@@ -175,11 +171,7 @@ export interface PromoVoucher {
 // -------------------------------------------------------------------------
 export type RawMaterialUnit = "gram" | "kg" | "ml" | "liter" | "pcs";
 export type RawMaterialCategory =
-  | "PASTA"
-  | "DAIRY_CHEESE"
-  | "PROTEIN"
-  | "SEASONING"
-  | "PACKAGING";
+  "PASTA" | "DAIRY_CHEESE" | "PROTEIN" | "SEASONING" | "PACKAGING";
 
 export interface RawMaterial {
   id: string;
@@ -246,7 +238,17 @@ export interface AuditLogRecord {
   time: string;
   action: AuditActionType;
   actionLabel: string;
-  entityType: "PRODUCT" | "ORDER" | "STAFF" | "SHIFT" | "SETTING" | "EXPENSE" | "STOCK" | "PROMO" | "RECIPE" | "RAW_MATERIAL";
+  entityType:
+    | "PRODUCT"
+    | "ORDER"
+    | "STAFF"
+    | "SHIFT"
+    | "SETTING"
+    | "EXPENSE"
+    | "STOCK"
+    | "PROMO"
+    | "RECIPE"
+    | "RAW_MATERIAL";
   entityId: string;
   performedBy: string;
   userRole: "owner" | "cashier";

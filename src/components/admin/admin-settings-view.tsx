@@ -30,7 +30,11 @@ interface AdminSettingsViewProps {
   onAddStaff: (newStaff: Omit<StaffAccount, "id" | "lastLogin">) => void;
   onUpdateStaffPin: (staffId: string, newPin: string) => void;
   onResetStaffPassword?: (staffId: string, newPass: string) => void;
-  onUpdateStaffBranch?: (staffId: string, branchId: string, branchName: string) => void;
+  onUpdateStaffBranch?: (
+    staffId: string,
+    branchId: string,
+    branchName: string,
+  ) => void;
   onToggleStaffStatus: (staffId: string) => void;
   onAddBranch?: (newBranch: Omit<BranchOutlet, "id">) => void;
   onUpdateBranch?: (branchId: string, updates: Partial<BranchOutlet>) => void;
@@ -51,7 +55,9 @@ export function AdminSettingsView({
   onUpdateBranch,
   onDeleteBranch,
 }: AdminSettingsViewProps) {
-  const [activeSection, setActiveSection] = useState<"outlet" | "branches" | "tax" | "staff">("outlet");
+  const [activeSection, setActiveSection] = useState<
+    "outlet" | "branches" | "tax" | "staff"
+  >("outlet");
 
   // Form State for Settings
   const [outletForm, setOutletForm] = useState<OutletSettings>({ ...settings });
@@ -59,9 +65,13 @@ export function AdminSettingsView({
 
   // Modal States
   const [isAddStaffOpen, setIsAddStaffOpen] = useState(false);
-  const [staffForPinReset, setStaffForPinReset] = useState<StaffAccount | null>(null);
-  const [staffForPasswordReset, setStaffForPasswordReset] = useState<StaffAccount | null>(null);
-  const [staffForBranchAssignment, setStaffForBranchAssignment] = useState<StaffAccount | null>(null);
+  const [staffForPinReset, setStaffForPinReset] = useState<StaffAccount | null>(
+    null,
+  );
+  const [staffForPasswordReset, setStaffForPasswordReset] =
+    useState<StaffAccount | null>(null);
+  const [staffForBranchAssignment, setStaffForBranchAssignment] =
+    useState<StaffAccount | null>(null);
   const [isAddBranchOpen, setIsAddBranchOpen] = useState(false);
 
   // Add Staff Form
@@ -101,11 +111,18 @@ export function AdminSettingsView({
     pin: "",
     isActive: true,
   });
-  const [branchForDelete, setBranchForDelete] = useState<BranchOutlet | null>(null);
+  const [branchForDelete, setBranchForDelete] = useState<BranchOutlet | null>(
+    null,
+  );
 
   const handleEditBranchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!branchForEdit || !editBranchForm.name.trim() || !editBranchForm.code.trim()) return;
+    if (
+      !branchForEdit ||
+      !editBranchForm.name.trim() ||
+      !editBranchForm.code.trim()
+    )
+      return;
 
     if (onUpdateBranch) {
       onUpdateBranch(branchForEdit.id, {
@@ -122,7 +139,9 @@ export function AdminSettingsView({
     }
 
     setBranchForEdit(null);
-    setSavedSuccess(`Informasi akun cabang ${editBranchForm.name} berhasil diperbarui!`);
+    setSavedSuccess(
+      `Informasi akun cabang ${editBranchForm.name} berhasil diperbarui!`,
+    );
     setTimeout(() => setSavedSuccess(null), 3000);
   };
 
@@ -159,7 +178,9 @@ export function AdminSettingsView({
 
     onAddStaff({
       name: newStaffForm.name,
-      email: newStaffForm.email || `${newStaffForm.name.toLowerCase().replace(/\s+/g, ".")}@macmood.id`,
+      email:
+        newStaffForm.email ||
+        `${newStaffForm.name.toLowerCase().replace(/\s+/g, ".")}@macmood.id`,
       role: newStaffForm.role,
       pin: newStaffForm.pin,
       branchId: newStaffForm.branchId,
@@ -168,7 +189,13 @@ export function AdminSettingsView({
     });
 
     setIsAddStaffOpen(false);
-    setNewStaffForm({ name: "", email: "", role: "cashier", pin: "", branchId: branches[0]?.id || "branch-1" });
+    setNewStaffForm({
+      name: "",
+      email: "",
+      role: "cashier",
+      pin: "",
+      branchId: branches[0]?.id || "branch-1",
+    });
     setSavedSuccess("Akun staf baru berhasil ditambahkan!");
     setTimeout(() => setSavedSuccess(null), 3000);
   };
@@ -193,7 +220,9 @@ export function AdminSettingsView({
     }
     setStaffForPasswordReset(null);
     setNewPasswordInput("");
-    setSavedSuccess(`Password akun ${staffForPasswordReset.name} berhasil di-reset.`);
+    setSavedSuccess(
+      `Password akun ${staffForPasswordReset.name} berhasil di-reset.`,
+    );
     setTimeout(() => setSavedSuccess(null), 3000);
   };
 
@@ -203,10 +232,16 @@ export function AdminSettingsView({
 
     const targetBranch = branches.find((b) => b.id === selectedBranchForStaff);
     if (targetBranch && onUpdateStaffBranch) {
-      onUpdateStaffBranch(staffForBranchAssignment.id, targetBranch.id, targetBranch.name);
+      onUpdateStaffBranch(
+        staffForBranchAssignment.id,
+        targetBranch.id,
+        targetBranch.name,
+      );
     }
     setStaffForBranchAssignment(null);
-    setSavedSuccess(`Cabang penugasan ${staffForBranchAssignment.name} berhasil diubah.`);
+    setSavedSuccess(
+      `Cabang penugasan ${staffForBranchAssignment.name} berhasil diubah.`,
+    );
     setTimeout(() => setSavedSuccess(null), 3000);
   };
 
@@ -222,7 +257,9 @@ export function AdminSettingsView({
         address: newBranchForm.address,
         city: newBranchForm.city,
         phone: newBranchForm.phone,
-        email: newBranchForm.email || `${newBranchForm.code.toLowerCase()}@macmood.id`,
+        email:
+          newBranchForm.email ||
+          `${newBranchForm.code.toLowerCase()}@macmood.id`,
         pin: newBranchForm.pin || "1234",
         isActive: true,
       });
@@ -255,7 +292,8 @@ export function AdminSettingsView({
             Pengaturan Cabang, Pajak & Akun Kredensial
           </h2>
           <p className="text-xs sm:text-sm text-neutral-600 mt-0.5">
-            Kelola profil outlet, penambahan cabang baru, konfigurasi PB1/QRIS, serta hak akses dan akun kasir cabang.
+            Kelola profil outlet, penambahan cabang baru, konfigurasi PB1/QRIS,
+            serta hak akses dan akun kasir cabang.
           </p>
         </div>
 
@@ -324,7 +362,10 @@ export function AdminSettingsView({
 
       {/* Section 1: Profil Kantor Pusat */}
       {activeSection === "outlet" && (
-        <form onSubmit={handleSaveSettings} className="bg-white p-6 rounded-3xl border border-brand-green-900/10 shadow-xs space-y-6">
+        <form
+          onSubmit={handleSaveSettings}
+          className="bg-white p-6 rounded-3xl border border-brand-green-900/10 shadow-xs space-y-6"
+        >
           <div className="flex items-center gap-2 border-b border-neutral-100 pb-3">
             <Building className="size-5 text-brand-green-900" />
             <div>
@@ -332,7 +373,8 @@ export function AdminSettingsView({
                 Identitas & Lokasi Kantor Pusat MacMood
               </h3>
               <p className="text-[11px] text-neutral-500">
-                Profil badan usaha induk (Corporate HQ) yang memayungi seluruh outlet fisik MacMood.
+                Profil badan usaha induk (Corporate HQ) yang memayungi seluruh
+                outlet fisik MacMood.
               </p>
             </div>
           </div>
@@ -347,7 +389,14 @@ export function AdminSettingsView({
                 Entitas Bisnis Utama (Corporate Headquarters)
               </h4>
               <p className="text-xs text-neutral-600 mt-0.5">
-                Profil ini merepresentasikan badan usaha induk <strong>MacMood Indonesia (PT MacMood Kuliner Nusantara)</strong>. Kantor pusat mengawasi seluruh outlet fisik operasional ({branches.length} cabang aktif: Fatmawati, Margonda, dan Tebet). Pengaturan cabang individual dapat dikelola di tab <strong>Manajemen Cabang</strong>.
+                Profil ini merepresentasikan badan usaha induk{" "}
+                <strong>
+                  MacMood Indonesia (PT MacMood Kuliner Nusantara)
+                </strong>
+                . Kantor pusat mengawasi seluruh outlet fisik operasional (
+                {branches.length} cabang aktif: Fatmawati, Margonda, dan Tebet).
+                Pengaturan cabang individual dapat dikelola di tab{" "}
+                <strong>Manajemen Cabang</strong>.
               </p>
             </div>
           </div>
@@ -361,7 +410,9 @@ export function AdminSettingsView({
                 type="text"
                 required
                 value={outletForm.name}
-                onChange={(e) => setOutletForm({ ...outletForm, name: e.target.value })}
+                onChange={(e) =>
+                  setOutletForm({ ...outletForm, name: e.target.value })
+                }
                 className="w-full h-10 px-3 rounded-2xl border border-neutral-200 text-xs focus:outline-none focus:border-brand-green-800"
               />
             </div>
@@ -374,7 +425,9 @@ export function AdminSettingsView({
                 type="text"
                 required
                 value={outletForm.branchCode}
-                onChange={(e) => setOutletForm({ ...outletForm, branchCode: e.target.value })}
+                onChange={(e) =>
+                  setOutletForm({ ...outletForm, branchCode: e.target.value })
+                }
                 className="w-full h-10 px-3 rounded-2xl border border-neutral-200 text-xs font-mono font-bold focus:outline-none focus:border-brand-green-800"
               />
             </div>
@@ -387,43 +440,63 @@ export function AdminSettingsView({
                 rows={2}
                 required
                 value={outletForm.address}
-                onChange={(e) => setOutletForm({ ...outletForm, address: e.target.value })}
+                onChange={(e) =>
+                  setOutletForm({ ...outletForm, address: e.target.value })
+                }
                 className="w-full p-3 rounded-2xl border border-neutral-200 text-xs focus:outline-none focus:border-brand-green-800 resize-none"
               />
             </div>
 
             <div>
-              <label className="text-xs font-bold text-neutral-700 block mb-1">Kota</label>
+              <label className="text-xs font-bold text-neutral-700 block mb-1">
+                Kota
+              </label>
               <input
                 type="text"
                 required
                 value={outletForm.city}
-                onChange={(e) => setOutletForm({ ...outletForm, city: e.target.value })}
+                onChange={(e) =>
+                  setOutletForm({ ...outletForm, city: e.target.value })
+                }
                 className="w-full h-10 px-3 rounded-2xl border border-neutral-200 text-xs focus:outline-none focus:border-brand-green-800"
               />
             </div>
 
             <div>
-              <label className="text-xs font-bold text-neutral-700 block mb-1">No. Kontak / Hotline</label>
+              <label className="text-xs font-bold text-neutral-700 block mb-1">
+                No. Kontak / Hotline
+              </label>
               <input
                 type="text"
                 required
                 value={outletForm.phone}
-                onChange={(e) => setOutletForm({ ...outletForm, phone: e.target.value })}
+                onChange={(e) =>
+                  setOutletForm({ ...outletForm, phone: e.target.value })
+                }
                 className="w-full h-10 px-3 rounded-2xl border border-neutral-200 text-xs font-mono focus:outline-none focus:border-brand-green-800"
               />
             </div>
 
             <div>
-              <label className="text-xs font-bold text-neutral-700 block mb-1">Zona Waktu</label>
+              <label className="text-xs font-bold text-neutral-700 block mb-1">
+                Zona Waktu
+              </label>
               <select
                 value={outletForm.timezone}
-                onChange={(e) => setOutletForm({ ...outletForm, timezone: e.target.value })}
+                onChange={(e) =>
+                  setOutletForm({ ...outletForm, timezone: e.target.value })
+                }
                 className="w-full h-10 px-3 rounded-2xl border border-neutral-200 text-xs bg-white focus:outline-none focus:border-brand-green-800"
               >
-                <option value="Asia/Jakarta (WIB)">Asia/Jakarta (WIB - UTC+7)</option>
-                <option value="Asia/Makassar (WITA)">Asia/Makassar (WITA - UTC+8)</option>
-                <option value="Asia/Jayapura (WIT)">Asia/Jayapura (WIT - UTC+9)</option>
+                <option value="Asia/Jakarta (WIB)">
+                  Asia/Jakarta (WIB - UTC+7)
+                </option>
+                <option value="Asia/Makassar (WITA)">
+                  Asia/Makassar (WITA - UTC+8)
+                </option>
+                <option value="Asia/Jayapura (WIT)">
+                  Asia/Jayapura (WIT - UTC+9)
+                </option>
               </select>
             </div>
           </div>
@@ -451,7 +524,8 @@ export function AdminSettingsView({
                   Daftar Cabang & Outlet Operasional
                 </h3>
                 <p className="text-[11px] text-neutral-500">
-                  Kelola titik gerai (POS), alamat gerai, PIC cabang, serta lakukan penambahan, pengeditan, atau penghapusan cabang.
+                  Kelola titik gerai (POS), alamat gerai, PIC cabang, serta
+                  lakukan penambahan, pengeditan, atau penghapusan cabang.
                 </p>
               </div>
             </div>
@@ -473,10 +547,15 @@ export function AdminSettingsView({
             </div>
             <div>
               <h4 className="font-display font-extrabold text-xs text-brand-green-950 uppercase tracking-wider">
-                Jaringan Outlet & Akun Cabang POS ({branches.length} Cabang Aktif)
+                Jaringan Outlet & Akun Cabang POS ({branches.length} Cabang
+                Aktif)
               </h4>
               <p className="text-xs text-neutral-600 mt-0.5">
-                Masing-masing cabang memiliki akun mandiri (email cabang & PIN kasir POS), kode unik gerai, alamat operasional, dan data penjualan terintegrasi. Gunakan tombol <strong>Edit</strong> untuk mengubah kredensial/info atau <strong>Hapus</strong> untuk menutup cabang non-pusat.
+                Masing-masing cabang memiliki akun mandiri (email cabang & PIN
+                kasir POS), kode unik gerai, alamat operasional, dan data
+                penjualan terintegrasi. Gunakan tombol <strong>Edit</strong>{" "}
+                untuk mengubah kredensial/info atau <strong>Hapus</strong> untuk
+                menutup cabang non-pusat.
               </p>
             </div>
           </div>
@@ -492,9 +571,15 @@ export function AdminSettingsView({
                     <span className="text-[10px] font-bold uppercase tracking-wider text-brand-green-900 bg-brand-cream-100 px-2.5 py-0.5 rounded-full border border-brand-green-900/15">
                       {b.branchCode || b.code}
                     </span>
-                    <span className={`inline-flex items-center gap-1 text-[11px] font-bold ${b.isActive !== false ? "text-brand-green-800" : "text-neutral-500"}`}>
-                      <span className={`size-2 rounded-full ${b.isActive !== false ? "bg-brand-green-900" : "bg-neutral-400"}`} />
-                      {b.isActive !== false ? "Aktif Melayani" : "Sementara Tutup"}
+                    <span
+                      className={`inline-flex items-center gap-1 text-[11px] font-bold ${b.isActive !== false ? "text-brand-green-800" : "text-neutral-500"}`}
+                    >
+                      <span
+                        className={`size-2 rounded-full ${b.isActive !== false ? "bg-brand-green-900" : "bg-neutral-400"}`}
+                      />
+                      {b.isActive !== false
+                        ? "Aktif Melayani"
+                        : "Sementara Tutup"}
                     </span>
                   </div>
 
@@ -503,22 +588,31 @@ export function AdminSettingsView({
                   </h4>
                   <p className="text-xs text-neutral-600 mt-1 flex items-start gap-1">
                     <MapPin className="size-3.5 text-neutral-400 shrink-0 mt-0.5" />
-                    <span>{b.address}, {b.city}</span>
+                    <span>
+                      {b.address}, {b.city}
+                    </span>
                   </p>
                 </div>
 
                 <div className="pt-3 border-t border-neutral-200/60 space-y-2 text-xs">
                   <div className="flex items-center justify-between">
                     <span className="text-neutral-500">Email Akun:</span>
-                    <span className="font-mono text-neutral-900 font-semibold">{b.email || `${(b.branchCode || "cabang").toLowerCase()}@macmood.id`}</span>
+                    <span className="font-mono text-neutral-900 font-semibold">
+                      {b.email ||
+                        `${(b.branchCode || "cabang").toLowerCase()}@macmood.id`}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-neutral-500">PIN Kasir POS:</span>
-                    <span className="font-mono bg-neutral-200/70 px-2 py-0.5 rounded text-neutral-800 font-bold">{b.pin || "1234"}</span>
+                    <span className="font-mono bg-neutral-200/70 px-2 py-0.5 rounded text-neutral-800 font-bold">
+                      {b.pin || "1234"}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-neutral-500">No. Telepon:</span>
-                    <span className="font-mono text-neutral-700">{b.phone}</span>
+                    <span className="font-mono text-neutral-700">
+                      {b.phone}
+                    </span>
                   </div>
 
                   {/* Action Buttons: Edit and Delete */}
@@ -533,7 +627,9 @@ export function AdminSettingsView({
                           address: b.address,
                           city: b.city,
                           phone: b.phone,
-                          email: b.email || `${(b.branchCode || "cabang").toLowerCase()}@macmood.id`,
+                          email:
+                            b.email ||
+                            `${(b.branchCode || "cabang").toLowerCase()}@macmood.id`,
                           pin: b.pin || "1234",
                           isActive: b.isActive !== false,
                         });
@@ -568,7 +664,10 @@ export function AdminSettingsView({
 
       {/* Section 3: Pajak & QRIS */}
       {activeSection === "tax" && (
-        <form onSubmit={handleSaveSettings} className="bg-white p-6 rounded-3xl border border-brand-green-900/10 shadow-xs space-y-6">
+        <form
+          onSubmit={handleSaveSettings}
+          className="bg-white p-6 rounded-3xl border border-brand-green-900/10 shadow-xs space-y-6"
+        >
           <div className="flex items-center gap-2 border-b border-neutral-100 pb-3">
             <CreditCard className="size-5 text-brand-green-900" />
             <h3 className="font-display font-extrabold text-base text-brand-green-950">
@@ -589,7 +688,12 @@ export function AdminSettingsView({
                   step="0.5"
                   required
                   value={outletForm.taxRate}
-                  onChange={(e) => setOutletForm({ ...outletForm, taxRate: Number(e.target.value) })}
+                  onChange={(e) =>
+                    setOutletForm({
+                      ...outletForm,
+                      taxRate: Number(e.target.value),
+                    })
+                  }
                   className="w-full h-10 px-3 rounded-2xl border border-neutral-200 text-xs font-mono font-bold focus:outline-none focus:border-brand-green-800"
                 />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-neutral-400 font-bold">
@@ -612,7 +716,10 @@ export function AdminSettingsView({
                   max="10"
                   value={outletForm.serviceChargeRate}
                   onChange={(e) =>
-                    setOutletForm({ ...outletForm, serviceChargeRate: Number(e.target.value) })
+                    setOutletForm({
+                      ...outletForm,
+                      serviceChargeRate: Number(e.target.value),
+                    })
                   }
                   className="w-full h-10 px-3 rounded-2xl border border-neutral-200 text-xs font-mono focus:outline-none focus:border-brand-green-800"
                 />
@@ -634,7 +741,10 @@ export function AdminSettingsView({
                 required
                 value={outletForm.qrisMerchantName}
                 onChange={(e) =>
-                  setOutletForm({ ...outletForm, qrisMerchantName: e.target.value })
+                  setOutletForm({
+                    ...outletForm,
+                    qrisMerchantName: e.target.value,
+                  })
                 }
                 className="w-full h-10 px-3 rounded-2xl border border-neutral-200 text-xs focus:outline-none focus:border-brand-green-800"
               />
@@ -648,7 +758,9 @@ export function AdminSettingsView({
                 type="text"
                 required
                 value={outletForm.qrisNmid}
-                onChange={(e) => setOutletForm({ ...outletForm, qrisNmid: e.target.value })}
+                onChange={(e) =>
+                  setOutletForm({ ...outletForm, qrisNmid: e.target.value })
+                }
                 className="w-full h-10 px-3 rounded-2xl border border-neutral-200 text-xs font-mono focus:outline-none focus:border-brand-green-800"
               />
             </div>
@@ -661,7 +773,9 @@ export function AdminSettingsView({
                 type="text"
                 required
                 value={outletForm.bankName}
-                onChange={(e) => setOutletForm({ ...outletForm, bankName: e.target.value })}
+                onChange={(e) =>
+                  setOutletForm({ ...outletForm, bankName: e.target.value })
+                }
                 className="w-full h-10 px-3 rounded-2xl border border-neutral-200 text-xs focus:outline-none focus:border-brand-green-800"
               />
             </div>
@@ -674,7 +788,9 @@ export function AdminSettingsView({
                 type="text"
                 required
                 value={outletForm.bankAccount}
-                onChange={(e) => setOutletForm({ ...outletForm, bankAccount: e.target.value })}
+                onChange={(e) =>
+                  setOutletForm({ ...outletForm, bankAccount: e.target.value })
+                }
                 className="w-full h-10 px-3 rounded-2xl border border-neutral-200 text-xs font-mono focus:outline-none focus:border-brand-green-800"
               />
             </div>
@@ -703,7 +819,8 @@ export function AdminSettingsView({
                   Daftar Akun Pengguna & Kredensial POS
                 </h3>
                 <span className="text-[11px] text-neutral-500">
-                  Kelola akun login owner, akun operasional cabang, reset password, dan reset PIN cepat POS.
+                  Kelola akun login owner, akun operasional cabang, reset
+                  password, dan reset PIN cepat POS.
                 </span>
               </div>
             </div>
@@ -728,7 +845,11 @@ export function AdminSettingsView({
                 Hierarki Akun, Kredensial & Hak Akses
               </h4>
               <p className="text-xs text-neutral-600 mt-0.5">
-                Akun terbagi menjadi Owner Admin (Muhammad Afrizal) untuk kendali manajerial global dan Akun Cabang (Fatmawati, Margonda, Tebet) untuk operasional kasir POS di masing-masing gerai. Seluruh data transaksi, shift laci, dan pengeluaran terisolasi rapi per akun cabang.
+                Akun terbagi menjadi Owner Admin (Muhammad Afrizal) untuk
+                kendali manajerial global dan Akun Cabang (Fatmawati, Margonda,
+                Tebet) untuk operasional kasir POS di masing-masing gerai.
+                Seluruh data transaksi, shift laci, dan pengeluaran terisolasi
+                rapi per akun cabang.
               </p>
             </div>
           </div>
@@ -747,13 +868,18 @@ export function AdminSettingsView({
               </thead>
               <tbody className="divide-y divide-neutral-100 font-sans">
                 {staffAccounts.map((staff) => (
-                  <tr key={staff.id} className="hover:bg-brand-cream-50/50 transition-colors">
+                  <tr
+                    key={staff.id}
+                    className="hover:bg-brand-cream-50/50 transition-colors"
+                  >
                     {/* Name & Email */}
                     <td className="py-3 px-4">
                       <strong className="font-display font-bold text-sm text-neutral-900 block">
                         {staff.name}
                       </strong>
-                      <span className="text-[11px] text-neutral-500 font-mono">{staff.email}</span>
+                      <span className="text-[11px] text-neutral-500 font-mono">
+                        {staff.email}
+                      </span>
                     </td>
 
                     {/* Role */}
@@ -765,23 +891,37 @@ export function AdminSettingsView({
                             : "bg-brand-cream-100 text-brand-green-950 border border-brand-green-900/15"
                         }`}
                       >
-                        {staff.role === "owner" ? <ShieldCheck className="size-3" /> : <UserCheck className="size-3" />}
-                        <span>{staff.role === "owner" ? "Business Owner" : "Kasir Cabang"}</span>
+                        {staff.role === "owner" ? (
+                          <ShieldCheck className="size-3" />
+                        ) : (
+                          <UserCheck className="size-3" />
+                        )}
+                        <span>
+                          {staff.role === "owner"
+                            ? "Business Owner"
+                            : "Kasir Cabang"}
+                        </span>
                       </span>
                     </td>
 
                     {/* Branch */}
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-1.5">
-                        <span className={`font-medium ${staff.role === "owner" ? "text-brand-green-900 font-bold" : "text-brand-green-950"}`}>
-                          {staff.role === "owner" ? "Akses Global (Semua Cabang)" : (staff.branchName || "MacMood Pusat - Fatmawati")}
+                        <span
+                          className={`font-medium ${staff.role === "owner" ? "text-brand-green-900 font-bold" : "text-brand-green-950"}`}
+                        >
+                          {staff.role === "owner"
+                            ? "Akses Global (Semua Cabang)"
+                            : staff.branchName || "MacMood Pusat - Fatmawati"}
                         </span>
                         {staff.role !== "owner" && (
                           <button
                             type="button"
                             onClick={() => {
                               setStaffForBranchAssignment(staff);
-                              setSelectedBranchForStaff(staff.branchId || branches[0]?.id || "branch-1");
+                              setSelectedBranchForStaff(
+                                staff.branchId || branches[0]?.id || "branch-1",
+                              );
                             }}
                             className="size-5 rounded-md hover:bg-neutral-200 text-neutral-500 flex items-center justify-center cursor-pointer"
                             title="Ubah Cabang Penugasan"
@@ -879,14 +1019,17 @@ export function AdminSettingsView({
             <form onSubmit={handleAddBranchSubmit} className="space-y-4">
               <div>
                 <label className="text-xs font-bold text-neutral-700 block mb-1">
-                  Nama Cabang / Outlet <span className="text-brand-coral-600">*</span>
+                  Nama Cabang / Outlet{" "}
+                  <span className="text-brand-coral-600">*</span>
                 </label>
                 <input
                   type="text"
                   required
                   placeholder="Misal: MacMood Express - BSD"
                   value={newBranchForm.name}
-                  onChange={(e) => setNewBranchForm({ ...newBranchForm, name: e.target.value })}
+                  onChange={(e) =>
+                    setNewBranchForm({ ...newBranchForm, name: e.target.value })
+                  }
                   className="w-full h-10 px-3 rounded-2xl border border-neutral-200 text-xs focus:outline-none focus:border-brand-green-800"
                 />
               </div>
@@ -901,7 +1044,12 @@ export function AdminSettingsView({
                     required
                     placeholder="BSD-04"
                     value={newBranchForm.code}
-                    onChange={(e) => setNewBranchForm({ ...newBranchForm, code: e.target.value })}
+                    onChange={(e) =>
+                      setNewBranchForm({
+                        ...newBranchForm,
+                        code: e.target.value,
+                      })
+                    }
                     className="w-full h-10 px-3 rounded-2xl border border-neutral-200 text-xs font-mono font-bold focus:outline-none focus:border-brand-green-800"
                   />
                 </div>
@@ -914,7 +1062,12 @@ export function AdminSettingsView({
                     required
                     placeholder="Tangerang Selatan"
                     value={newBranchForm.city}
-                    onChange={(e) => setNewBranchForm({ ...newBranchForm, city: e.target.value })}
+                    onChange={(e) =>
+                      setNewBranchForm({
+                        ...newBranchForm,
+                        city: e.target.value,
+                      })
+                    }
                     className="w-full h-10 px-3 rounded-2xl border border-neutral-200 text-xs focus:outline-none focus:border-brand-green-800"
                   />
                 </div>
@@ -922,14 +1075,20 @@ export function AdminSettingsView({
 
               <div>
                 <label className="text-xs font-bold text-neutral-700 block mb-1">
-                  Alamat Lengkap Gerai <span className="text-brand-coral-600">*</span>
+                  Alamat Lengkap Gerai{" "}
+                  <span className="text-brand-coral-600">*</span>
                 </label>
                 <textarea
                   rows={2}
                   required
                   placeholder="Jl. BSD Boulevard No. 12..."
                   value={newBranchForm.address}
-                  onChange={(e) => setNewBranchForm({ ...newBranchForm, address: e.target.value })}
+                  onChange={(e) =>
+                    setNewBranchForm({
+                      ...newBranchForm,
+                      address: e.target.value,
+                    })
+                  }
                   className="w-full p-3 rounded-2xl border border-neutral-200 text-xs focus:outline-none focus:border-brand-green-800 resize-none"
                 />
               </div>
@@ -937,20 +1096,27 @@ export function AdminSettingsView({
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs font-bold text-neutral-700 block mb-1">
-                    Email Akun Cabang <span className="text-brand-coral-600">*</span>
+                    Email Akun Cabang{" "}
+                    <span className="text-brand-coral-600">*</span>
                   </label>
                   <input
                     type="email"
                     required
                     placeholder="bsd@macmood.id"
                     value={newBranchForm.email}
-                    onChange={(e) => setNewBranchForm({ ...newBranchForm, email: e.target.value })}
+                    onChange={(e) =>
+                      setNewBranchForm({
+                        ...newBranchForm,
+                        email: e.target.value,
+                      })
+                    }
                     className="w-full h-10 px-3 rounded-2xl border border-neutral-200 text-xs font-mono focus:outline-none focus:border-brand-green-800"
                   />
                 </div>
                 <div>
                   <label className="text-xs font-bold text-neutral-700 block mb-1">
-                    PIN Akses POS (4 Digit) <span className="text-brand-coral-600">*</span>
+                    PIN Akses POS (4 Digit){" "}
+                    <span className="text-brand-coral-600">*</span>
                   </label>
                   <input
                     type="password"
@@ -958,7 +1124,12 @@ export function AdminSettingsView({
                     required
                     placeholder="1234"
                     value={newBranchForm.pin}
-                    onChange={(e) => setNewBranchForm({ ...newBranchForm, pin: e.target.value })}
+                    onChange={(e) =>
+                      setNewBranchForm({
+                        ...newBranchForm,
+                        pin: e.target.value,
+                      })
+                    }
                     className="w-full h-10 px-3 rounded-2xl border border-neutral-200 text-xs font-mono font-bold tracking-widest focus:outline-none focus:border-brand-green-800"
                   />
                 </div>
@@ -966,14 +1137,20 @@ export function AdminSettingsView({
 
               <div>
                 <label className="text-xs font-bold text-neutral-700 block mb-1">
-                  No. Telepon / WhatsApp <span className="text-brand-coral-600">*</span>
+                  No. Telepon / WhatsApp{" "}
+                  <span className="text-brand-coral-600">*</span>
                 </label>
                 <input
                   type="text"
                   required
                   placeholder="0812-xxxx-xxxx"
                   value={newBranchForm.phone}
-                  onChange={(e) => setNewBranchForm({ ...newBranchForm, phone: e.target.value })}
+                  onChange={(e) =>
+                    setNewBranchForm({
+                      ...newBranchForm,
+                      phone: e.target.value,
+                    })
+                  }
                   className="w-full h-10 px-3 rounded-2xl border border-neutral-200 text-xs font-mono focus:outline-none focus:border-brand-green-800"
                 />
               </div>
@@ -1024,7 +1201,9 @@ export function AdminSettingsView({
                   type="text"
                   required
                   value={newStaffForm.name}
-                  onChange={(e) => setNewStaffForm({ ...newStaffForm, name: e.target.value })}
+                  onChange={(e) =>
+                    setNewStaffForm({ ...newStaffForm, name: e.target.value })
+                  }
                   placeholder="Misal: Andi Pratama"
                   className="w-full h-10 px-3 rounded-2xl border border-neutral-200 text-xs focus:outline-none focus:border-brand-green-800"
                 />
@@ -1037,14 +1216,18 @@ export function AdminSettingsView({
                 <input
                   type="email"
                   value={newStaffForm.email}
-                  onChange={(e) => setNewStaffForm({ ...newStaffForm, email: e.target.value })}
+                  onChange={(e) =>
+                    setNewStaffForm({ ...newStaffForm, email: e.target.value })
+                  }
                   placeholder="andi.kasir@macmood.id"
                   className="w-full h-10 px-3 rounded-2xl border border-neutral-200 text-xs focus:outline-none focus:border-brand-green-800"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-neutral-700 block mb-1">Role Jabatan</label>
+                <label className="text-xs font-bold text-neutral-700 block mb-1">
+                  Role Jabatan
+                </label>
                 <select
                   value={newStaffForm.role}
                   onChange={(e) =>
@@ -1061,10 +1244,17 @@ export function AdminSettingsView({
               </div>
 
               <div>
-                <label className="text-xs font-bold text-neutral-700 block mb-1">Penugasan Cabang</label>
+                <label className="text-xs font-bold text-neutral-700 block mb-1">
+                  Penugasan Cabang
+                </label>
                 <select
                   value={newStaffForm.branchId}
-                  onChange={(e) => setNewStaffForm({ ...newStaffForm, branchId: e.target.value })}
+                  onChange={(e) =>
+                    setNewStaffForm({
+                      ...newStaffForm,
+                      branchId: e.target.value,
+                    })
+                  }
                   className="w-full h-10 px-3 rounded-2xl border border-neutral-200 text-xs bg-white focus:outline-none focus:border-brand-green-800"
                 >
                   {branches.map((b) => (
@@ -1077,14 +1267,17 @@ export function AdminSettingsView({
 
               <div>
                 <label className="text-xs font-bold text-neutral-700 block mb-1">
-                  PIN 4 Digit Kasir <span className="text-brand-coral-600">*</span>
+                  PIN 4 Digit Kasir{" "}
+                  <span className="text-brand-coral-600">*</span>
                 </label>
                 <input
                   type="password"
                   maxLength={6}
                   required
                   value={newStaffForm.pin}
-                  onChange={(e) => setNewStaffForm({ ...newStaffForm, pin: e.target.value })}
+                  onChange={(e) =>
+                    setNewStaffForm({ ...newStaffForm, pin: e.target.value })
+                  }
                   placeholder="••••"
                   className="w-full h-10 px-3 rounded-2xl border border-neutral-200 text-xs font-mono font-bold tracking-widest focus:outline-none focus:border-brand-green-800"
                 />
@@ -1131,13 +1324,18 @@ export function AdminSettingsView({
             </div>
 
             <p className="text-xs text-neutral-600">
-              Ganti PIN login cepat untuk <strong className="text-neutral-900">{staffForPinReset.name}</strong> ({staffForPinReset.email}).
+              Ganti PIN login cepat untuk{" "}
+              <strong className="text-neutral-900">
+                {staffForPinReset.name}
+              </strong>{" "}
+              ({staffForPinReset.email}).
             </p>
 
             <form onSubmit={handlePinResetSubmit} className="space-y-4">
               <div>
                 <label className="text-xs font-bold text-neutral-700 block mb-1">
-                  Masukkan PIN Baru (4 Digit) <span className="text-brand-coral-600">*</span>
+                  Masukkan PIN Baru (4 Digit){" "}
+                  <span className="text-brand-coral-600">*</span>
                 </label>
                 <input
                   type="password"
@@ -1191,7 +1389,11 @@ export function AdminSettingsView({
             </div>
 
             <p className="text-xs text-neutral-600">
-              Tetapkan kata sandi baru untuk login email akun <strong className="text-neutral-900">{staffForPasswordReset.name}</strong>.
+              Tetapkan kata sandi baru untuk login email akun{" "}
+              <strong className="text-neutral-900">
+                {staffForPasswordReset.name}
+              </strong>
+              .
             </p>
 
             <form onSubmit={handlePasswordResetSubmit} className="space-y-4">
@@ -1250,7 +1452,11 @@ export function AdminSettingsView({
             </div>
 
             <p className="text-xs text-neutral-600">
-              Pilih cabang operasional tempat staf <strong className="text-neutral-900">{staffForBranchAssignment.name}</strong> ditugaskan:
+              Pilih cabang operasional tempat staf{" "}
+              <strong className="text-neutral-900">
+                {staffForBranchAssignment.name}
+              </strong>{" "}
+              ditugaskan:
             </p>
 
             <form onSubmit={handleBranchAssignmentSubmit} className="space-y-3">
@@ -1270,11 +1476,15 @@ export function AdminSettingsView({
                     >
                       <div>
                         <strong className="text-xs block">{b.name}</strong>
-                        <span className={`text-[11px] ${isSelected ? "text-brand-cream-200" : "text-neutral-500"}`}>
+                        <span
+                          className={`text-[11px] ${isSelected ? "text-brand-cream-200" : "text-neutral-500"}`}
+                        >
                           {b.address}
                         </span>
                       </div>
-                      {isSelected && <Check className="size-4 text-brand-yellow-400 shrink-0" />}
+                      {isSelected && (
+                        <Check className="size-4 text-brand-yellow-400 shrink-0" />
+                      )}
                     </button>
                   );
                 })}
@@ -1312,7 +1522,8 @@ export function AdminSettingsView({
                     Edit Informasi Cabang
                   </h3>
                   <span className="text-[11px] text-neutral-500 font-mono">
-                    ID: {branchForEdit.id} · Kode: {branchForEdit.branchCode || branchForEdit.code}
+                    ID: {branchForEdit.id} · Kode:{" "}
+                    {branchForEdit.branchCode || branchForEdit.code}
                   </span>
                 </div>
               </div>
@@ -1329,53 +1540,77 @@ export function AdminSettingsView({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="sm:col-span-2">
                   <label className="text-xs font-bold text-neutral-700 block mb-1">
-                    Nama Cabang Outlet <span className="text-brand-coral-600">*</span>
+                    Nama Cabang Outlet{" "}
+                    <span className="text-brand-coral-600">*</span>
                   </label>
                   <input
                     type="text"
                     required
                     value={editBranchForm.name}
-                    onChange={(e) => setEditBranchForm({ ...editBranchForm, name: e.target.value })}
+                    onChange={(e) =>
+                      setEditBranchForm({
+                        ...editBranchForm,
+                        name: e.target.value,
+                      })
+                    }
                     className="w-full h-10 px-3 rounded-2xl border border-neutral-200 text-xs focus:outline-none focus:border-brand-green-800"
                   />
                 </div>
 
                 <div>
                   <label className="text-xs font-bold text-neutral-700 block mb-1">
-                    Kode Cabang POS <span className="text-brand-coral-600">*</span>
+                    Kode Cabang POS{" "}
+                    <span className="text-brand-coral-600">*</span>
                   </label>
                   <input
                     type="text"
                     required
                     value={editBranchForm.code}
-                    onChange={(e) => setEditBranchForm({ ...editBranchForm, code: e.target.value })}
+                    onChange={(e) =>
+                      setEditBranchForm({
+                        ...editBranchForm,
+                        code: e.target.value,
+                      })
+                    }
                     className="w-full h-10 px-3 rounded-2xl border border-neutral-200 text-xs font-mono font-bold uppercase focus:outline-none focus:border-brand-green-800"
                   />
                 </div>
 
                 <div>
                   <label className="text-xs font-bold text-neutral-700 block mb-1">
-                    Email Akun Cabang <span className="text-brand-coral-600">*</span>
+                    Email Akun Cabang{" "}
+                    <span className="text-brand-coral-600">*</span>
                   </label>
                   <input
                     type="email"
                     required
                     value={editBranchForm.email}
-                    onChange={(e) => setEditBranchForm({ ...editBranchForm, email: e.target.value })}
+                    onChange={(e) =>
+                      setEditBranchForm({
+                        ...editBranchForm,
+                        email: e.target.value,
+                      })
+                    }
                     className="w-full h-10 px-3 rounded-2xl border border-neutral-200 text-xs font-mono focus:outline-none focus:border-brand-green-800"
                   />
                 </div>
 
                 <div>
                   <label className="text-xs font-bold text-neutral-700 block mb-1">
-                    PIN Kasir POS (4 Digit) <span className="text-brand-coral-600">*</span>
+                    PIN Kasir POS (4 Digit){" "}
+                    <span className="text-brand-coral-600">*</span>
                   </label>
                   <input
                     type="password"
                     maxLength={4}
                     required
                     value={editBranchForm.pin}
-                    onChange={(e) => setEditBranchForm({ ...editBranchForm, pin: e.target.value })}
+                    onChange={(e) =>
+                      setEditBranchForm({
+                        ...editBranchForm,
+                        pin: e.target.value,
+                      })
+                    }
                     className="w-full h-10 px-3 rounded-2xl border border-neutral-200 text-xs font-mono font-bold tracking-widest focus:outline-none focus:border-brand-green-800"
                   />
                 </div>
@@ -1388,29 +1623,48 @@ export function AdminSettingsView({
                     rows={2}
                     required
                     value={editBranchForm.address}
-                    onChange={(e) => setEditBranchForm({ ...editBranchForm, address: e.target.value })}
+                    onChange={(e) =>
+                      setEditBranchForm({
+                        ...editBranchForm,
+                        address: e.target.value,
+                      })
+                    }
                     className="w-full p-3 rounded-2xl border border-neutral-200 text-xs focus:outline-none focus:border-brand-green-800 resize-none"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-neutral-700 block mb-1">Kota</label>
+                  <label className="text-xs font-bold text-neutral-700 block mb-1">
+                    Kota
+                  </label>
                   <input
                     type="text"
                     required
                     value={editBranchForm.city}
-                    onChange={(e) => setEditBranchForm({ ...editBranchForm, city: e.target.value })}
+                    onChange={(e) =>
+                      setEditBranchForm({
+                        ...editBranchForm,
+                        city: e.target.value,
+                      })
+                    }
                     className="w-full h-10 px-3 rounded-2xl border border-neutral-200 text-xs focus:outline-none focus:border-brand-green-800"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-neutral-700 block mb-1">No. Telepon Gerai</label>
+                  <label className="text-xs font-bold text-neutral-700 block mb-1">
+                    No. Telepon Gerai
+                  </label>
                   <input
                     type="text"
                     required
                     value={editBranchForm.phone}
-                    onChange={(e) => setEditBranchForm({ ...editBranchForm, phone: e.target.value })}
+                    onChange={(e) =>
+                      setEditBranchForm({
+                        ...editBranchForm,
+                        phone: e.target.value,
+                      })
+                    }
                     className="w-full h-10 px-3 rounded-2xl border border-neutral-200 text-xs font-mono focus:outline-none focus:border-brand-green-800"
                   />
                 </div>
@@ -1420,7 +1674,12 @@ export function AdminSettingsView({
                     <input
                       type="checkbox"
                       checked={editBranchForm.isActive}
-                      onChange={(e) => setEditBranchForm({ ...editBranchForm, isActive: e.target.checked })}
+                      onChange={(e) =>
+                        setEditBranchForm({
+                          ...editBranchForm,
+                          isActive: e.target.checked,
+                        })
+                      }
                       className="size-4 rounded text-brand-green-900 accent-brand-green-900"
                     />
                     <span className="text-xs font-bold text-neutral-800">
@@ -1472,10 +1731,13 @@ export function AdminSettingsView({
 
             <div className="space-y-2 text-xs text-neutral-600">
               <p>
-                Apakah Anda yakin ingin menghapus cabang <strong>{branchForDelete.name}</strong> ({branchForDelete.branchCode || branchForDelete.code})?
+                Apakah Anda yakin ingin menghapus cabang{" "}
+                <strong>{branchForDelete.name}</strong> (
+                {branchForDelete.branchCode || branchForDelete.code})?
               </p>
               <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-[11px] leading-relaxed">
-                Staf kasir yang sebelumnya ditugaskan di cabang ini akan otomatis dialihkan ke MacMood Pusat - Fatmawati.
+                Staf kasir yang sebelumnya ditugaskan di cabang ini akan
+                otomatis dialihkan ke MacMood Pusat - Fatmawati.
               </div>
             </div>
 

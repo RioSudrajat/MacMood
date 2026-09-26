@@ -4,7 +4,14 @@ export const createRawMaterialSchema = z
   .object({
     sku: z.string().trim().min(2).max(50),
     name: z.string().trim().min(2).max(150),
-    category: z.enum(["DAIRY", "STAPLE", "MEAT", "SAUCE", "BEVERAGE", "PACKAGING"]),
+    category: z.enum([
+      "DAIRY",
+      "STAPLE",
+      "MEAT",
+      "SAUCE",
+      "BEVERAGE",
+      "PACKAGING",
+    ]),
     unit: z.enum(["g", "kg", "ml", "pcs"]),
     currentStock: z.coerce.number().min(0).default(0),
     minStock: z.coerce.number().min(0).default(0),

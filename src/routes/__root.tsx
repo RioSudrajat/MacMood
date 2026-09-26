@@ -26,7 +26,11 @@ export const Route = createRootRoute({
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      {
+        rel: "preconnect",
+        href: "https://fonts.gstatic.com",
+        crossOrigin: "anonymous",
+      },
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..800;1,9..40,400..800&family=Inter:ital,opsz,wght@0,14..32,300..800;1,14..32,300..800&family=Manrope:wght@500;600;700;800&display=swap",
@@ -74,7 +78,9 @@ function RootDocument({ children }: { children: ReactNode }) {
 function NotFound() {
   return (
     <main id="main-content" className="mx-auto max-w-lg px-6 py-24 text-center">
-      <p className="mb-3 font-mono text-sm font-bold text-brand-coral-600">404</p>
+      <p className="mb-3 font-mono text-sm font-bold text-brand-coral-600">
+        404
+      </p>
       <h1 className="text-3xl font-bold tracking-tight font-display text-brand-green-950">
         Halaman tidak ditemukan
       </h1>
@@ -82,7 +88,10 @@ function NotFound() {
         Halaman yang Anda tuju belum tersedia atau telah dipindahkan.
       </p>
       <div className="flex justify-center gap-3">
-        <Button asChild className="bg-brand-green-800 text-brand-cream-50 hover:bg-brand-green-900">
+        <Button
+          asChild
+          className="bg-brand-green-800 text-brand-cream-50 hover:bg-brand-green-900"
+        >
           <Link to="/">Ke Beranda</Link>
         </Button>
         <Button asChild variant="outline">
@@ -97,9 +106,12 @@ function ErrorPage() {
   const router = useRouter();
   return (
     <main id="main-content" className="mx-auto max-w-lg px-6 py-24 text-center">
-      <h1 className="text-2xl font-bold font-display text-brand-green-950">Terjadi kesalahan</h1>
+      <h1 className="text-2xl font-bold font-display text-brand-green-950">
+        Terjadi kesalahan
+      </h1>
       <p className="my-4 leading-7 text-neutral-600">
-        Sistem mengalami kendala saat memuat data. Silakan muat ulang halaman atau periksa koneksi.
+        Sistem mengalami kendala saat memuat data. Silakan muat ulang halaman
+        atau periksa koneksi.
       </p>
       <Button
         onClick={() => router.invalidate()}

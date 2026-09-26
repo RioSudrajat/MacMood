@@ -56,7 +56,9 @@ export const Route = createFileRoute("/_protected/admin")({
       throw redirect({ to: "/app" });
     }
   },
-  head: () => ({ meta: [{ title: `Dashboard Owner & Admin | ${siteConfig.name}` }] }),
+  head: () => ({
+    meta: [{ title: `Dashboard Owner & Admin | ${siteConfig.name}` }],
+  }),
   component: AdminDashboardPage,
 });
 
@@ -106,7 +108,9 @@ export function AdminDashboardPage() {
   };
 
   // Shared Data States
-  const [products, setProducts] = useState<AdminProduct[]>(INITIAL_ADMIN_PRODUCTS);
+  const [products, setProducts] = useState<AdminProduct[]>(
+    INITIAL_ADMIN_PRODUCTS,
+  );
   const [stockLogs, setStockLogs] = useState<StockLog[]>(INITIAL_STOCK_LOGS);
   const [orders, setOrders] = useState<CompletedOrder[]>(() => {
     if (typeof window !== "undefined") {
@@ -119,14 +123,23 @@ export function AdminDashboardPage() {
     }
     return INITIAL_ORDERS;
   });
-  const [staffAccounts, setStaffAccounts] = useState<StaffAccount[]>(INITIAL_STAFF_ACCOUNTS);
-  const [settings, setSettings] = useState<OutletSettings>(INITIAL_OUTLET_SETTINGS);
+  const [staffAccounts, setStaffAccounts] = useState<StaffAccount[]>(
+    INITIAL_STAFF_ACCOUNTS,
+  );
+  const [settings, setSettings] = useState<OutletSettings>(
+    INITIAL_OUTLET_SETTINGS,
+  );
   const [shifts, setShifts] = useState<ShiftRecord[]>(INITIAL_SHIFTS);
   const [expenses, setExpenses] = useState<ExpenseRecord[]>(INITIAL_EXPENSES);
-  const [auditLogs, setAuditLogs] = useState<AuditLogRecord[]>(INITIAL_AUDIT_LOGS);
+  const [auditLogs, setAuditLogs] =
+    useState<AuditLogRecord[]>(INITIAL_AUDIT_LOGS);
   const [promos, setPromos] = useState<PromoVoucher[]>(INITIAL_PROMOS);
-  const [rawMaterials, setRawMaterials] = useState<RawMaterial[]>(INITIAL_RAW_MATERIALS);
-  const [recipes, setRecipes] = useState<ProductRecipe[]>(INITIAL_PRODUCT_RECIPES);
+  const [rawMaterials, setRawMaterials] = useState<RawMaterial[]>(
+    INITIAL_RAW_MATERIALS,
+  );
+  const [recipes, setRecipes] = useState<ProductRecipe[]>(
+    INITIAL_PRODUCT_RECIPES,
+  );
   const [branches, setBranches] = useState<BranchOutlet[]>(() => {
     if (typeof window !== "undefined") {
       try {
@@ -145,40 +158,57 @@ export function AdminDashboardPage() {
     let isMounted = true;
     async function loadAdminData() {
       try {
-        const [prodRes, orderRes, shiftRes, expRes, promoRes, matRes, recipeRes, auditRes, branchRes] =
-          await Promise.allSettled([
-            fetch("/api/catalog/products").then((r) => r.json()),
-            fetch("/api/pos/orders?limit=50").then((r) => r.json()),
-            fetch("/api/pos/shifts").then((r) => r.json()),
-            fetch("/api/expenses").then((r) => r.json()),
-            fetch("/api/promos").then((r) => r.json()),
-            fetch("/api/inventory/materials").then((r) => r.json()),
-            fetch("/api/inventory/recipes").then((r) => r.json()),
-            fetch("/api/audit-logs").then((r) => r.json()),
-            fetch("/api/branches").then((r) => r.json()),
-          ]);
+        const [
+          prodRes,
+          orderRes,
+          shiftRes,
+          expRes,
+          promoRes,
+          matRes,
+          recipeRes,
+          auditRes,
+          branchRes,
+        ] = await Promise.allSettled([
+          fetch("/api/catalog/products").then((r) => r.json()),
+          fetch("/api/pos/orders?limit=50").then((r) => r.json()),
+          fetch("/api/pos/shifts").then((r) => r.json()),
+          fetch("/api/expenses").then((r) => r.json()),
+          fetch("/api/promos").then((r) => r.json()),
+          fetch("/api/inventory/materials").then((r) => r.json()),
+          fetch("/api/inventory/recipes").then((r) => r.json()),
+          fetch("/api/audit-logs").then((r) => r.json()),
+          fetch("/api/branches").then((r) => r.json()),
+        ]);
 
         if (!isMounted) return;
 
         if (prodRes.status === "fulfilled" && prodRes.value?.data?.length > 0) {
           setProducts(
-            (prodRes.value.data as Array<{
-              id: string;
-              name: string;
-              categorySlug: string;
-              price: number;
-              costPrice?: number;
-              currentStock: number;
-              trackStock: boolean;
-              isAvailable: boolean;
-              imageUrl?: string;
-              soldCount?: number;
-              branchSoldCounts?: Record<string, number>;
-              branchStocks?: Record<string, number>;
-            }>).map((p) => {
+            (
+              prodRes.value.data as Array<{
+                id: string;
+                name: string;
+                categorySlug: string;
+                price: number;
+                costPrice?: number;
+                currentStock: number;
+                trackStock: boolean;
+                isAvailable: boolean;
+                imageUrl?: string;
+                soldCount?: number;
+                branchSoldCounts?: Record<string, number>;
+                branchStocks?: Record<string, number>;
+              }>
+            ).map((p) => {
               const category: "mac" | "sides" | "drinks" =
-                p.categorySlug === "sides" || p.categorySlug === "drinks" ? p.categorySlug : "mac";
-              const catLabels = { mac: "Macaroni", sides: "Sides & Snack", drinks: "Minuman" };
+                p.categorySlug === "sides" || p.categorySlug === "drinks"
+                  ? p.categorySlug
+                  : "mac";
+              const catLabels = {
+                mac: "Macaroni",
+                sides: "Sides & Snack",
+                drinks: "Minuman",
+              };
               return {
                 id: p.id,
                 name: p.name,
@@ -196,42 +226,59 @@ export function AdminDashboardPage() {
                 branchSoldCounts: p.branchSoldCounts || {},
                 branchStocks: p.branchStocks,
               };
-            })
+            }),
           );
         }
 
-        if (orderRes.status === "fulfilled" && orderRes.value?.data?.length > 0) {
-          const backendOrders = (orderRes.value.data as Array<{
-            id: string;
-            orderNumber: string;
-            branchId?: string;
-            branchName?: string;
-            items?: Array<{
-              productId?: string;
-              productName: string;
-              quantity: number;
-              price: number;
+        if (
+          orderRes.status === "fulfilled" &&
+          orderRes.value?.data?.length > 0
+        ) {
+          const backendOrders = (
+            orderRes.value.data as Array<{
+              id: string;
+              orderNumber: string;
+              branchId?: string;
+              branchName?: string;
+              items?: Array<{
+                productId?: string;
+                productName: string;
+                quantity: number;
+                price: number;
+                subtotal: number;
+                notes?: string;
+              }>;
               subtotal: number;
-              notes?: string;
-            }>;
-            subtotal: number;
-            discount?: number;
-            promoCode?: string;
-            promoName?: string;
-            tax: number;
-            total: number;
-            paymentMethod: CompletedOrder["paymentMethod"];
-            amountTendered?: number;
-            changeAmount?: number;
-            createdAt: string;
-            cashierName: string;
-            syncStatus?: "SYNCED" | "PENDING_SYNC";
-            paymentStatus?: "PAID" | "REFUNDED" | "VOID";
-          }>).map((o) => ({
+              discount?: number;
+              promoCode?: string;
+              promoName?: string;
+              tax: number;
+              total: number;
+              paymentMethod: CompletedOrder["paymentMethod"];
+              amountTendered?: number;
+              changeAmount?: number;
+              createdAt: string;
+              cashierName: string;
+              syncStatus?: "SYNCED" | "PENDING_SYNC";
+              paymentStatus?: "PAID" | "REFUNDED" | "VOID";
+            }>
+          ).map((o) => ({
             id: o.id,
             orderNumber: o.orderNumber,
-            branchId: o.branchId || (o.cashierName?.includes("Tebet") ? "branch-3" : o.cashierName?.includes("Margonda") ? "branch-2" : "branch-1"),
-            branchName: o.branchName || (o.cashierName?.includes("Tebet") ? "MacMood Kitchen - Tebet" : o.cashierName?.includes("Margonda") ? "MacMood Express - Margonda" : "MacMood Pusat - Fatmawati"),
+            branchId:
+              o.branchId ||
+              (o.cashierName?.includes("Tebet")
+                ? "branch-3"
+                : o.cashierName?.includes("Margonda")
+                  ? "branch-2"
+                  : "branch-1"),
+            branchName:
+              o.branchName ||
+              (o.cashierName?.includes("Tebet")
+                ? "MacMood Kitchen - Tebet"
+                : o.cashierName?.includes("Margonda")
+                  ? "MacMood Express - Margonda"
+                  : "MacMood Pusat - Fatmawati"),
             items: (o.items || []).map((it) => ({
               productId: it.productId || it.productName,
               name: it.productName,
@@ -249,16 +296,25 @@ export function AdminDashboardPage() {
             paymentMethod: o.paymentMethod,
             amountTendered: o.amountTendered || o.total,
             change: o.changeAmount || 0,
-            timestamp: new Date(o.createdAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB",
+            timestamp:
+              new Date(o.createdAt).toLocaleTimeString("id-ID", {
+                hour: "2-digit",
+                minute: "2-digit",
+              }) + " WIB",
             dateStr: new Date(o.createdAt).toISOString().slice(0, 10),
             cashierName: o.cashierName,
             syncStatus: o.syncStatus || "SYNCED",
-            status: (o.paymentStatus === "REFUNDED" ? "VOID" : o.paymentStatus || "PAID") as CompletedOrder["status"],
+            status: (o.paymentStatus === "REFUNDED"
+              ? "VOID"
+              : o.paymentStatus || "PAID") as CompletedOrder["status"],
           }));
           setOrders(backendOrders);
 
           // Sync soldCounts from loaded orders
-          const orderSoldMap = new Map<string, { total: number; byBranch: Record<string, number> }>();
+          const orderSoldMap = new Map<
+            string,
+            { total: number; byBranch: Record<string, number> }
+          >();
           for (const o of backendOrders) {
             if (o.status !== "VOID") {
               for (const it of o.items) {
@@ -266,7 +322,8 @@ export function AdminDashboardPage() {
                 const cur = orderSoldMap.get(key) || { total: 0, byBranch: {} };
                 cur.total += it.quantity;
                 if (o.branchId) {
-                  cur.byBranch[o.branchId] = (cur.byBranch[o.branchId] || 0) + it.quantity;
+                  cur.byBranch[o.branchId] =
+                    (cur.byBranch[o.branchId] || 0) + it.quantity;
                 }
                 orderSoldMap.set(key, cur);
               }
@@ -279,9 +336,11 @@ export function AdminDashboardPage() {
               return {
                 ...p,
                 soldCount: fromOrders ? fromOrders.total : p.soldCount,
-                branchSoldCounts: fromOrders ? fromOrders.byBranch : p.branchSoldCounts,
+                branchSoldCounts: fromOrders
+                  ? fromOrders.byBranch
+                  : p.branchSoldCounts,
               };
-            })
+            }),
           );
         }
 
@@ -322,23 +381,26 @@ export function AdminDashboardPage() {
               notes?: string;
             }>;
           };
-          const shiftMap = new Map<string, {
-            id: string;
-            staffName: string;
-            shiftCode: string;
-            startTime: string;
-            endTime?: string;
-            initialCash: number;
-            cashSales: number;
-            qrisSales: number;
-            totalOrders: number;
-            expectedCash: number;
-            actualCash?: number;
-            cashDifference?: number;
-            status: "OPEN" | "CLOSED";
-            isVerified?: boolean;
-            notes?: string;
-          }>();
+          const shiftMap = new Map<
+            string,
+            {
+              id: string;
+              staffName: string;
+              shiftCode: string;
+              startTime: string;
+              endTime?: string;
+              initialCash: number;
+              cashSales: number;
+              qrisSales: number;
+              totalOrders: number;
+              expectedCash: number;
+              actualCash?: number;
+              cashDifference?: number;
+              status: "OPEN" | "CLOSED";
+              isVerified?: boolean;
+              notes?: string;
+            }
+          >();
 
           if (val.active) shiftMap.set(val.active.id, val.active);
           if (val.past && Array.isArray(val.past)) {
@@ -356,11 +418,19 @@ export function AdminDashboardPage() {
               let branchCode = "MAC-JKT-01";
 
               const nameLower = (s.staffName || "").toLowerCase();
-              if (nameLower.includes("margonda") || nameLower.includes("rian") || nameLower.includes("outlet 2")) {
+              if (
+                nameLower.includes("margonda") ||
+                nameLower.includes("rian") ||
+                nameLower.includes("outlet 2")
+              ) {
                 branchId = "branch-2";
                 branchName = "MacMood Express - Margonda";
                 branchCode = "MAC-DPK-01";
-              } else if (nameLower.includes("tebet") || nameLower.includes("siti") || nameLower.includes("outlet 3")) {
+              } else if (
+                nameLower.includes("tebet") ||
+                nameLower.includes("siti") ||
+                nameLower.includes("outlet 3")
+              ) {
                 branchId = "branch-3";
                 branchName = "MacMood Kitchen - Tebet";
                 branchCode = "MAC-JKT-02";
@@ -374,9 +444,22 @@ export function AdminDashboardPage() {
                 branchCode,
                 cashierId: s.staffName,
                 cashierName: s.staffName,
-                startTime: new Date(s.startTime).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB",
-                endTime: s.endTime ? new Date(s.endTime).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB" : null,
-                date: new Date(s.startTime).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }),
+                startTime:
+                  new Date(s.startTime).toLocaleTimeString("id-ID", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }) + " WIB",
+                endTime: s.endTime
+                  ? new Date(s.endTime).toLocaleTimeString("id-ID", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }) + " WIB"
+                  : null,
+                date: new Date(s.startTime).toLocaleDateString("id-ID", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                }),
                 initialCash: s.initialCash,
                 cashSales: s.cashSales,
                 qrisSales: s.qrisSales,
@@ -403,54 +486,73 @@ export function AdminDashboardPage() {
             OPERASIONAL_LAIN: "Operasional Lain-lain",
           };
           setExpenses(
-            (expRes.value.data as Array<{
-              id: string;
-              createdAt: string;
-              title: string;
-              amount: number;
-              category: ExpenseRecord["category"];
-              paymentSource: "CASH_DRAWER" | "BANK_TRANSFER";
-              staffName: string;
-              receiptNumber?: string;
-              notes?: string;
-            }>).map((e) => ({
+            (
+              expRes.value.data as Array<{
+                id: string;
+                createdAt: string;
+                title: string;
+                amount: number;
+                category: ExpenseRecord["category"];
+                paymentSource: "CASH_DRAWER" | "BANK_TRANSFER";
+                staffName: string;
+                receiptNumber?: string;
+                notes?: string;
+              }>
+            ).map((e) => ({
               id: e.id,
-              date: new Date(e.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }),
-              time: new Date(e.createdAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB",
+              date: new Date(e.createdAt).toLocaleDateString("id-ID", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              }),
+              time:
+                new Date(e.createdAt).toLocaleTimeString("id-ID", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }) + " WIB",
               category: e.category,
               categoryLabel: expCategoryLabels[e.category] || "Pengeluaran",
               description: e.title,
               amount: e.amount,
-              sourceOfFund: e.paymentSource === "CASH_DRAWER" ? ("KAS_LACI" as const) : ("TRANSFER_OWNER" as const),
+              sourceOfFund:
+                e.paymentSource === "CASH_DRAWER"
+                  ? ("KAS_LACI" as const)
+                  : ("TRANSFER_OWNER" as const),
               staffName: e.staffName,
               receiptNumber: e.receiptNumber || undefined,
               notes: e.notes || "",
-            }))
+            })),
           );
         }
 
-        if (promoRes.status === "fulfilled" && promoRes.value?.data?.length > 0) {
+        if (
+          promoRes.status === "fulfilled" &&
+          promoRes.value?.data?.length > 0
+        ) {
           setPromos(
-            (promoRes.value.data as Array<{
-              id: string;
-              code: string;
-              name: string;
-              description?: string;
-              discountType: "PERCENTAGE" | "FIXED";
-              discountValue: number;
-              maxDiscount?: number;
-              minSubtotal?: number;
-              maxUsage?: number;
-              currentUsage?: number;
-              isActive: boolean;
-              startDate: string;
-              endDate?: string;
-            }>).map((p) => ({
+            (
+              promoRes.value.data as Array<{
+                id: string;
+                code: string;
+                name: string;
+                description?: string;
+                discountType: "PERCENTAGE" | "FIXED";
+                discountValue: number;
+                maxDiscount?: number;
+                minSubtotal?: number;
+                maxUsage?: number;
+                currentUsage?: number;
+                isActive: boolean;
+                startDate: string;
+                endDate?: string;
+              }>
+            ).map((p) => ({
               id: p.id,
               code: p.code,
               name: p.name,
               description: p.description || "",
-              discountType: p.discountType === "FIXED" ? "FIXED_AMOUNT" : "PERCENTAGE",
+              discountType:
+                p.discountType === "FIXED" ? "FIXED_AMOUNT" : "PERCENTAGE",
               discountValue: p.discountValue,
               maxDiscount: p.maxDiscount || undefined,
               minOrderAmount: p.minSubtotal || 0,
@@ -458,25 +560,29 @@ export function AdminDashboardPage() {
               usedCount: p.currentUsage || 0,
               isActive: p.isActive,
               startDate: new Date(p.startDate).toISOString().slice(0, 10),
-              endDate: p.endDate ? new Date(p.endDate).toISOString().slice(0, 10) : "2026-12-31",
-            }))
+              endDate: p.endDate
+                ? new Date(p.endDate).toISOString().slice(0, 10)
+                : "2026-12-31",
+            })),
           );
         }
 
         if (matRes.status === "fulfilled" && matRes.value?.data?.length > 0) {
           setRawMaterials(
-            (matRes.value.data as Array<{
-              id: string;
-              name: string;
-              sku: string;
-              category: RawMaterialCategory;
-              unit: RawMaterialUnit;
-              currentStock: string | number;
-              minStock: string | number;
-              costPerUnit: number;
-              supplierName?: string;
-              updatedAt: string;
-            }>).map((m) => {
+            (
+              matRes.value.data as Array<{
+                id: string;
+                name: string;
+                sku: string;
+                category: RawMaterialCategory;
+                unit: RawMaterialUnit;
+                currentStock: string | number;
+                minStock: string | number;
+                costPerUnit: number;
+                supplierName?: string;
+                updatedAt: string;
+              }>
+            ).map((m) => {
               const catLabels: Record<RawMaterialCategory, string> = {
                 PASTA: "Pasta Kering",
                 DAIRY_CHEESE: "Keju & Olahan Susu",
@@ -495,33 +601,42 @@ export function AdminDashboardPage() {
                 minThreshold: Number(m.minStock),
                 costPerUnit: m.costPerUnit,
                 supplier: m.supplierName || "-",
-                lastRestockDate: new Date(m.updatedAt).toISOString().slice(0, 10),
+                lastRestockDate: new Date(m.updatedAt)
+                  .toISOString()
+                  .slice(0, 10),
               };
-            })
+            }),
           );
         }
 
-        if (recipeRes.status === "fulfilled" && recipeRes.value?.data?.length > 0) {
+        if (
+          recipeRes.status === "fulfilled" &&
+          recipeRes.value?.data?.length > 0
+        ) {
           setRecipes(
-            (recipeRes.value.data as Array<{
-              productId: string;
-              productName: string;
-              categorySlug: string;
-              price: number;
-              calculatedHpp: number;
-              grossMargin: number;
-              availablePortions: number;
-              limitingIngredient?: string;
-              ingredients?: Array<{
-                rawMaterialId: string;
-                materialName: string;
-                amount: number;
-                unit: string;
-                costSubtotal: number;
-              }>;
-            }>).map((r) => {
+            (
+              recipeRes.value.data as Array<{
+                productId: string;
+                productName: string;
+                categorySlug: string;
+                price: number;
+                calculatedHpp: number;
+                grossMargin: number;
+                availablePortions: number;
+                limitingIngredient?: string;
+                ingredients?: Array<{
+                  rawMaterialId: string;
+                  materialName: string;
+                  amount: number;
+                  unit: string;
+                  costSubtotal: number;
+                }>;
+              }>
+            ).map((r) => {
               const category: "mac" | "sides" | "drinks" =
-                r.categorySlug === "sides" || r.categorySlug === "drinks" ? r.categorySlug : "mac";
+                r.categorySlug === "sides" || r.categorySlug === "drinks"
+                  ? r.categorySlug
+                  : "mac";
               return {
                 productId: r.productId,
                 productName: r.productName,
@@ -531,7 +646,8 @@ export function AdminDashboardPage() {
                 grossMarginAmount: r.price - r.calculatedHpp,
                 grossMarginPercent: r.grossMargin,
                 maxPortionsAvailable: r.availablePortions,
-                limitingMaterialName: r.limitingIngredient || "Bahan Baku Cukup",
+                limitingMaterialName:
+                  r.limitingIngredient || "Bahan Baku Cukup",
                 ingredients: (r.ingredients || []).map((it) => ({
                   materialId: it.rawMaterialId,
                   materialName: it.materialName,
@@ -541,25 +657,30 @@ export function AdminDashboardPage() {
                   subtotalCost: it.costSubtotal,
                 })),
               };
-            })
+            }),
           );
         }
 
-        if (auditRes.status === "fulfilled" && auditRes.value?.data?.length > 0) {
+        if (
+          auditRes.status === "fulfilled" &&
+          auditRes.value?.data?.length > 0
+        ) {
           setAuditLogs(
-            (auditRes.value.data as Array<{
-              id: string;
-              createdAt: string;
-              action: AuditLogRecord["action"];
-              actionLabel: string;
-              entityType: string;
-              entityId?: string;
-              userName: string;
-              userRole: string;
-              oldValue?: string;
-              newValue?: string;
-              reason?: string;
-            }>).map((a) => {
+            (
+              auditRes.value.data as Array<{
+                id: string;
+                createdAt: string;
+                action: AuditLogRecord["action"];
+                actionLabel: string;
+                entityType: string;
+                entityId?: string;
+                userName: string;
+                userRole: string;
+                oldValue?: string;
+                newValue?: string;
+                reason?: string;
+              }>
+            ).map((a) => {
               const validEntityTypes: AuditLogRecord["entityType"][] = [
                 "PRODUCT",
                 "ORDER",
@@ -572,28 +693,37 @@ export function AdminDashboardPage() {
                 "RECIPE",
                 "RAW_MATERIAL",
               ];
-              const entityType = validEntityTypes.includes(a.entityType as AuditLogRecord["entityType"])
+              const entityType = validEntityTypes.includes(
+                a.entityType as AuditLogRecord["entityType"],
+              )
                 ? (a.entityType as AuditLogRecord["entityType"])
                 : "PRODUCT";
               return {
                 id: a.id,
                 timestamp: `${new Date(a.createdAt).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}, ${new Date(a.createdAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB`,
-                date: new Date(a.createdAt).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }),
-                time: new Date(a.createdAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB",
+                date: new Date(a.createdAt).toLocaleDateString("id-ID", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                }),
+                time:
+                  new Date(a.createdAt).toLocaleTimeString("id-ID", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }) + " WIB",
                 action: a.action,
                 actionLabel: a.actionLabel,
                 entityType,
                 entityId: a.entityId || "",
                 performedBy: a.userName,
-                userRole: (
-                  (a.userRole?.toLowerCase() === "owner" || a.userName.toLowerCase().includes("afrizal")) &&
-                  !a.userName.toLowerCase().includes("budi") &&
-                  !a.userName.toLowerCase().includes("rian") &&
-                  !a.userName.toLowerCase().includes("siti") &&
-                  !a.userName.toLowerCase().includes("kasir")
-                    ? "owner"
-                    : "cashier"
-                ) as "owner" | "cashier",
+                userRole: ((a.userRole?.toLowerCase() === "owner" ||
+                  a.userName.toLowerCase().includes("afrizal")) &&
+                !a.userName.toLowerCase().includes("budi") &&
+                !a.userName.toLowerCase().includes("rian") &&
+                !a.userName.toLowerCase().includes("siti") &&
+                !a.userName.toLowerCase().includes("kasir")
+                  ? "owner"
+                  : "cashier") as "owner" | "cashier",
                 details: {
                   title: a.actionLabel,
                   before: a.oldValue || "-",
@@ -601,28 +731,33 @@ export function AdminDashboardPage() {
                   reason: a.reason || "-",
                 },
               };
-            })
+            }),
           );
         }
 
-        if (branchRes.status === "fulfilled" && branchRes.value?.data?.length > 0) {
-          const mappedBranches: BranchOutlet[] = (branchRes.value.data as Array<{
-            id: string;
-            name: string;
-            branchCode: string;
-            address: string;
-            city: string;
-            phone: string;
-            email?: string;
-            pin?: string;
-            isActive?: boolean;
-            taxRate?: number;
-            serviceChargeRate?: number;
-            qrisMerchantName?: string;
-            qrisNmid?: string;
-            bankAccount?: string;
-            bankName?: string;
-          }>).map((b) => ({
+        if (
+          branchRes.status === "fulfilled" &&
+          branchRes.value?.data?.length > 0
+        ) {
+          const mappedBranches: BranchOutlet[] = (
+            branchRes.value.data as Array<{
+              id: string;
+              name: string;
+              branchCode: string;
+              address: string;
+              city: string;
+              phone: string;
+              email?: string;
+              pin?: string;
+              isActive?: boolean;
+              taxRate?: number;
+              serviceChargeRate?: number;
+              qrisMerchantName?: string;
+              qrisNmid?: string;
+              bankAccount?: string;
+              bankName?: string;
+            }>
+          ).map((b) => ({
             id: b.id,
             name: b.name,
             branchCode: b.branchCode,
@@ -657,11 +792,13 @@ export function AdminDashboardPage() {
 
   // Counts for Badges
   const lowStockCount = products.filter(
-    (p) => p.trackStock && p.currentStock <= p.lowStockThreshold
+    (p) => p.trackStock && p.currentStock <= p.lowStockThreshold,
   ).length;
 
   // Product Actions
-  const handleAddProduct = (newProd: Omit<AdminProduct, "id" | "soldCount">) => {
+  const handleAddProduct = (
+    newProd: Omit<AdminProduct, "id" | "soldCount">,
+  ) => {
     const id = `prod-${Date.now()}`;
     const product: AdminProduct = {
       ...newProd,
@@ -692,7 +829,11 @@ export function AdminDashboardPage() {
     const oldProduct = products.find((p) => p.id === id);
 
     // If price changed, log to audit trail
-    if (oldProduct && updates.price !== undefined && oldProduct.price !== updates.price) {
+    if (
+      oldProduct &&
+      updates.price !== undefined &&
+      oldProduct.price !== updates.price
+    ) {
       const audit: AuditLogRecord = {
         id: `audit-${Date.now()}`,
         timestamp: `${new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}, ${new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB`,
@@ -714,12 +855,16 @@ export function AdminDashboardPage() {
       setAuditLogs((prev) => [audit, ...prev]);
     }
 
-    setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)));
+    setProducts((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, ...updates } : p)),
+    );
   };
 
   const handleToggleProductAvailability = (productId: string) => {
     setProducts((prev) =>
-      prev.map((p) => (p.id === productId ? { ...p, isAvailable: !p.isAvailable } : p))
+      prev.map((p) =>
+        p.id === productId ? { ...p, isAvailable: !p.isAvailable } : p,
+      ),
     );
   };
 
@@ -731,7 +876,7 @@ export function AdminDashboardPage() {
     notes: string,
     staff: string,
     branchId?: string,
-    branchName?: string
+    branchName?: string,
   ) => {
     const target = products.find((p) => p.id === productId);
     if (!target) return;
@@ -739,7 +884,8 @@ export function AdminDashboardPage() {
     const newStock = Math.max(0, target.currentStock + delta);
     const updatedBranchStocks = { ...(target.branchStocks || {}) };
     if (branchId) {
-      const curBranchStock = updatedBranchStocks[branchId] ?? Math.round(target.currentStock / 3);
+      const curBranchStock =
+        updatedBranchStocks[branchId] ?? Math.round(target.currentStock / 3);
       updatedBranchStocks[branchId] = Math.max(0, curBranchStock + delta);
     }
 
@@ -752,8 +898,8 @@ export function AdminDashboardPage() {
               currentStock: newStock,
               branchStocks: updatedBranchStocks,
             }
-          : p
-      )
+          : p,
+      ),
     );
 
     // Add log
@@ -791,8 +937,8 @@ export function AdminDashboardPage() {
               voidReason: reason,
               voidedAt: `${new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB`,
             }
-          : ord
-      )
+          : ord,
+      ),
     );
 
     // Add audit log
@@ -820,7 +966,7 @@ export function AdminDashboardPage() {
   // Shift Verification Action
   const handleVerifyShift = (shiftId: string) => {
     setShifts((prev) =>
-      prev.map((s) => (s.id === shiftId ? { ...s, verifiedByOwner: true } : s))
+      prev.map((s) => (s.id === shiftId ? { ...s, verifiedByOwner: true } : s)),
     );
     const target = shifts.find((s) => s.id === shiftId);
     const log: AuditLogRecord = {
@@ -878,7 +1024,10 @@ export function AdminDashboardPage() {
         title: newExp.description,
         amount: newExp.amount,
         category: newExp.category,
-        paymentSource: newExp.sourceOfFund === "TRANSFER_OWNER" ? "OWNER_TRANSFER" : "CASH_DRAWER",
+        paymentSource:
+          newExp.sourceOfFund === "TRANSFER_OWNER"
+            ? "OWNER_TRANSFER"
+            : "CASH_DRAWER",
         staffName: newExp.staffName,
         receiptNumber: newExp.receiptNumber,
         notes: newExp.notes,
@@ -899,7 +1048,7 @@ export function AdminDashboardPage() {
   const handleUpdateStaffPin = (staffId: string, newPin: string) => {
     const target = staffAccounts.find((s) => s.id === staffId);
     setStaffAccounts((prev) =>
-      prev.map((s) => (s.id === staffId ? { ...s, pin: newPin } : s))
+      prev.map((s) => (s.id === staffId ? { ...s, pin: newPin } : s)),
     );
 
     if (target) {
@@ -927,7 +1076,7 @@ export function AdminDashboardPage() {
 
   const handleToggleStaffStatus = (staffId: string) => {
     setStaffAccounts((prev) =>
-      prev.map((s) => (s.id === staffId ? { ...s, isActive: !s.isActive } : s))
+      prev.map((s) => (s.id === staffId ? { ...s, isActive: !s.isActive } : s)),
     );
   };
 
@@ -956,9 +1105,13 @@ export function AdminDashboardPage() {
     }
   };
 
-  const handleUpdateStaffBranch = (staffId: string, branchId: string, branchName: string) => {
+  const handleUpdateStaffBranch = (
+    staffId: string,
+    branchId: string,
+    branchName: string,
+  ) => {
     setStaffAccounts((prev) =>
-      prev.map((s) => (s.id === staffId ? { ...s, branchId, branchName } : s))
+      prev.map((s) => (s.id === staffId ? { ...s, branchId, branchName } : s)),
     );
     const target = staffAccounts.find((s) => s.id === staffId);
     if (target) {
@@ -1000,7 +1153,9 @@ export function AdminDashboardPage() {
           address: newBranchData.address,
           city: newBranchData.city || "Jakarta",
           phone: newBranchData.phone || "0812-9988-1234",
-          email: newBranchData.email || `${(newBranchData.branchCode || "cabang").toLowerCase()}@macmood.id`,
+          email:
+            newBranchData.email ||
+            `${(newBranchData.branchCode || "cabang").toLowerCase()}@macmood.id`,
           pin: newBranchData.pin || "1234",
           isActive: newBranchData.isActive !== false,
         }),
@@ -1053,7 +1208,10 @@ export function AdminDashboardPage() {
     setAuditLogs((prev) => [log, ...prev]);
   };
 
-  const handleUpdateBranch = async (branchId: string, updates: Partial<BranchOutlet>) => {
+  const handleUpdateBranch = async (
+    branchId: string,
+    updates: Partial<BranchOutlet>,
+  ) => {
     try {
       await fetch(`/api/branches/${branchId}`, {
         method: "PATCH",
@@ -1074,7 +1232,9 @@ export function AdminDashboardPage() {
     }
 
     setBranches((prev) => {
-      const next = prev.map((b) => (b.id === branchId ? { ...b, ...updates } : b));
+      const next = prev.map((b) =>
+        b.id === branchId ? { ...b, ...updates } : b,
+      );
       if (typeof window !== "undefined") {
         try {
           localStorage.setItem("macmood_branches", JSON.stringify(next));
@@ -1088,7 +1248,9 @@ export function AdminDashboardPage() {
     // Synchronize staff branchName if branch name updated
     if (updates.name) {
       setStaffAccounts((prev) =>
-        prev.map((s) => (s.branchId === branchId ? { ...s, branchName: updates.name } : s))
+        prev.map((s) =>
+          s.branchId === branchId ? { ...s, branchName: updates.name } : s,
+        ),
       );
     }
 
@@ -1143,9 +1305,13 @@ export function AdminDashboardPage() {
     setStaffAccounts((prev) =>
       prev.map((s) =>
         s.branchId === branchId
-          ? { ...s, branchId: "branch-1", branchName: "MacMood Pusat - Fatmawati" }
-          : s
-      )
+          ? {
+              ...s,
+              branchId: "branch-1",
+              branchName: "MacMood Pusat - Fatmawati",
+            }
+          : s,
+      ),
     );
 
     const log: AuditLogRecord = {
@@ -1170,7 +1336,9 @@ export function AdminDashboardPage() {
   };
 
   // Promo Handlers (PRD Fase 2)
-  const handleAddPromo = (newPromoData: Omit<PromoVoucher, "id" | "usedCount">) => {
+  const handleAddPromo = (
+    newPromoData: Omit<PromoVoucher, "id" | "usedCount">,
+  ) => {
     const newPromo: PromoVoucher = {
       ...newPromoData,
       id: `promo-${Date.now()}`,
@@ -1181,7 +1349,11 @@ export function AdminDashboardPage() {
     const log: AuditLogRecord = {
       id: `audit-${Date.now()}`,
       timestamp: `${new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}, ${new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB`,
-      date: new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }),
+      date: new Date().toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }),
       time: `${new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB`,
       action: "PROMO_CREATED",
       actionLabel: "Pembuatan Promo Baru",
@@ -1205,7 +1377,8 @@ export function AdminDashboardPage() {
         code: newPromo.code,
         name: newPromo.name,
         description: newPromo.description,
-        discountType: newPromo.discountType === "FIXED_AMOUNT" ? "FIXED" : "PERCENTAGE",
+        discountType:
+          newPromo.discountType === "FIXED_AMOUNT" ? "FIXED" : "PERCENTAGE",
         discountValue: newPromo.discountValue,
         maxDiscount: newPromo.maxDiscount,
         minSubtotal: newPromo.minOrderAmount,
@@ -1218,12 +1391,18 @@ export function AdminDashboardPage() {
   };
 
   const handleUpdatePromo = (id: string, updates: Partial<PromoVoucher>) => {
-    setPromos((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)));
+    setPromos((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, ...updates } : p)),
+    );
 
     const log: AuditLogRecord = {
       id: `audit-${Date.now()}`,
       timestamp: `${new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}, ${new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB`,
-      date: new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }),
+      date: new Date().toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }),
       time: `${new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB`,
       action: "PROMO_UPDATED",
       actionLabel: "Pembaruan Pengaturan Promo",
@@ -1245,7 +1424,7 @@ export function AdminDashboardPage() {
 
   const handleTogglePromoStatus = (id: string, currentStatus: boolean) => {
     setPromos((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, isActive: !currentStatus } : p))
+      prev.map((p) => (p.id === id ? { ...p, isActive: !currentStatus } : p)),
     );
   };
 
@@ -1253,16 +1432,21 @@ export function AdminDashboardPage() {
   const handleUpdateRecipe = (
     productId: string,
     updatedIngredients: ProductRecipe["ingredients"],
-    notes?: string
+    notes?: string,
   ) => {
-    const newTotalHpp = updatedIngredients.reduce((s, i) => s + i.subtotalCost, 0);
+    const newTotalHpp = updatedIngredients.reduce(
+      (s, i) => s + i.subtotalCost,
+      0,
+    );
 
     setRecipes((prev) =>
       prev.map((r) => {
         if (r.productId === productId) {
           const grossMarginAmount = r.sellingPrice - newTotalHpp;
           const grossMarginPercent =
-            Math.round(((r.sellingPrice - newTotalHpp) / r.sellingPrice) * 1000) / 10;
+            Math.round(
+              ((r.sellingPrice - newTotalHpp) / r.sellingPrice) * 1000,
+            ) / 10;
           return {
             ...r,
             ingredients: updatedIngredients,
@@ -1273,19 +1457,25 @@ export function AdminDashboardPage() {
           };
         }
         return r;
-      })
+      }),
     );
 
     // Sync product costPrice (HPP) in menu catalog
     setProducts((prev) =>
-      prev.map((p) => (p.id === productId ? { ...p, costPrice: newTotalHpp } : p))
+      prev.map((p) =>
+        p.id === productId ? { ...p, costPrice: newTotalHpp } : p,
+      ),
     );
 
     const targetRecipe = recipes.find((r) => r.productId === productId);
     const log: AuditLogRecord = {
       id: `audit-${Date.now()}`,
       timestamp: `${new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}, ${new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB`,
-      date: new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }),
+      date: new Date().toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }),
       time: `${new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB`,
       action: "RECIPE_UPDATED",
       actionLabel: "Penyesuaian Komposisi Resep (BOM)",
@@ -1323,13 +1513,16 @@ export function AdminDashboardPage() {
     materialId: string,
     addedStock: number,
     newCostPerUnit?: number,
-    notes?: string
+    notes?: string,
   ) => {
     setRawMaterials((prev) =>
       prev.map((m) => {
         if (m.id === materialId) {
           const updatedStock = m.currentStock + addedStock;
-          const updatedCost = newCostPerUnit && newCostPerUnit > 0 ? newCostPerUnit : m.costPerUnit;
+          const updatedCost =
+            newCostPerUnit && newCostPerUnit > 0
+              ? newCostPerUnit
+              : m.costPerUnit;
           return {
             ...m,
             currentStock: updatedStock,
@@ -1338,14 +1531,18 @@ export function AdminDashboardPage() {
           };
         }
         return m;
-      })
+      }),
     );
 
     const mat = rawMaterials.find((m) => m.id === materialId);
     const log: AuditLogRecord = {
       id: `audit-${Date.now()}`,
       timestamp: `${new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}, ${new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB`,
-      date: new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }),
+      date: new Date().toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }),
       time: `${new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB`,
       action: "RAW_MATERIAL_RESTOCKED",
       actionLabel: "Restock Bahan Mentah Gudang",
@@ -1478,13 +1675,19 @@ export function AdminDashboardPage() {
 
           {activeTab === "shifts" && (
             <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full pb-12">
-              <AdminShiftsView shifts={shifts} onVerifyShift={handleVerifyShift} />
+              <AdminShiftsView
+                shifts={shifts}
+                onVerifyShift={handleVerifyShift}
+              />
             </div>
           )}
 
           {activeTab === "expenses" && (
             <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full pb-12">
-              <AdminExpensesView expenses={expenses} onAddExpense={handleAddExpense} />
+              <AdminExpensesView
+                expenses={expenses}
+                onAddExpense={handleAddExpense}
+              />
             </div>
           )}
 

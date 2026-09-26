@@ -20,8 +20,17 @@ import {
 interface AdminRecipesViewProps {
   recipes: ProductRecipe[];
   rawMaterials: RawMaterial[];
-  onUpdateRecipe: (productId: string, updatedIngredients: ProductRecipe["ingredients"], notes?: string) => void;
-  onRestockMaterial: (materialId: string, addedStock: number, newCostPerUnit?: number, notes?: string) => void;
+  onUpdateRecipe: (
+    productId: string,
+    updatedIngredients: ProductRecipe["ingredients"],
+    notes?: string,
+  ) => void;
+  onRestockMaterial: (
+    materialId: string,
+    addedStock: number,
+    newCostPerUnit?: number,
+    notes?: string,
+  ) => void;
   onAddNewMaterial: (material: Omit<RawMaterial, "id">) => void;
 }
 
@@ -46,15 +55,20 @@ export function AdminRecipesView({
 
   // Edit Recipe Modal State
   const [isRecipeModalOpen, setIsRecipeModalOpen] = useState(false);
-  const [editingRecipe, setEditingRecipe] = useState<ProductRecipe | null>(null);
-  const [tempIngredients, setTempIngredients] = useState<ProductRecipe["ingredients"]>([]);
+  const [editingRecipe, setEditingRecipe] = useState<ProductRecipe | null>(
+    null,
+  );
+  const [tempIngredients, setTempIngredients] = useState<
+    ProductRecipe["ingredients"]
+  >([]);
   const [recipeNotes, setRecipeNotes] = useState("");
 
   // Add Material Modal State
   const [isNewMaterialModalOpen, setIsNewMaterialModalOpen] = useState(false);
   const [newMatName, setNewMatName] = useState("");
   const [newMatCode, setNewMatCode] = useState("");
-  const [newMatCategory, setNewMatCategory] = useState<RawMaterialCategory>("PASTA");
+  const [newMatCategory, setNewMatCategory] =
+    useState<RawMaterialCategory>("PASTA");
   const [newMatStock, setNewMatStock] = useState<number>(1000);
   const [newMatUnit, setNewMatUnit] = useState<"gram" | "ml" | "pcs">("gram");
   const [newMatThreshold, setNewMatThreshold] = useState<number>(500);
@@ -63,16 +77,23 @@ export function AdminRecipesView({
 
   // KPI Calculations
   const totalRawValue = useMemo(() => {
-    return rawMaterials.reduce((sum, rm) => sum + rm.currentStock * rm.costPerUnit, 0);
+    return rawMaterials.reduce(
+      (sum, rm) => sum + rm.currentStock * rm.costPerUnit,
+      0,
+    );
   }, [rawMaterials]);
 
   const lowStockMaterialsCount = useMemo(() => {
-    return rawMaterials.filter((rm) => rm.currentStock <= rm.minThreshold).length;
+    return rawMaterials.filter((rm) => rm.currentStock <= rm.minThreshold)
+      .length;
   }, [rawMaterials]);
 
   const avgGrossMargin = useMemo(() => {
     if (recipes.length === 0) return 0;
-    const totalMargin = recipes.reduce((sum, r) => sum + r.grossMarginPercent, 0);
+    const totalMargin = recipes.reduce(
+      (sum, r) => sum + r.grossMarginPercent,
+      0,
+    );
     return Math.round((totalMargin / recipes.length) * 10) / 10;
   }, [recipes]);
 
@@ -81,8 +102,11 @@ export function AdminRecipesView({
     return recipes.filter((r) => {
       const matchSearch =
         r.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        r.ingredients.some((ing) => ing.materialName.toLowerCase().includes(searchQuery.toLowerCase()));
-      const matchCat = categoryFilter === "ALL" || r.category === categoryFilter;
+        r.ingredients.some((ing) =>
+          ing.materialName.toLowerCase().includes(searchQuery.toLowerCase()),
+        );
+      const matchCat =
+        categoryFilter === "ALL" || r.category === categoryFilter;
       return matchSearch && matchCat;
     });
   }, [recipes, searchQuery, categoryFilter]);
@@ -94,14 +118,17 @@ export function AdminRecipesView({
         m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         m.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
         m.supplier.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchCat = categoryFilter === "ALL" || m.category === categoryFilter;
+      const matchCat =
+        categoryFilter === "ALL" || m.category === categoryFilter;
       return matchSearch && matchCat;
     });
   }, [rawMaterials, searchQuery, categoryFilter]);
 
   // Open Restock Modal
   const handleOpenRestock = (matId?: string) => {
-    const target = matId ? rawMaterials.find((m) => m.id === matId) : rawMaterials[0];
+    const target = matId
+      ? rawMaterials.find((m) => m.id === matId)
+      : rawMaterials[0];
     if (target) {
       setSelectedMaterialId(target.id);
       setRestockAmount(target.unit === "pcs" ? 100 : 1000);
@@ -115,7 +142,12 @@ export function AdminRecipesView({
   const handleConfirmRestock = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedMaterialId || restockAmount <= 0) return;
-    onRestockMaterial(selectedMaterialId, restockAmount, restockUnitCost, restockNotes);
+    onRestockMaterial(
+      selectedMaterialId,
+      restockAmount,
+      restockUnitCost,
+      restockNotes,
+    );
     setIsRestockModalOpen(false);
   };
 
@@ -138,7 +170,7 @@ export function AdminRecipesView({
           };
         }
         return ing;
-      })
+      }),
     );
   };
 
@@ -208,7 +240,9 @@ export function AdminRecipesView({
             Manajemen Resep & Bahan Baku Mentah
           </h2>
           <p className="text-xs sm:text-sm text-neutral-600 max-w-2xl mt-0.5">
-            Konversi takaran gramatur keju & makaroni, kalkulasi HPP otomatis per porsi menu, dan pantau batas kapasitas porsi berdasarkan stok bahan mentah.
+            Konversi takaran gramatur keju & makaroni, kalkulasi HPP otomatis
+            per porsi menu, dan pantau batas kapasitas porsi berdasarkan stok
+            bahan mentah.
           </p>
         </div>
 
@@ -239,7 +273,9 @@ export function AdminRecipesView({
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div className="p-4 sm:p-5 rounded-2xl bg-white border border-brand-green-900/10 shadow-2xs">
           <div className="flex items-center justify-between text-neutral-500 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider">Rata-rata Margin Resep</span>
+            <span className="text-xs font-bold uppercase tracking-wider">
+              Rata-rata Margin Resep
+            </span>
             <TrendingUp className="size-4 text-emerald-600" />
           </div>
           <div className="font-display font-black text-2xl sm:text-3xl text-emerald-700">
@@ -252,12 +288,16 @@ export function AdminRecipesView({
 
         <div className="p-4 sm:p-5 rounded-2xl bg-white border border-brand-green-900/10 shadow-2xs">
           <div className="flex items-center justify-between text-neutral-500 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider">Menu Terhubung Resep</span>
+            <span className="text-xs font-bold uppercase tracking-wider">
+              Menu Terhubung Resep
+            </span>
             <UtensilsCrossed className="size-4 text-blue-600" />
           </div>
           <div className="font-display font-black text-2xl sm:text-3xl text-blue-900">
             {recipes.length}{" "}
-            <span className="text-xs font-bold text-neutral-500 font-sans">menu katalog</span>
+            <span className="text-xs font-bold text-neutral-500 font-sans">
+              menu katalog
+            </span>
           </div>
           <span className="text-[11px] text-neutral-500 mt-1 block">
             HPP terhitung otomatis per gram/ml
@@ -266,21 +306,33 @@ export function AdminRecipesView({
 
         <div className="p-4 sm:p-5 rounded-2xl bg-white border border-brand-green-900/10 shadow-2xs">
           <div className="flex items-center justify-between text-neutral-500 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider">Bahan Menipis</span>
-            <AlertTriangle className={`size-4 ${lowStockMaterialsCount > 0 ? "text-amber-600" : "text-emerald-600"}`} />
+            <span className="text-xs font-bold uppercase tracking-wider">
+              Bahan Menipis
+            </span>
+            <AlertTriangle
+              className={`size-4 ${lowStockMaterialsCount > 0 ? "text-amber-600" : "text-emerald-600"}`}
+            />
           </div>
-          <div className={`font-display font-black text-2xl sm:text-3xl ${lowStockMaterialsCount > 0 ? "text-amber-900" : "text-brand-green-950"}`}>
+          <div
+            className={`font-display font-black text-2xl sm:text-3xl ${lowStockMaterialsCount > 0 ? "text-amber-900" : "text-brand-green-950"}`}
+          >
             {lowStockMaterialsCount}{" "}
-            <span className="text-xs font-bold text-neutral-500 font-sans">bahan mentah</span>
+            <span className="text-xs font-bold text-neutral-500 font-sans">
+              bahan mentah
+            </span>
           </div>
           <span className="text-[11px] text-neutral-500 mt-1 block">
-            {lowStockMaterialsCount > 0 ? "Perlu restock untuk hindari limit porsi" : "Semua bahan baku dalam kuota aman"}
+            {lowStockMaterialsCount > 0
+              ? "Perlu restock untuk hindari limit porsi"
+              : "Semua bahan baku dalam kuota aman"}
           </span>
         </div>
 
         <div className="p-4 sm:p-5 rounded-2xl bg-brand-green-950 text-white shadow-xs">
           <div className="flex items-center justify-between text-brand-yellow-400 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider">Nilai Aset Bahan Dapur</span>
+            <span className="text-xs font-bold uppercase tracking-wider">
+              Nilai Aset Bahan Dapur
+            </span>
             <DollarSign className="size-4" />
           </div>
           <div className="font-display font-black text-xl sm:text-2xl text-white">
@@ -337,7 +389,11 @@ export function AdminRecipesView({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={subTab === "RECIPES" ? "Cari resep menu..." : "Cari bahan baku, supplier..."}
+              placeholder={
+                subTab === "RECIPES"
+                  ? "Cari resep menu..."
+                  : "Cari bahan baku, supplier..."
+              }
               className="w-full h-9 pl-9 pr-3 rounded-xl border border-neutral-200 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
             />
           </div>
@@ -382,7 +438,11 @@ export function AdminRecipesView({
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <span className="text-[10px] font-black uppercase tracking-widest text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md">
-                      {recipe.category === "mac" ? "Mac & Cheese" : recipe.category === "sides" ? "Sides" : "Minuman"}
+                      {recipe.category === "mac"
+                        ? "Mac & Cheese"
+                        : recipe.category === "sides"
+                          ? "Sides"
+                          : "Minuman"}
                     </span>
                     <h3 className="font-display font-extrabold text-lg sm:text-xl text-brand-green-950 mt-1">
                       {recipe.productName}
@@ -402,21 +462,27 @@ export function AdminRecipesView({
                 {/* Financial Summary Badges */}
                 <div className="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-neutral-200/60">
                   <div className="p-2.5 rounded-xl bg-white border border-neutral-200">
-                    <span className="text-[10px] font-bold text-neutral-500 uppercase block">Total HPP Resep</span>
+                    <span className="text-[10px] font-bold text-neutral-500 uppercase block">
+                      Total HPP Resep
+                    </span>
                     <span className="font-mono font-black text-sm text-neutral-900">
                       {formatRupiah(recipe.totalHpp)}
                     </span>
                   </div>
 
                   <div className="p-2.5 rounded-xl bg-white border border-neutral-200">
-                    <span className="text-[10px] font-bold text-neutral-500 uppercase block">Laba Kotor / Porsi</span>
+                    <span className="text-[10px] font-bold text-neutral-500 uppercase block">
+                      Laba Kotor / Porsi
+                    </span>
                     <span className="font-mono font-black text-sm text-emerald-700">
                       {formatRupiah(recipe.grossMarginAmount)}
                     </span>
                   </div>
 
                   <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200">
-                    <span className="text-[10px] font-bold text-emerald-800 uppercase block">Margin Kotor</span>
+                    <span className="text-[10px] font-bold text-emerald-800 uppercase block">
+                      Margin Kotor
+                    </span>
                     <span className="font-display font-black text-sm text-emerald-800">
                       {recipe.grossMarginPercent}%
                     </span>
@@ -443,12 +509,17 @@ export function AdminRecipesView({
                 <div>
                   <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-500 mb-3 flex items-center justify-between">
                     <span>Komposisi Bahan per Porsi (BOM)</span>
-                    <span className="text-[10px] font-normal lowercase">{recipe.ingredients.length} item bahan</span>
+                    <span className="text-[10px] font-normal lowercase">
+                      {recipe.ingredients.length} item bahan
+                    </span>
                   </h4>
 
                   <div className="divide-y divide-neutral-100 text-xs">
                     {recipe.ingredients.map((ing) => (
-                      <div key={ing.materialId} className="py-2 first:pt-0 flex items-center justify-between gap-3">
+                      <div
+                        key={ing.materialId}
+                        className="py-2 first:pt-0 flex items-center justify-between gap-3"
+                      >
                         <div className="flex-1 min-w-0">
                           <span className="font-bold text-neutral-800 block truncate">
                             {ing.materialName}
@@ -518,10 +589,17 @@ export function AdminRecipesView({
                   const totalValue = mat.currentStock * mat.costPerUnit;
 
                   return (
-                    <tr key={mat.id} className="hover:bg-neutral-50/70 transition-colors">
+                    <tr
+                      key={mat.id}
+                      className="hover:bg-neutral-50/70 transition-colors"
+                    >
                       <td className="py-3.5 px-4">
-                        <div className="font-bold text-neutral-900">{mat.name}</div>
-                        <span className="font-mono text-[10px] text-neutral-400">{mat.code}</span>
+                        <div className="font-bold text-neutral-900">
+                          {mat.name}
+                        </div>
+                        <span className="font-mono text-[10px] text-neutral-400">
+                          {mat.code}
+                        </span>
                       </td>
 
                       <td className="py-3.5 px-4">
@@ -535,7 +613,8 @@ export function AdminRecipesView({
                           {formatQuantity(mat.currentStock, mat.unit)}
                         </span>
                         <span className="block text-[10px] text-neutral-400">
-                          Batas min: {mat.minThreshold.toLocaleString("id-ID")} {mat.unit}
+                          Batas min: {mat.minThreshold.toLocaleString("id-ID")}{" "}
+                          {mat.unit}
                         </span>
                       </td>
 
@@ -547,7 +626,11 @@ export function AdminRecipesView({
                               : "bg-emerald-100 text-emerald-800 border border-emerald-200"
                           }`}
                         >
-                          {isLow ? <AlertTriangle className="size-3" /> : <CheckCircle2 className="size-3" />}
+                          {isLow ? (
+                            <AlertTriangle className="size-3" />
+                          ) : (
+                            <CheckCircle2 className="size-3" />
+                          )}
                           <span>{isLow ? "MENIPIS" : "AMAN"}</span>
                         </span>
                       </td>
@@ -556,7 +639,9 @@ export function AdminRecipesView({
                         <span className="font-mono font-bold text-neutral-900">
                           {formatRupiah(mat.costPerUnit)}
                         </span>
-                        <span className="block text-[10px] text-neutral-400">per {mat.unit}</span>
+                        <span className="block text-[10px] text-neutral-400">
+                          per {mat.unit}
+                        </span>
                       </td>
 
                       <td className="py-3.5 px-4 text-right">
@@ -566,8 +651,12 @@ export function AdminRecipesView({
                       </td>
 
                       <td className="py-3.5 px-4">
-                        <div className="text-neutral-700 font-medium truncate max-w-[160px]">{mat.supplier}</div>
-                        <span className="text-[10px] text-neutral-400">Terakhir: {mat.lastRestockDate}</span>
+                        <div className="text-neutral-700 font-medium truncate max-w-[160px]">
+                          {mat.supplier}
+                        </div>
+                        <span className="text-[10px] text-neutral-400">
+                          Terakhir: {mat.lastRestockDate}
+                        </span>
                       </td>
 
                       <td className="py-3.5 px-4 text-center">
@@ -633,7 +722,8 @@ export function AdminRecipesView({
                 >
                   {rawMaterials.map((m) => (
                     <option key={m.id} value={m.id}>
-                      {m.name} ({m.code}) — Sisa: {m.currentStock.toLocaleString("id-ID")} {m.unit}
+                      {m.name} ({m.code}) — Sisa:{" "}
+                      {m.currentStock.toLocaleString("id-ID")} {m.unit}
                     </option>
                   ))}
                 </select>
@@ -654,7 +744,9 @@ export function AdminRecipesView({
                     className="w-full h-10 px-3 rounded-xl border border-neutral-300 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
                   />
                   <span className="text-[10px] text-neutral-400 mt-0.5 block">
-                    Satuan: {rawMaterials.find((m) => m.id === selectedMaterialId)?.unit || "gram"}
+                    Satuan:{" "}
+                    {rawMaterials.find((m) => m.id === selectedMaterialId)
+                      ?.unit || "gram"}
                   </span>
                 </div>
 
@@ -746,19 +838,28 @@ export function AdminRecipesView({
               </button>
             </div>
 
-            <form onSubmit={handleSaveRecipe} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+            <form
+              onSubmit={handleSaveRecipe}
+              className="p-6 space-y-4 max-h-[80vh] overflow-y-auto"
+            >
               <div className="p-3 rounded-2xl bg-brand-cream-100 border border-brand-green-900/10 flex justify-between items-center text-xs">
                 <div>
-                  <span className="text-neutral-500 font-bold block">Harga Jual:</span>
+                  <span className="text-neutral-500 font-bold block">
+                    Harga Jual:
+                  </span>
                   <span className="font-display font-black text-brand-green-950 text-base">
                     {formatRupiah(editingRecipe.sellingPrice)}
                   </span>
                 </div>
 
                 <div className="text-right">
-                  <span className="text-neutral-500 font-bold block">Kalkulasi HPP Baru:</span>
+                  <span className="text-neutral-500 font-bold block">
+                    Kalkulasi HPP Baru:
+                  </span>
                   <span className="font-display font-black text-emerald-800 text-base">
-                    {formatRupiah(tempIngredients.reduce((s, i) => s + i.subtotalCost, 0))}
+                    {formatRupiah(
+                      tempIngredients.reduce((s, i) => s + i.subtotalCost, 0),
+                    )}
                   </span>
                 </div>
               </div>
@@ -770,7 +871,10 @@ export function AdminRecipesView({
                 </label>
 
                 {tempIngredients.map((ing) => (
-                  <div key={ing.materialId} className="p-3 rounded-xl border border-neutral-200 bg-neutral-50/60 flex items-center justify-between gap-3">
+                  <div
+                    key={ing.materialId}
+                    className="p-3 rounded-xl border border-neutral-200 bg-neutral-50/60 flex items-center justify-between gap-3"
+                  >
                     <div className="flex-1 min-w-0">
                       <span className="font-bold text-neutral-900 text-xs block truncate">
                         {ing.materialName}
@@ -786,10 +890,17 @@ export function AdminRecipesView({
                         min="0"
                         step="1"
                         value={ing.amount}
-                        onChange={(e) => handleUpdateIngredientAmount(ing.materialId, Number(e.target.value))}
+                        onChange={(e) =>
+                          handleUpdateIngredientAmount(
+                            ing.materialId,
+                            Number(e.target.value),
+                          )
+                        }
                         className="w-20 h-9 px-2 text-center rounded-lg border border-neutral-300 font-mono font-bold text-xs bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
                       />
-                      <span className="text-xs text-neutral-500 font-bold w-10">{ing.unit}</span>
+                      <span className="text-xs text-neutral-500 font-bold w-10">
+                        {ing.unit}
+                      </span>
                       <span className="font-mono font-bold text-xs text-emerald-800 min-w-[70px] text-right">
                         {formatRupiah(ing.subtotalCost)}
                       </span>
@@ -865,7 +976,9 @@ export function AdminRecipesView({
                     type="text"
                     required
                     value={newMatCode}
-                    onChange={(e) => setNewMatCode(e.target.value.toUpperCase())}
+                    onChange={(e) =>
+                      setNewMatCode(e.target.value.toUpperCase())
+                    }
                     placeholder="MISAL: RM-CHK-02"
                     className="w-full h-10 px-3 rounded-xl border border-neutral-300 font-mono font-bold text-xs uppercase focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
                   />
@@ -877,7 +990,9 @@ export function AdminRecipesView({
                   </label>
                   <select
                     value={newMatUnit}
-                    onChange={(e) => setNewMatUnit(e.target.value as "gram" | "ml" | "pcs")}
+                    onChange={(e) =>
+                      setNewMatUnit(e.target.value as "gram" | "ml" | "pcs")
+                    }
                     className="w-full h-10 px-3 rounded-xl border border-neutral-300 text-xs font-bold text-neutral-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 cursor-pointer"
                   >
                     <option value="gram">gram (g)</option>
@@ -908,7 +1023,9 @@ export function AdminRecipesView({
                   </label>
                   <select
                     value={newMatCategory}
-                    onChange={(e) => setNewMatCategory(e.target.value as RawMaterialCategory)}
+                    onChange={(e) =>
+                      setNewMatCategory(e.target.value as RawMaterialCategory)
+                    }
                     className="w-full h-10 px-3 rounded-xl border border-neutral-300 text-xs font-bold text-neutral-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 cursor-pointer"
                   >
                     <option value="PASTA">Pasta Mentah</option>
@@ -921,7 +1038,8 @@ export function AdminRecipesView({
 
                 <div>
                   <label className="block text-xs font-bold text-neutral-700 mb-1">
-                    Harga Modal / Unit (Rp) <span className="text-rose-600">*</span>
+                    Harga Modal / Unit (Rp){" "}
+                    <span className="text-rose-600">*</span>
                   </label>
                   <input
                     type="number"
@@ -937,7 +1055,8 @@ export function AdminRecipesView({
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-neutral-700 mb-1">
-                    Stok Awal ({newMatUnit}) <span className="text-rose-600">*</span>
+                    Stok Awal ({newMatUnit}){" "}
+                    <span className="text-rose-600">*</span>
                   </label>
                   <input
                     type="number"

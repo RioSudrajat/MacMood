@@ -68,7 +68,8 @@ export function AdminSidebar({
       subLabel: "Kontrol porsi & mutasi opname",
       icon: Package,
       badge: lowStockCount > 0 ? `${lowStockCount} menipis` : null,
-      badgeColor: "bg-brand-yellow-400/20 text-brand-yellow-600 border border-brand-yellow-400/40 font-bold",
+      badgeColor:
+        "bg-brand-yellow-400/20 text-brand-yellow-600 border border-brand-yellow-400/40 font-bold",
     },
     {
       id: "transactions" as const,
@@ -154,7 +155,11 @@ export function AdminSidebar({
             aria-label={collapsed ? "Buka Navigasi" : "Sembunyikan Navigasi"}
             title={collapsed ? "Perluas Sidebar" : "Ciutkan Sidebar"}
           >
-            {collapsed ? <ChevronRight className="size-4" /> : <ChevronLeft className="size-4" />}
+            {collapsed ? (
+              <ChevronRight className="size-4" />
+            ) : (
+              <ChevronLeft className="size-4" />
+            )}
           </button>
         )}
 
@@ -203,7 +208,10 @@ export function AdminSidebar({
 
             if (collapsed) {
               return (
-                <div key={item.id} className="relative group flex justify-center">
+                <div
+                  key={item.id}
+                  className="relative group flex justify-center"
+                >
                   <button
                     type="button"
                     onClick={() => onTabChange(item.id)}
@@ -310,7 +318,9 @@ export function AdminSidebar({
             >
               <div className="flex items-center gap-2.5 min-w-0">
                 <Store className="size-4 text-brand-green-800 flex-shrink-0" />
-                <span className="text-xs font-bold truncate">Buka Layar Kasir (POS)</span>
+                <span className="text-xs font-bold truncate">
+                  Buka Layar Kasir (POS)
+                </span>
               </div>
               <ArrowUpRight className="size-3.5 text-neutral-400" />
             </button>

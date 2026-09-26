@@ -52,7 +52,8 @@ export const INITIAL_ADMIN_PRODUCTS: AdminProduct[] = [
     categoryLabel: "Mac & Cheese",
     price: 10000,
     costPrice: 4800,
-    description: "Comfort food klasik makaroni dengan lelehan saus keju lembut.",
+    description:
+      "Comfort food klasik makaroni dengan lelehan saus keju lembut.",
     image: "/assets/menu-classic-mac-reference.png",
     isAvailable: true,
     trackStock: true,
@@ -68,7 +69,8 @@ export const INITIAL_ADMIN_PRODUCTS: AdminProduct[] = [
     categoryLabel: "Mac & Cheese",
     price: 18000,
     costPrice: 8500,
-    description: "Makaroni saus keju dengan aroma smoky dan sensasi pedas mantap.",
+    description:
+      "Makaroni saus keju dengan aroma smoky dan sensasi pedas mantap.",
     image: "/assets/menu-super-mac-reference.png",
     isAvailable: true,
     trackStock: true,
@@ -84,7 +86,8 @@ export const INITIAL_ADMIN_PRODUCTS: AdminProduct[] = [
     categoryLabel: "Add-on",
     price: 12000,
     costPrice: 5500,
-    description: "Fillet dada ayam krispi berbalut tepung roti renyah keemasan.",
+    description:
+      "Fillet dada ayam krispi berbalut tepung roti renyah keemasan.",
     image: "/assets/menu-chicken-katsu.png",
     isAvailable: true,
     trackStock: true,
@@ -317,7 +320,6 @@ export const INITIAL_STAFF_ACCOUNTS: StaffAccount[] = [
   },
 ];
 
-
 export const INITIAL_OUTLET_SETTINGS: OutletSettings = {
   name: "MacMood Indonesia (PT MacMood Kuliner Nusantara)",
   branchCode: "MAC-HQ-01",
@@ -405,7 +407,6 @@ export const INITIAL_SHIFTS: ShiftRecord[] = [
   },
 ];
 
-
 // -------------------------------------------------------------
 // Initial Mock Data: Pengeluaran Kas Kecil / Biaya Operasional (PRD Fase 2)
 // -------------------------------------------------------------
@@ -420,7 +421,8 @@ export const INITIAL_EXPENSES: ExpenseRecord[] = [
     amount: 24000,
     sourceOfFund: "KAS_LACI",
     staffName: "Kasir Fatmawati",
-    notes: "Kebutuhan es batu mendesak untuk es teh & lemon tea cabang Fatmawati",
+    notes:
+      "Kebutuhan es batu mendesak untuk es teh & lemon tea cabang Fatmawati",
     receiptNumber: "NOTA-ES-882",
   },
   {
@@ -450,7 +452,6 @@ export const INITIAL_EXPENSES: ExpenseRecord[] = [
     receiptNumber: "INV-PLASTIK-44",
   },
 ];
-
 
 // -------------------------------------------------------------
 // Initial Mock Data: Log Audit Keamanan & Sistem (PRD)
@@ -489,7 +490,8 @@ export const INITIAL_AUDIT_LOGS: AuditLogRecord[] = [
       title: "Pembatalan Nota Transaksi #MAC-20260924-004",
       before: "Status: PAID (Rp 30.800 - Tunai)",
       after: "Status: VOID (Pengembalian Dana Kasir)",
-      reason: "Pelanggan salah pesan varian dan minta diganti sebelum makanan diproses dapur",
+      reason:
+        "Pelanggan salah pesan varian dan minta diganti sebelum makanan diproses dapur",
     },
   },
   {
@@ -543,7 +545,8 @@ export const INITIAL_AUDIT_LOGS: AuditLogRecord[] = [
       title: "Pengeluaran Kas Laci Rp 45.000",
       before: "Saldo Kas Laci: Rp 1.150.000",
       after: "Saldo Kas Laci: Rp 1.105.000",
-      reason: "Beli kantong plastik kresek ramah lingkungan MacMood di toko terdekat",
+      reason:
+        "Beli kantong plastik kresek ramah lingkungan MacMood di toko terdekat",
     },
   },
 ];
@@ -565,7 +568,8 @@ export const INITIAL_PROMOS: PromoVoucher[] = [
     startDate: "2026-09-01",
     endDate: "2026-10-31",
     isActive: true,
-    description: "Diskon 10% untuk semua menu dengan minimal transaksi Rp 30.000 (Maks. Rp 15.000).",
+    description:
+      "Diskon 10% untuk semua menu dengan minimal transaksi Rp 30.000 (Maks. Rp 15.000).",
   },
   {
     id: "promo-2",
@@ -579,7 +583,8 @@ export const INITIAL_PROMOS: PromoVoucher[] = [
     startDate: "2026-09-10",
     endDate: "2026-10-15",
     isActive: true,
-    description: "Potongan harga langsung Rp 5.000 untuk pembelian minimal Rp 40.000.",
+    description:
+      "Potongan harga langsung Rp 5.000 untuk pembelian minimal Rp 40.000.",
   },
   {
     id: "promo-3",
@@ -608,7 +613,8 @@ export const INITIAL_PROMOS: PromoVoucher[] = [
     startDate: "2026-09-15",
     endDate: "2026-10-25",
     isActive: true,
-    description: "Potongan Rp 10.000 khusus pembelian combo party minimal Rp 75.000.",
+    description:
+      "Potongan Rp 10.000 khusus pembelian combo party minimal Rp 75.000.",
   },
   {
     id: "promo-5",
@@ -623,7 +629,8 @@ export const INITIAL_PROMOS: PromoVoucher[] = [
     startDate: "2026-09-01",
     endDate: "2026-12-31",
     isActive: true,
-    description: "Tunjukkan kartu pelajar/mahasiswa untuk menikmati diskon 15% (Maks. Rp 10.000).",
+    description:
+      "Tunjukkan kartu pelajar/mahasiswa untuk menikmati diskon 15% (Maks. Rp 10.000).",
   },
   {
     id: "promo-6",
@@ -637,7 +644,8 @@ export const INITIAL_PROMOS: PromoVoucher[] = [
     startDate: "2026-08-01",
     endDate: "2026-08-31",
     isActive: false,
-    description: "Promo flash sale periode bulan lalu yang sudah non-aktif / kuota habis.",
+    description:
+      "Promo flash sale periode bulan lalu yang sudah non-aktif / kuota habis.",
   },
 ];
 
@@ -787,19 +795,62 @@ export const INITIAL_PRODUCT_RECIPES: ProductRecipe[] = [
     category: "mac",
     sellingPrice: 20000,
     ingredients: [
-      { materialId: "rm-1", materialName: "Makaroni Elbow Kering", amount: 75, unit: "gram", costPerUnit: 32, subtotalCost: 2400 },
-      { materialId: "rm-2", materialName: "Keju Cheddar Olahan Melt", amount: 30, unit: "gram", costPerUnit: 98, subtotalCost: 2940 },
-      { materialId: "rm-3", materialName: "Keju Mozzarella Shredded", amount: 15, unit: "gram", costPerUnit: 135, subtotalCost: 2025 },
-      { materialId: "rm-4", materialName: "Cooking Cream / Evaporasi", amount: 20, unit: "ml", costPerUnit: 42, subtotalCost: 840 },
-      { materialId: "rm-9", materialName: "Paper Box MacMood Signature", amount: 1, unit: "pcs", costPerUnit: 850, subtotalCost: 850 },
-      { materialId: "rm-10", materialName: "Sendok & Garpu Kayu", amount: 1, unit: "pcs", costPerUnit: 250, subtotalCost: 250 },
+      {
+        materialId: "rm-1",
+        materialName: "Makaroni Elbow Kering",
+        amount: 75,
+        unit: "gram",
+        costPerUnit: 32,
+        subtotalCost: 2400,
+      },
+      {
+        materialId: "rm-2",
+        materialName: "Keju Cheddar Olahan Melt",
+        amount: 30,
+        unit: "gram",
+        costPerUnit: 98,
+        subtotalCost: 2940,
+      },
+      {
+        materialId: "rm-3",
+        materialName: "Keju Mozzarella Shredded",
+        amount: 15,
+        unit: "gram",
+        costPerUnit: 135,
+        subtotalCost: 2025,
+      },
+      {
+        materialId: "rm-4",
+        materialName: "Cooking Cream / Evaporasi",
+        amount: 20,
+        unit: "ml",
+        costPerUnit: 42,
+        subtotalCost: 840,
+      },
+      {
+        materialId: "rm-9",
+        materialName: "Paper Box MacMood Signature",
+        amount: 1,
+        unit: "pcs",
+        costPerUnit: 850,
+        subtotalCost: 850,
+      },
+      {
+        materialId: "rm-10",
+        materialName: "Sendok & Garpu Kayu",
+        amount: 1,
+        unit: "pcs",
+        costPerUnit: 250,
+        subtotalCost: 250,
+      },
     ],
     totalHpp: 9305,
     grossMarginAmount: 10695,
     grossMarginPercent: 53.5,
     maxPortionsAvailable: 193, // min(14500/75, 6800/30, 4200/15, 5500/20, 480/1) = 193
     limitingMaterialName: "Makaroni Elbow Kering",
-    notes: "Signature recipe creamy comfort mac dengan keju ganda dan aroma gurih seimbang.",
+    notes:
+      "Signature recipe creamy comfort mac dengan keju ganda dan aroma gurih seimbang.",
   },
   {
     productId: "prod-2",
@@ -807,19 +858,62 @@ export const INITIAL_PRODUCT_RECIPES: ProductRecipe[] = [
     category: "mac",
     sellingPrice: 15000,
     ingredients: [
-      { materialId: "rm-1", materialName: "Makaroni Elbow Kering", amount: 75, unit: "gram", costPerUnit: 32, subtotalCost: 2400 },
-      { materialId: "rm-2", materialName: "Keju Cheddar Olahan Melt", amount: 30, unit: "gram", costPerUnit: 98, subtotalCost: 2940 },
-      { materialId: "rm-6", materialName: "Kentang Fries Frozen", amount: 50, unit: "gram", costPerUnit: 45, subtotalCost: 2250 },
-      { materialId: "rm-4", materialName: "Cooking Cream / Evaporasi", amount: 15, unit: "ml", costPerUnit: 42, subtotalCost: 630 },
-      { materialId: "rm-9", materialName: "Paper Box MacMood Signature", amount: 1, unit: "pcs", costPerUnit: 850, subtotalCost: 850 },
-      { materialId: "rm-10", materialName: "Sendok & Garpu Kayu", amount: 1, unit: "pcs", costPerUnit: 250, subtotalCost: 250 },
+      {
+        materialId: "rm-1",
+        materialName: "Makaroni Elbow Kering",
+        amount: 75,
+        unit: "gram",
+        costPerUnit: 32,
+        subtotalCost: 2400,
+      },
+      {
+        materialId: "rm-2",
+        materialName: "Keju Cheddar Olahan Melt",
+        amount: 30,
+        unit: "gram",
+        costPerUnit: 98,
+        subtotalCost: 2940,
+      },
+      {
+        materialId: "rm-6",
+        materialName: "Kentang Fries Frozen",
+        amount: 50,
+        unit: "gram",
+        costPerUnit: 45,
+        subtotalCost: 2250,
+      },
+      {
+        materialId: "rm-4",
+        materialName: "Cooking Cream / Evaporasi",
+        amount: 15,
+        unit: "ml",
+        costPerUnit: 42,
+        subtotalCost: 630,
+      },
+      {
+        materialId: "rm-9",
+        materialName: "Paper Box MacMood Signature",
+        amount: 1,
+        unit: "pcs",
+        costPerUnit: 850,
+        subtotalCost: 850,
+      },
+      {
+        materialId: "rm-10",
+        materialName: "Sendok & Garpu Kayu",
+        amount: 1,
+        unit: "pcs",
+        costPerUnit: 250,
+        subtotalCost: 250,
+      },
     ],
     totalHpp: 9320,
     grossMarginAmount: 5680,
     grossMarginPercent: 37.9,
     maxPortionsAvailable: 104, // 5200 / 50 = 104 porsi
     limitingMaterialName: "Kentang French Fries Shoestring",
-    notes: "Kombinasi makaroni keju dengan topping kentang goreng renyah gurih.",
+    notes:
+      "Kombinasi makaroni keju dengan topping kentang goreng renyah gurih.",
   },
   {
     productId: "prod-3",
@@ -827,11 +921,46 @@ export const INITIAL_PRODUCT_RECIPES: ProductRecipe[] = [
     category: "mac",
     sellingPrice: 10000,
     ingredients: [
-      { materialId: "rm-1", materialName: "Makaroni Elbow Kering", amount: 75, unit: "gram", costPerUnit: 32, subtotalCost: 2400 },
-      { materialId: "rm-2", materialName: "Keju Cheddar Olahan Melt", amount: 25, unit: "gram", costPerUnit: 98, subtotalCost: 2450 },
-      { materialId: "rm-4", materialName: "Cooking Cream / Evaporasi", amount: 15, unit: "ml", costPerUnit: 42, subtotalCost: 630 },
-      { materialId: "rm-9", materialName: "Paper Box MacMood Signature", amount: 1, unit: "pcs", costPerUnit: 850, subtotalCost: 850 },
-      { materialId: "rm-10", materialName: "Sendok & Garpu Kayu", amount: 1, unit: "pcs", costPerUnit: 250, subtotalCost: 250 },
+      {
+        materialId: "rm-1",
+        materialName: "Makaroni Elbow Kering",
+        amount: 75,
+        unit: "gram",
+        costPerUnit: 32,
+        subtotalCost: 2400,
+      },
+      {
+        materialId: "rm-2",
+        materialName: "Keju Cheddar Olahan Melt",
+        amount: 25,
+        unit: "gram",
+        costPerUnit: 98,
+        subtotalCost: 2450,
+      },
+      {
+        materialId: "rm-4",
+        materialName: "Cooking Cream / Evaporasi",
+        amount: 15,
+        unit: "ml",
+        costPerUnit: 42,
+        subtotalCost: 630,
+      },
+      {
+        materialId: "rm-9",
+        materialName: "Paper Box MacMood Signature",
+        amount: 1,
+        unit: "pcs",
+        costPerUnit: 850,
+        subtotalCost: 850,
+      },
+      {
+        materialId: "rm-10",
+        materialName: "Sendok & Garpu Kayu",
+        amount: 1,
+        unit: "pcs",
+        costPerUnit: 250,
+        subtotalCost: 250,
+      },
     ],
     totalHpp: 6580,
     grossMarginAmount: 3420,
@@ -846,12 +975,54 @@ export const INITIAL_PRODUCT_RECIPES: ProductRecipe[] = [
     category: "mac",
     sellingPrice: 18000,
     ingredients: [
-      { materialId: "rm-1", materialName: "Makaroni Elbow Kering", amount: 75, unit: "gram", costPerUnit: 32, subtotalCost: 2400 },
-      { materialId: "rm-2", materialName: "Keju Cheddar Olahan Melt", amount: 30, unit: "gram", costPerUnit: 98, subtotalCost: 2940 },
-      { materialId: "rm-3", materialName: "Keju Mozzarella Shredded", amount: 15, unit: "gram", costPerUnit: 135, subtotalCost: 2025 },
-      { materialId: "rm-4", materialName: "Cooking Cream / Evaporasi", amount: 20, unit: "ml", costPerUnit: 42, subtotalCost: 840 },
-      { materialId: "rm-9", materialName: "Paper Box MacMood Signature", amount: 1, unit: "pcs", costPerUnit: 850, subtotalCost: 850 },
-      { materialId: "rm-10", materialName: "Sendok & Garpu Kayu", amount: 1, unit: "pcs", costPerUnit: 250, subtotalCost: 250 },
+      {
+        materialId: "rm-1",
+        materialName: "Makaroni Elbow Kering",
+        amount: 75,
+        unit: "gram",
+        costPerUnit: 32,
+        subtotalCost: 2400,
+      },
+      {
+        materialId: "rm-2",
+        materialName: "Keju Cheddar Olahan Melt",
+        amount: 30,
+        unit: "gram",
+        costPerUnit: 98,
+        subtotalCost: 2940,
+      },
+      {
+        materialId: "rm-3",
+        materialName: "Keju Mozzarella Shredded",
+        amount: 15,
+        unit: "gram",
+        costPerUnit: 135,
+        subtotalCost: 2025,
+      },
+      {
+        materialId: "rm-4",
+        materialName: "Cooking Cream / Evaporasi",
+        amount: 20,
+        unit: "ml",
+        costPerUnit: 42,
+        subtotalCost: 840,
+      },
+      {
+        materialId: "rm-9",
+        materialName: "Paper Box MacMood Signature",
+        amount: 1,
+        unit: "pcs",
+        costPerUnit: 850,
+        subtotalCost: 850,
+      },
+      {
+        materialId: "rm-10",
+        materialName: "Sendok & Garpu Kayu",
+        amount: 1,
+        unit: "pcs",
+        costPerUnit: 250,
+        subtotalCost: 250,
+      },
     ],
     totalHpp: 9305,
     grossMarginAmount: 8695,
@@ -866,8 +1037,22 @@ export const INITIAL_PRODUCT_RECIPES: ProductRecipe[] = [
     category: "sides",
     sellingPrice: 8000,
     ingredients: [
-      { materialId: "rm-6", materialName: "Kentang Fries Frozen", amount: 120, unit: "gram", costPerUnit: 45, subtotalCost: 5400 },
-      { materialId: "rm-9", materialName: "Paper Box MacMood Signature", amount: 1, unit: "pcs", costPerUnit: 850, subtotalCost: 850 },
+      {
+        materialId: "rm-6",
+        materialName: "Kentang Fries Frozen",
+        amount: 120,
+        unit: "gram",
+        costPerUnit: 45,
+        subtotalCost: 5400,
+      },
+      {
+        materialId: "rm-9",
+        materialName: "Paper Box MacMood Signature",
+        amount: 1,
+        unit: "pcs",
+        costPerUnit: 850,
+        subtotalCost: 850,
+      },
     ],
     totalHpp: 6250,
     grossMarginAmount: 1750,
@@ -882,9 +1067,30 @@ export const INITIAL_PRODUCT_RECIPES: ProductRecipe[] = [
     category: "drinks",
     sellingPrice: 6000,
     ingredients: [
-      { materialId: "rm-7", materialName: "Daun Teh Melati Loose", amount: 15, unit: "gram", costPerUnit: 25, subtotalCost: 375 },
-      { materialId: "rm-8", materialName: "Sari Lemon Murni", amount: 25, unit: "ml", costPerUnit: 35, subtotalCost: 875 },
-      { materialId: "rm-9", materialName: "Cup Kemasan Dingin + Sedotan", amount: 1, unit: "pcs", costPerUnit: 750, subtotalCost: 750 },
+      {
+        materialId: "rm-7",
+        materialName: "Daun Teh Melati Loose",
+        amount: 15,
+        unit: "gram",
+        costPerUnit: 25,
+        subtotalCost: 375,
+      },
+      {
+        materialId: "rm-8",
+        materialName: "Sari Lemon Murni",
+        amount: 25,
+        unit: "ml",
+        costPerUnit: 35,
+        subtotalCost: 875,
+      },
+      {
+        materialId: "rm-9",
+        materialName: "Cup Kemasan Dingin + Sedotan",
+        amount: 1,
+        unit: "pcs",
+        costPerUnit: 750,
+        subtotalCost: 750,
+      },
     ],
     totalHpp: 2000,
     grossMarginAmount: 4000,
@@ -899,8 +1105,22 @@ export const INITIAL_PRODUCT_RECIPES: ProductRecipe[] = [
     category: "drinks",
     sellingPrice: 4000,
     ingredients: [
-      { materialId: "rm-7", materialName: "Daun Teh Melati Loose", amount: 15, unit: "gram", costPerUnit: 25, subtotalCost: 375 },
-      { materialId: "rm-9", materialName: "Cup Kemasan Dingin + Sedotan", amount: 1, unit: "pcs", costPerUnit: 750, subtotalCost: 750 },
+      {
+        materialId: "rm-7",
+        materialName: "Daun Teh Melati Loose",
+        amount: 15,
+        unit: "gram",
+        costPerUnit: 25,
+        subtotalCost: 375,
+      },
+      {
+        materialId: "rm-9",
+        materialName: "Cup Kemasan Dingin + Sedotan",
+        amount: 1,
+        unit: "pcs",
+        costPerUnit: 750,
+        subtotalCost: 750,
+      },
     ],
     totalHpp: 1125,
     grossMarginAmount: 2875,

@@ -13,7 +13,10 @@ export async function listExpenses(branchId?: string) {
   return query.orderBy(desc(expenses.createdAt));
 }
 
-export async function createExpense(input: CreateExpenseInput, userId?: string) {
+export async function createExpense(
+  input: CreateExpenseInput,
+  userId?: string,
+) {
   await ensureSeededData();
 
   const [newExpense] = await db
@@ -41,7 +44,11 @@ export async function createExpense(input: CreateExpenseInput, userId?: string) 
     const [openShift] = await db
       .select()
       .from(shifts)
-      .where(conditions.length > 1 ? sql`${shifts.status} = 'OPEN' AND ${shifts.branchId} = ${input.branchId}` : eq(shifts.status, "OPEN"))
+      .where(
+        conditions.length > 1
+          ? sql`${shifts.status} = 'OPEN' AND ${shifts.branchId} = ${input.branchId}`
+          : eq(shifts.status, "OPEN"),
+      )
       .orderBy(desc(shifts.startTime))
       .limit(1);
 
@@ -54,7 +61,6 @@ export async function createExpense(input: CreateExpenseInput, userId?: string) 
         .where(eq(shifts.id, openShift.id));
     }
   }
-
 
   return newExpense;
 }

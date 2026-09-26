@@ -38,20 +38,22 @@ export function PosShiftView({
   const [isDenominationOpen, setIsDenominationOpen] = useState(false);
 
   // Denominations Breakdown helper
-  const [denominations, setDenominations] = useState<{ [key: number]: number }>({
-    100000: 0,
-    50000: 0,
-    20000: 0,
-    10000: 0,
-    5000: 0,
-    2000: 0,
-    1000: 0,
-  });
+  const [denominations, setDenominations] = useState<{ [key: number]: number }>(
+    {
+      100000: 0,
+      50000: 0,
+      20000: 0,
+      10000: 0,
+      5000: 0,
+      2000: 0,
+      1000: 0,
+    },
+  );
 
   const countedDenominationTotal = useMemo(() => {
     return Object.entries(denominations).reduce(
       (acc, [nominal, count]) => acc + Number(nominal) * count,
-      0
+      0,
     );
   }, [denominations]);
 
@@ -62,7 +64,7 @@ export function PosShiftView({
       const updated = { ...prev, [nominal]: next };
       const newTotal = Object.entries(updated).reduce(
         (acc, [n, c]) => acc + Number(n) * c,
-        0
+        0,
       );
       setActualCashInput(newTotal.toString());
       return updated;
@@ -143,7 +145,8 @@ export function PosShiftView({
                 Buka Laci Kas Cabang
               </h3>
               <p className="text-xs text-neutral-500">
-                Wajib menginput uang kas modal awal (cash float) laci sebelum kasir memulai transaksi cabang.
+                Wajib menginput uang kas modal awal (cash float) laci sebelum
+                kasir memulai transaksi cabang.
               </p>
             </div>
 
@@ -222,7 +225,9 @@ export function PosShiftView({
                   <div className="font-display font-black text-lg text-neutral-800 mt-1">
                     {formatRupiah(shift.initialCash)}
                   </div>
-                  <span className="text-[10px] text-neutral-400">Kas awal laci</span>
+                  <span className="text-[10px] text-neutral-400">
+                    Kas awal laci
+                  </span>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-white border border-brand-green-900/10 shadow-xs">
@@ -232,7 +237,9 @@ export function PosShiftView({
                   <div className="font-display font-black text-lg text-emerald-800 mt-1">
                     {formatRupiah(shift.cashSales)}
                   </div>
-                  <span className="text-[10px] text-emerald-600 font-medium">Uang masuk fisik</span>
+                  <span className="text-[10px] text-emerald-600 font-medium">
+                    Uang masuk fisik
+                  </span>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-white border border-brand-green-900/10 shadow-xs">
@@ -242,7 +249,9 @@ export function PosShiftView({
                   <div className="font-display font-black text-lg text-blue-800 mt-1">
                     {formatRupiah(shift.qrisSales)}
                   </div>
-                  <span className="text-[10px] text-blue-600 font-medium">Masuk rekening</span>
+                  <span className="text-[10px] text-blue-600 font-medium">
+                    Masuk rekening
+                  </span>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-white border border-brand-green-900/10 shadow-xs">
@@ -252,7 +261,9 @@ export function PosShiftView({
                   <div className="font-display font-black text-lg text-brand-green-950 mt-1">
                     {formatRupiah(shift.cashSales + shift.qrisSales)}
                   </div>
-                  <span className="text-[10px] text-neutral-400">{shift.orderCount} transaksi</span>
+                  <span className="text-[10px] text-neutral-400">
+                    {shift.orderCount} transaksi
+                  </span>
                 </div>
 
                 <div className="col-span-2 p-4 rounded-2xl bg-brand-cream-100 border border-brand-green-800/20 shadow-xs">
@@ -266,7 +277,8 @@ export function PosShiftView({
                     {formatRupiah(expectedCashInDrawer)}
                   </div>
                   <span className="text-[11px] text-brand-green-800/80">
-                    Kalkulasi: Kas Awal ({formatRupiah(shift.initialCash)}) + Penjualan Tunai ({formatRupiah(shift.cashSales)})
+                    Kalkulasi: Kas Awal ({formatRupiah(shift.initialCash)}) +
+                    Penjualan Tunai ({formatRupiah(shift.cashSales)})
                   </span>
                 </div>
               </div>
@@ -279,7 +291,8 @@ export function PosShiftView({
                       Rekonsiliasi Kas & Tutup Laci Cabang
                     </h3>
                     <p className="text-xs text-neutral-500 mt-0.5">
-                      Hitung fisik uang tunai di laci kasir cabang secara teliti sebelum menutup laci kas.
+                      Hitung fisik uang tunai di laci kasir cabang secara teliti
+                      sebelum menutup laci kas.
                     </p>
                   </div>
                   <button
@@ -288,7 +301,11 @@ export function PosShiftView({
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-neutral-200 text-xs font-bold text-neutral-700 hover:bg-neutral-50 transition-colors"
                   >
                     <Calculator className="size-3.5 text-brand-green-900" />
-                    <span>{isDenominationOpen ? "Tutup Hitung Lembar" : "Hitung per Lembar"}</span>
+                    <span>
+                      {isDenominationOpen
+                        ? "Tutup Hitung Lembar"
+                        : "Hitung per Lembar"}
+                    </span>
                   </button>
                 </div>
 
@@ -303,30 +320,37 @@ export function PosShiftView({
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                      {[100000, 50000, 20000, 10000, 5000, 2000, 1000].map((nom) => (
-                        <div key={nom} className="p-2 rounded-xl bg-white border border-neutral-200 flex items-center justify-between">
-                          <span className="font-bold text-neutral-700 text-[11px]">{nom / 1000}k</span>
-                          <div className="flex items-center gap-1">
-                            <button
-                              type="button"
-                              onClick={() => updateDenomination(nom, -1)}
-                              className="size-5 rounded bg-neutral-100 hover:bg-neutral-200 text-xs font-bold"
-                            >
-                              -
-                            </button>
-                            <span className="w-5 text-center font-bold text-[11px]">
-                              {denominations[nom]}
+                      {[100000, 50000, 20000, 10000, 5000, 2000, 1000].map(
+                        (nom) => (
+                          <div
+                            key={nom}
+                            className="p-2 rounded-xl bg-white border border-neutral-200 flex items-center justify-between"
+                          >
+                            <span className="font-bold text-neutral-700 text-[11px]">
+                              {nom / 1000}k
                             </span>
-                            <button
-                              type="button"
-                              onClick={() => updateDenomination(nom, 1)}
-                              className="size-5 rounded bg-neutral-100 hover:bg-neutral-200 text-xs font-bold"
-                            >
-                              +
-                            </button>
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                onClick={() => updateDenomination(nom, -1)}
+                                className="size-5 rounded bg-neutral-100 hover:bg-neutral-200 text-xs font-bold"
+                              >
+                                -
+                              </button>
+                              <span className="w-5 text-center font-bold text-[11px]">
+                                {denominations[nom]}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => updateDenomination(nom, 1)}
+                                className="size-5 rounded bg-neutral-100 hover:bg-neutral-200 text-xs font-bold"
+                              >
+                                +
+                              </button>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        ),
+                      )}
                     </div>
                   </div>
                 )}
@@ -360,8 +384,8 @@ export function PosShiftView({
                         cashDifference === 0
                           ? "bg-emerald-50 border-emerald-200"
                           : cashDifference > 0
-                          ? "bg-blue-50 border-blue-200"
-                          : "bg-red-50 border-red-200"
+                            ? "bg-blue-50 border-blue-200"
+                            : "bg-red-50 border-red-200"
                       }`}
                     >
                       <div className="flex items-start gap-3">
@@ -370,7 +394,9 @@ export function PosShiftView({
                         ) : (
                           <AlertCircle
                             className={`size-5 shrink-0 mt-0.5 ${
-                              cashDifference > 0 ? "text-blue-600" : "text-brand-coral-600"
+                              cashDifference > 0
+                                ? "text-blue-600"
+                                : "text-brand-coral-600"
                             }`}
                           />
                         )}
@@ -381,31 +407,31 @@ export function PosShiftView({
                               {cashDifference === 0
                                 ? "Kas Fisik Akurat (Sesuai)"
                                 : cashDifference > 0
-                                ? "Kas Fisik Berlebih"
-                                : "Kas Fisik Kurang (Selisih)"}
+                                  ? "Kas Fisik Berlebih"
+                                  : "Kas Fisik Kurang (Selisih)"}
                             </span>
                             <strong
                               className={`font-mono font-black text-sm ${
                                 cashDifference === 0
                                   ? "text-emerald-700"
                                   : cashDifference > 0
-                                  ? "text-blue-700"
-                                  : "text-brand-coral-600"
+                                    ? "text-blue-700"
+                                    : "text-brand-coral-600"
                               }`}
                             >
                               {cashDifference === 0
                                 ? "Selisih Rp0"
                                 : cashDifference > 0
-                                ? `+${formatRupiah(cashDifference)}`
-                                : formatRupiah(cashDifference)}
+                                  ? `+${formatRupiah(cashDifference)}`
+                                  : formatRupiah(cashDifference)}
                             </strong>
                           </div>
                           <p className="text-[11px] text-neutral-600 mt-1">
                             {cashDifference === 0
                               ? "Jumlah uang tunai fisik di laci sama persis dengan akumulasi penjualan sistem."
                               : cashDifference > 0
-                              ? "Terdapat kelebihan uang fisik di laci. Pastikan uang tips atau kembalian dicatat dengan jelas."
-                              : "Uang fisik kurang dari ekspektasi sistem. Wajib menuliskan keterangan/alasan di bawah."}
+                                ? "Terdapat kelebihan uang fisik di laci. Pastikan uang tips atau kembalian dicatat dengan jelas."
+                                : "Uang fisik kurang dari ekspektasi sistem. Wajib menuliskan keterangan/alasan di bawah."}
                           </p>
                         </div>
                       </div>
@@ -415,7 +441,8 @@ export function PosShiftView({
                   {/* Catatan Shift Kasir */}
                   <div>
                     <label className="block text-xs font-bold text-neutral-800 mb-1.5">
-                      Catatan Shift & Rekonsiliasi (Opsional / Wajib jika ada selisih):
+                      Catatan Shift & Rekonsiliasi (Opsional / Wajib jika ada
+                      selisih):
                     </label>
                     <textarea
                       rows={2}
@@ -451,24 +478,34 @@ export function PosShiftView({
                 <div className="space-y-2.5 text-xs">
                   <div className="flex justify-between">
                     <span className="text-neutral-500">ID Shift:</span>
-                    <span className="font-mono font-bold text-neutral-800">{shift.id}</span>
+                    <span className="font-mono font-bold text-neutral-800">
+                      {shift.id}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-neutral-500">Kasir:</span>
-                    <span className="font-bold text-neutral-900">{shift.cashierName}</span>
+                    <span className="font-bold text-neutral-900">
+                      {shift.cashierName}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-neutral-500">Waktu Mulai:</span>
-                    <span className="font-bold text-neutral-800">{shift.startTime}</span>
+                    <span className="font-bold text-neutral-800">
+                      {shift.startTime}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-neutral-500">Outlet:</span>
-                    <span className="font-bold text-neutral-800">01 Pusat (Jakarta)</span>
+                    <span className="font-bold text-neutral-800">
+                      01 Pusat (Jakarta)
+                    </span>
                   </div>
                 </div>
 
                 <div className="p-3 rounded-xl bg-brand-cream-50 border border-neutral-200 text-xs text-neutral-600 space-y-1">
-                  <span className="font-bold text-brand-green-950 block">SOP Tutup Shift Kasir:</span>
+                  <span className="font-bold text-brand-green-950 block">
+                    SOP Tutup Shift Kasir:
+                  </span>
                   <ol className="list-decimal pl-4 space-y-0.5 text-[11px]">
                     <li>Pastikan tidak ada pesanan gantung/belum bayar.</li>
                     <li>Hitung fisik uang tunai di laci kasir.</li>
@@ -512,14 +549,19 @@ export function PosShiftView({
               </thead>
               <tbody className="divide-y divide-neutral-100">
                 {pastShifts.map((ps) => (
-                  <tr key={ps.id} className="hover:bg-brand-cream-50/50 transition-colors">
+                  <tr
+                    key={ps.id}
+                    className="hover:bg-brand-cream-50/50 transition-colors"
+                  >
                     <td className="py-3 px-4 font-bold text-neutral-900">
                       {ps.date}
                       <span className="block text-[10px] text-neutral-500 font-normal">
                         {ps.shiftName}
                       </span>
                     </td>
-                    <td className="py-3 px-4 font-medium text-neutral-800">{ps.cashierName}</td>
+                    <td className="py-3 px-4 font-medium text-neutral-800">
+                      {ps.cashierName}
+                    </td>
                     <td className="py-3 px-4 text-neutral-500 whitespace-nowrap">
                       {ps.startTime} - {ps.endTime}
                     </td>
@@ -541,15 +583,15 @@ export function PosShiftView({
                           ps.cashDifference === 0
                             ? "bg-emerald-100 text-emerald-800"
                             : ps.cashDifference > 0
-                            ? "bg-blue-100 text-blue-800"
-                            : "bg-red-100 text-red-800"
+                              ? "bg-blue-100 text-blue-800"
+                              : "bg-red-100 text-red-800"
                         }`}
                       >
                         {ps.cashDifference === 0
                           ? "✓ Rp0"
                           : ps.cashDifference > 0
-                          ? `+${formatRupiah(ps.cashDifference)}`
-                          : formatRupiah(ps.cashDifference)}
+                            ? `+${formatRupiah(ps.cashDifference)}`
+                            : formatRupiah(ps.cashDifference)}
                       </span>
                     </td>
                     <td className="py-3 px-4 text-neutral-500 max-w-xs truncate">

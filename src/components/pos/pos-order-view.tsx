@@ -1,5 +1,10 @@
 import { useState, useMemo } from "react";
-import type { Product, CartItem, ProductCategory, PaymentMethod } from "./types";
+import type {
+  Product,
+  CartItem,
+  ProductCategory,
+  PaymentMethod,
+} from "./types";
 import type { PromoVoucher } from "@/components/admin/types";
 import { INITIAL_PROMOS } from "@/components/admin/mock-data";
 import { formatRupiah } from "./format";
@@ -22,7 +27,14 @@ interface PosOrderViewProps {
   products: Product[];
   promos?: PromoVoucher[];
   onOrderComplete: (orderData: {
-    items: { productId: string; name: string; quantity: number; price: number; subtotal: number; notes?: string }[];
+    items: {
+      productId: string;
+      name: string;
+      quantity: number;
+      price: number;
+      subtotal: number;
+      notes?: string;
+    }[];
     subtotal: number;
     discount?: number;
     promoCode?: string;
@@ -35,9 +47,14 @@ interface PosOrderViewProps {
   }) => void;
 }
 
-export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplete }: PosOrderViewProps) {
+export function PosOrderView({
+  products,
+  promos = INITIAL_PROMOS,
+  onOrderComplete,
+}: PosOrderViewProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<ProductCategory>("all");
+  const [selectedCategory, setSelectedCategory] =
+    useState<ProductCategory>("all");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isMobileCartOpen, setIsMobileCartOpen] = useState(false);
@@ -54,7 +71,8 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
   // Filtered Menu
   const filteredProducts = useMemo(() => {
     return products.filter((prod) => {
-      const matchCategory = selectedCategory === "all" || prod.category === selectedCategory;
+      const matchCategory =
+        selectedCategory === "all" || prod.category === selectedCategory;
       const matchSearch =
         prod.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         prod.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -64,7 +82,10 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
 
   // Cart Calculations
   const subtotal = useMemo(() => {
-    return cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+    return cart.reduce(
+      (acc, item) => acc + item.product.price * item.quantity,
+      0,
+    );
   }, [cart]);
 
   // Discount Calculation
@@ -74,12 +95,17 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
       if (subtotal < appliedPromo.minOrderAmount) return 0;
       if (appliedPromo.discountType === "PERCENTAGE") {
         const raw = Math.round((subtotal * appliedPromo.discountValue) / 100);
-        return appliedPromo.maxDiscount ? Math.min(raw, appliedPromo.maxDiscount) : raw;
+        return appliedPromo.maxDiscount
+          ? Math.min(raw, appliedPromo.maxDiscount)
+          : raw;
       }
       return Math.min(appliedPromo.discountValue, subtotal);
     }
     if (manualDiscountPercent > 0) {
-      return Math.min(subtotal, Math.round((subtotal * manualDiscountPercent) / 100));
+      return Math.min(
+        subtotal,
+        Math.round((subtotal * manualDiscountPercent) / 100),
+      );
     }
     if (manualDiscountAmount > 0) {
       return Math.min(subtotal, manualDiscountAmount);
@@ -103,7 +129,9 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
       const existing = prev.find((item) => item.product.id === product.id);
       if (existing) {
         return prev.map((item) =>
-          item.product.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+          item.product.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item,
         );
       }
       return [...prev, { product, quantity: 1, notes: "" }];
@@ -126,7 +154,9 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
 
   const updateNotes = (productId: string, notes: string) => {
     setCart((prev) =>
-      prev.map((item) => (item.product.id === productId ? { ...item, notes } : item))
+      prev.map((item) =>
+        item.product.id === productId ? { ...item, notes } : item,
+      ),
     );
   };
 
@@ -143,15 +173,19 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
   const handleApplyPromoCode = (codeToApply: string) => {
     setPromoError("");
     const cleanCode = codeToApply.trim().toUpperCase();
-    const found = promos.find((p) => p.code.toUpperCase() === cleanCode && p.isActive);
+    const found = promos.find(
+      (p) => p.code.toUpperCase() === cleanCode && p.isActive,
+    );
 
     if (!found) {
-      setPromoError("Kode voucher promo tidak ditemukan atau sedang tidak aktif.");
+      setPromoError(
+        "Kode voucher promo tidak ditemukan atau sedang tidak aktif.",
+      );
       return;
     }
     if (subtotal < found.minOrderAmount) {
       setPromoError(
-        `Minimal belanja ${formatRupiah(found.minOrderAmount)} untuk memakai kode ini (kurang ${formatRupiah(found.minOrderAmount - subtotal)}).`
+        `Minimal belanja ${formatRupiah(found.minOrderAmount)} untuk memakai kode ini (kurang ${formatRupiah(found.minOrderAmount - subtotal)}).`,
       );
       return;
     }
@@ -167,7 +201,10 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
     setPromoInputCode("");
   };
 
-  const handleApplyManualDiscount = (type: "PERCENT" | "FIXED", val: number) => {
+  const handleApplyManualDiscount = (
+    type: "PERCENT" | "FIXED",
+    val: number,
+  ) => {
     setAppliedPromo(null);
     if (type === "PERCENT") {
       setManualDiscountPercent(val);
@@ -188,7 +225,7 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
   const handleCheckoutSubmit = (
     method: PaymentMethod,
     amountTendered: number,
-    change: number
+    change: number,
   ) => {
     const itemsSnapshot = cart.map((i) => ({
       productId: i.product.id,
@@ -203,8 +240,16 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
       items: itemsSnapshot,
       subtotal,
       discount: discount > 0 ? discount : undefined,
-      promoCode: appliedPromo?.code || (manualDiscountPercent > 0 ? `MANUAL-${manualDiscountPercent}%` : manualDiscountAmount > 0 ? `MANUAL-RP` : undefined),
-      promoName: appliedPromo?.name || (discount > 0 ? "Diskon Manual Kasir" : undefined),
+      promoCode:
+        appliedPromo?.code ||
+        (manualDiscountPercent > 0
+          ? `MANUAL-${manualDiscountPercent}%`
+          : manualDiscountAmount > 0
+            ? `MANUAL-RP`
+            : undefined),
+      promoName:
+        appliedPromo?.name ||
+        (discount > 0 ? "Diskon Manual Kasir" : undefined),
       tax,
       total,
       paymentMethod: method,
@@ -265,7 +310,8 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
         {selectedCategory === "all" && !searchQuery ? (
           <div className="space-y-8 pb-20 lg:pb-6">
             {/* 1. Menu Utama Section */}
-            {filteredProducts.filter((p) => p.category === "mac").length > 0 && (
+            {filteredProducts.filter((p) => p.category === "mac").length >
+              0 && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between pb-1 border-b border-brand-green-900/10">
                   <div className="flex items-center gap-2">
@@ -275,7 +321,11 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
                     </h3>
                   </div>
                   <span className="text-xs font-bold text-brand-green-900 bg-brand-cream-100 px-2.5 py-0.5 rounded-full border border-brand-green-900/15">
-                    {filteredProducts.filter((p) => p.category === "mac").length} Pilihan
+                    {
+                      filteredProducts.filter((p) => p.category === "mac")
+                        .length
+                    }{" "}
+                    Pilihan
                   </span>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
@@ -286,7 +336,9 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
                         key={prod.id}
                         onClick={() => prod.isAvailable && addToCart(prod)}
                         className={`group flex flex-col justify-between p-3 sm:p-4 rounded-3xl bg-white border border-brand-green-900/10 shadow-2xs hover:shadow-md transition-all text-left relative overflow-hidden select-none cursor-pointer ${
-                          !prod.isAvailable ? "opacity-60 grayscale cursor-not-allowed" : "hover:-translate-y-0.5"
+                          !prod.isAvailable
+                            ? "opacity-60 grayscale cursor-not-allowed"
+                            : "hover:-translate-y-0.5"
                         }`}
                       >
                         <div>
@@ -334,7 +386,8 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
             )}
 
             {/* 2. Add-on & Camilan Section */}
-            {filteredProducts.filter((p) => p.category === "sides").length > 0 && (
+            {filteredProducts.filter((p) => p.category === "sides").length >
+              0 && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between pb-1 border-b border-brand-green-900/10">
                   <div className="flex items-center gap-2">
@@ -344,7 +397,11 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
                     </h3>
                   </div>
                   <span className="text-xs font-bold text-brand-green-900 bg-brand-cream-100 px-2.5 py-0.5 rounded-full border border-brand-green-900/15">
-                    {filteredProducts.filter((p) => p.category === "sides").length} Pilihan
+                    {
+                      filteredProducts.filter((p) => p.category === "sides")
+                        .length
+                    }{" "}
+                    Pilihan
                   </span>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
@@ -355,7 +412,9 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
                         key={prod.id}
                         onClick={() => prod.isAvailable && addToCart(prod)}
                         className={`group flex flex-col justify-between p-3 sm:p-4 rounded-3xl bg-white border border-brand-green-900/10 shadow-2xs hover:shadow-md transition-all text-left relative overflow-hidden select-none cursor-pointer ${
-                          !prod.isAvailable ? "opacity-60 grayscale cursor-not-allowed" : "hover:-translate-y-0.5"
+                          !prod.isAvailable
+                            ? "opacity-60 grayscale cursor-not-allowed"
+                            : "hover:-translate-y-0.5"
                         }`}
                       >
                         <div>
@@ -403,7 +462,8 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
             )}
 
             {/* 3. Minuman Dingin Section */}
-            {filteredProducts.filter((p) => p.category === "drinks").length > 0 && (
+            {filteredProducts.filter((p) => p.category === "drinks").length >
+              0 && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between pb-1 border-b border-brand-green-900/10">
                   <div className="flex items-center gap-2">
@@ -413,7 +473,11 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
                     </h3>
                   </div>
                   <span className="text-xs font-bold text-brand-green-900 bg-brand-cream-100 px-2.5 py-0.5 rounded-full border border-brand-green-900/15">
-                    {filteredProducts.filter((p) => p.category === "drinks").length} Pilihan
+                    {
+                      filteredProducts.filter((p) => p.category === "drinks")
+                        .length
+                    }{" "}
+                    Pilihan
                   </span>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
@@ -424,7 +488,9 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
                         key={prod.id}
                         onClick={() => prod.isAvailable && addToCart(prod)}
                         className={`group flex flex-col justify-between p-3 sm:p-4 rounded-3xl bg-white border border-brand-green-900/10 shadow-2xs hover:shadow-md transition-all text-left relative overflow-hidden select-none cursor-pointer ${
-                          !prod.isAvailable ? "opacity-60 grayscale cursor-not-allowed" : "hover:-translate-y-0.5"
+                          !prod.isAvailable
+                            ? "opacity-60 grayscale cursor-not-allowed"
+                            : "hover:-translate-y-0.5"
                         }`}
                       >
                         <div>
@@ -479,7 +545,9 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
                 key={prod.id}
                 onClick={() => prod.isAvailable && addToCart(prod)}
                 className={`group flex flex-col justify-between p-3 sm:p-4 rounded-3xl bg-white border border-brand-green-900/10 shadow-2xs hover:shadow-md transition-all text-left relative overflow-hidden select-none cursor-pointer ${
-                  !prod.isAvailable ? "opacity-60 grayscale cursor-not-allowed" : "hover:-translate-y-0.5"
+                  !prod.isAvailable
+                    ? "opacity-60 grayscale cursor-not-allowed"
+                    : "hover:-translate-y-0.5"
                 }`}
               >
                 <div>
@@ -677,23 +745,31 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
           <div className="space-y-1.5 text-xs text-neutral-600">
             <div className="flex justify-between">
               <span>Subtotal ({totalItemCount} item)</span>
-              <span className="font-semibold text-neutral-800">{formatRupiah(subtotal)}</span>
+              <span className="font-semibold text-neutral-800">
+                {formatRupiah(subtotal)}
+              </span>
             </div>
 
             {discount > 0 && (
               <div className="flex justify-between text-emerald-700 font-bold">
-                <span>Diskon {appliedPromo ? `(${appliedPromo.code})` : ""}</span>
+                <span>
+                  Diskon {appliedPromo ? `(${appliedPromo.code})` : ""}
+                </span>
                 <span className="font-mono">-{formatRupiah(discount)}</span>
               </div>
             )}
 
             <div className="flex justify-between">
               <span>Pajak Resto PB1 (10%)</span>
-              <span className="font-semibold text-neutral-800">{formatRupiah(tax)}</span>
+              <span className="font-semibold text-neutral-800">
+                {formatRupiah(tax)}
+              </span>
             </div>
 
             <div className="flex justify-between pt-2 border-t border-neutral-200 text-sm font-bold text-neutral-900">
-              <span className="font-display font-extrabold text-brand-green-950">Total Tagihan</span>
+              <span className="font-display font-extrabold text-brand-green-950">
+                Total Tagihan
+              </span>
               <span className="font-display font-black text-lg text-brand-green-900">
                 {formatRupiah(total)}
               </span>
@@ -716,7 +792,8 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
       <div className="lg:hidden fixed bottom-0 left-0 right-0 p-3 bg-white border-t border-neutral-200 shadow-xl flex items-center justify-between gap-3 z-30">
         <div>
           <span className="text-[11px] text-neutral-500 font-medium block">
-            {totalItemCount} item {discount > 0 ? `· Diskon ${formatRupiah(discount)}` : ""}
+            {totalItemCount} item{" "}
+            {discount > 0 ? `· Diskon ${formatRupiah(discount)}` : ""}
           </span>
           <strong className="font-display font-black text-lg text-brand-green-900">
             {formatRupiah(total)}
@@ -761,9 +838,14 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
 
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {cart.map((item) => (
-                <div key={item.product.id} className="p-3 rounded-xl bg-brand-cream-50 border border-neutral-200 space-y-2">
+                <div
+                  key={item.product.id}
+                  className="p-3 rounded-xl bg-brand-cream-50 border border-neutral-200 space-y-2"
+                >
                   <div className="flex justify-between items-start">
-                    <span className="font-bold text-sm text-neutral-900">{item.product.name}</span>
+                    <span className="font-bold text-sm text-neutral-900">
+                      {item.product.name}
+                    </span>
                     <strong className="text-sm text-brand-green-900 font-display">
                       {formatRupiah(item.product.price * item.quantity)}
                     </strong>
@@ -777,7 +859,9 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
                       >
                         <Minus className="size-3.5" />
                       </button>
-                      <span className="w-8 text-center text-xs font-bold">{item.quantity}</span>
+                      <span className="w-8 text-center text-xs font-bold">
+                        {item.quantity}
+                      </span>
                       <button
                         type="button"
                         onClick={() => updateQuantity(item.product.id, 1)}
@@ -805,7 +889,9 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
                       <span className="font-mono font-bold text-xs text-emerald-950 block">
                         {appliedPromo ? appliedPromo.code : "Diskon Manual"}
                       </span>
-                      <span className="text-[10px] text-emerald-700">Potongan: -{formatRupiah(discount)}</span>
+                      <span className="text-[10px] text-emerald-700">
+                        Potongan: -{formatRupiah(discount)}
+                      </span>
                     </div>
                     <button
                       type="button"
@@ -850,7 +936,9 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
               </div>
               <div className="flex justify-between text-base font-black font-display text-neutral-900 pt-1 border-t border-neutral-200">
                 <span>Total Bayar</span>
-                <span className="text-brand-green-900">{formatRupiah(total)}</span>
+                <span className="text-brand-green-900">
+                  {formatRupiah(total)}
+                </span>
               </div>
               <button
                 type="button"
@@ -924,7 +1012,9 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
                       <input
                         type="text"
                         value={promoInputCode}
-                        onChange={(e) => setPromoInputCode(e.target.value.toUpperCase())}
+                        onChange={(e) =>
+                          setPromoInputCode(e.target.value.toUpperCase())
+                        }
                         placeholder="MISAL: MACMOOD10"
                         className="flex-1 h-10 px-3 rounded-xl border border-neutral-300 font-mono font-bold text-xs uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
                       />
@@ -969,14 +1059,17 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
                                   {v.code}
                                 </span>
                                 <span className="font-bold text-xs text-emerald-800 truncate">
-                                  {v.discountType === "PERCENTAGE" ? `${v.discountValue}% OFF` : formatRupiah(v.discountValue)}
+                                  {v.discountType === "PERCENTAGE"
+                                    ? `${v.discountValue}% OFF`
+                                    : formatRupiah(v.discountValue)}
                                 </span>
                               </div>
                               <p className="text-[11px] text-neutral-600 leading-snug truncate">
                                 {v.name}
                               </p>
                               <span className="text-[10px] text-neutral-400 block mt-1">
-                                Min. belanja {formatRupiah(v.minOrderAmount)} · Sisa kuota: {v.quota - v.usedCount}
+                                Min. belanja {formatRupiah(v.minOrderAmount)} ·
+                                Sisa kuota: {v.quota - v.usedCount}
                               </span>
                             </div>
 
@@ -993,7 +1086,9 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
                                   : "bg-neutral-200 text-neutral-500 cursor-not-allowed"
                               }`}
                             >
-                              {isEligible ? "Gunakan" : `Kurang ${formatRupiah(v.minOrderAmount - subtotal)}`}
+                              {isEligible
+                                ? "Gunakan"
+                                : `Kurang ${formatRupiah(v.minOrderAmount - subtotal)}`}
                             </button>
                           </div>
                         );
@@ -1013,7 +1108,9 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
                         <button
                           key={pct}
                           type="button"
-                          onClick={() => handleApplyManualDiscount("PERCENT", pct)}
+                          onClick={() =>
+                            handleApplyManualDiscount("PERCENT", pct)
+                          }
                           className="h-10 rounded-xl border border-emerald-600/30 hover:bg-emerald-50 text-emerald-950 text-xs font-bold transition-colors cursor-pointer"
                         >
                           {pct}% OFF
@@ -1031,7 +1128,9 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
                         <button
                           key={nom}
                           type="button"
-                          onClick={() => handleApplyManualDiscount("FIXED", nom)}
+                          onClick={() =>
+                            handleApplyManualDiscount("FIXED", nom)
+                          }
                           className="h-10 rounded-xl border border-neutral-300 hover:bg-neutral-50 text-neutral-800 text-xs font-bold transition-colors cursor-pointer"
                         >
                           {formatRupiah(nom)}
@@ -1051,7 +1150,12 @@ export function PosOrderView({ products, promos = INITIAL_PROMOS, onOrderComplet
         <PosCheckoutModal
           subtotal={subtotal}
           discount={discount}
-          promoCode={appliedPromo?.code || (manualDiscountPercent > 0 ? `${manualDiscountPercent}%` : undefined)}
+          promoCode={
+            appliedPromo?.code ||
+            (manualDiscountPercent > 0
+              ? `${manualDiscountPercent}%`
+              : undefined)
+          }
           tax={tax}
           total={total}
           onClose={() => setIsCheckoutOpen(false)}

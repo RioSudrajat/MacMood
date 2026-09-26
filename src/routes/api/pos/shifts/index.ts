@@ -1,6 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { readJson, withApiSession } from "@/lib/api.server";
-import { getActiveShift, listPastShifts, openShift } from "@/services/pos.service.server";
+import {
+  getActiveShift,
+  listPastShifts,
+  openShift,
+} from "@/services/pos.service.server";
 import { openShiftSchema } from "@/validators/pos";
 
 export const Route = createFileRoute("/api/pos/shifts/")({

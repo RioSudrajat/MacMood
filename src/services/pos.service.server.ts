@@ -2,7 +2,11 @@ import { db } from "@/db/index.server";
 import { orders, orderItems, shifts, products, promos } from "@/db/schema";
 import { ensureSeededData } from "./seed.service.server";
 import { desc, eq, sql } from "drizzle-orm";
-import type { CreateOrderInput, OpenShiftInput, CloseShiftInput } from "@/validators/pos";
+import type {
+  CreateOrderInput,
+  OpenShiftInput,
+  CloseShiftInput,
+} from "@/validators/pos";
 
 export async function getActiveShift(branchId?: string) {
   await ensureSeededData();
@@ -13,7 +17,11 @@ export async function getActiveShift(branchId?: string) {
   const [activeShift] = await db
     .select()
     .from(shifts)
-    .where(conditions.length > 1 ? sql`${shifts.status} = 'OPEN' AND ${shifts.branchId} = ${branchId}` : eq(shifts.status, "OPEN"))
+    .where(
+      conditions.length > 1
+        ? sql`${shifts.status} = 'OPEN' AND ${shifts.branchId} = ${branchId}`
+        : eq(shifts.status, "OPEN"),
+    )
     .orderBy(desc(shifts.startTime))
     .limit(1);
   return activeShift || null;
@@ -44,9 +52,12 @@ export async function openShift(input: OpenShiftInput, userId?: string) {
   return newShift;
 }
 
-
 export async function closeShift(shiftId: string, input: CloseShiftInput) {
-  const [shift] = await db.select().from(shifts).where(eq(shifts.id, shiftId)).limit(1);
+  const [shift] = await db
+    .select()
+    .from(shifts)
+    .where(eq(shifts.id, shiftId))
+    .limit(1);
   if (!shift) {
     throw new Error("Shift not found");
   }
@@ -86,7 +97,8 @@ export async function createOrder(input: CreateOrderInput, userId?: string) {
   const now = new Date();
   const dateFormatted = now.toISOString().slice(0, 10).replace(/-/g, "");
   const orderNumber =
-    input.orderNumber || `MAC-${dateFormatted}-${Date.now().toString().slice(-4)}`;
+    input.orderNumber ||
+    `MAC-${dateFormatted}-${Date.now().toString().slice(-4)}`;
 
   // Find active shift if not provided
   let activeShiftId = input.shiftId;
@@ -125,10 +137,13 @@ export async function createOrder(input: CreateOrderInput, userId?: string) {
       .onConflictDoNothing({ target: orders.id })
       .returning();
 
-
     if (!insertedOrder) {
       // Idempotency: order already exists (offline sync repeat)
-      const [existing] = await tx.select().from(orders).where(eq(orders.id, orderId)).limit(1);
+      const [existing] = await tx
+        .select()
+        .from(orders)
+        .where(eq(orders.id, orderId))
+        .limit(1);
       return existing;
     }
 
@@ -136,7 +151,9 @@ export async function createOrder(input: CreateOrderInput, userId?: string) {
     if (input.items && input.items.length > 0) {
       const allDbProducts = await tx.select().from(products);
       const prodById = new Map(allDbProducts.map((p) => [p.id, p]));
-      const prodByName = new Map(allDbProducts.map((p) => [p.name.toLowerCase().trim(), p]));
+      const prodByName = new Map(
+        allDbProducts.map((p) => [p.name.toLowerCase().trim(), p]),
+      );
 
       const itemsWithProd = input.items.map((it) => {
         const matched =
@@ -155,7 +172,15 @@ export async function createOrder(input: CreateOrderInput, userId?: string) {
       });
 
       await tx.insert(orderItems).values(
-        itemsWithProd.map(({ matchedProduct, ...itemData }) => itemData)
+        itemsWithProd.map((it) => ({
+          orderId: it.orderId,
+          productId: it.productId,
+          productName: it.productName,
+          price: it.price,
+          quantity: it.quantity,
+          subtotal: it.subtotal,
+          notes: it.notes,
+        })),
       );
 
       // 3. Decrement stock for products if tracked
@@ -210,7 +235,10 @@ export async function createOrder(input: CreateOrderInput, userId?: string) {
   return result;
 }
 
-export async function syncOfflineOrders(ordersList: CreateOrderInput[], userId?: string) {
+export async function syncOfflineOrders(
+  ordersList: CreateOrderInput[],
+  userId?: string,
+) {
   const synced = [];
   for (const o of ordersList) {
     const res = await createOrder({ ...o, syncStatus: "SYNCED" }, userId);
@@ -219,7 +247,12 @@ export async function syncOfflineOrders(ordersList: CreateOrderInput[], userId?:
   return synced;
 }
 
-export async function listOrders(filter?: { limit?: number; offset?: number; shiftId?: string; branchId?: string }) {
+export async function listOrders(filter?: {
+  limit?: number;
+  offset?: number;
+  shiftId?: string;
+  branchId?: string;
+}) {
   await ensureSeededData();
   const limit = filter?.limit || 100;
   const offset = filter?.offset || 0;
@@ -232,12 +265,14 @@ export async function listOrders(filter?: { limit?: number; offset?: number; shi
     conditions.push(eq(orders.shiftId, filter.shiftId));
   }
 
-  const query = db
-    .select()
-    .from(orders);
+  const query = db.select().from(orders);
 
   if (conditions.length > 0) {
-    query.where(conditions.length === 1 ? conditions[0] : sql`${conditions[0]} AND ${conditions[1]}`);
+    query.where(
+      conditions.length === 1
+        ? conditions[0]
+        : sql`${conditions[0]} AND ${conditions[1]}`,
+    );
   }
 
   const orderRows = await query
@@ -256,13 +291,19 @@ export async function listOrders(filter?: { limit?: number; offset?: number; shi
   }));
 }
 
-
 export async function getOrder(id: string) {
   await ensureSeededData();
-  const [order] = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
+  const [order] = await db
+    .select()
+    .from(orders)
+    .where(eq(orders.id, id))
+    .limit(1);
   if (!order) return null;
 
-  const items = await db.select().from(orderItems).where(eq(orderItems.orderId, id));
+  const items = await db
+    .select()
+    .from(orderItems)
+    .where(eq(orderItems.orderId, id));
   return { ...order, items };
 }
 

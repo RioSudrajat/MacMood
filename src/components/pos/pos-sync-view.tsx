@@ -29,7 +29,9 @@ export function PosSyncView({
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncSuccessMsg, setSyncSuccessMsg] = useState(false);
 
-  const pendingCount = syncQueue.filter((i) => i.syncStatus === "PENDING_SYNC").length;
+  const pendingCount = syncQueue.filter(
+    (i) => i.syncStatus === "PENDING_SYNC",
+  ).length;
   const syncedCount = syncQueue.filter((i) => i.syncStatus === "SYNCED").length;
 
   const handleSyncClick = () => {
@@ -64,8 +66,12 @@ export function PosSyncView({
               onClick={handleSyncClick}
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-green-900 hover:bg-brand-green-800 disabled:bg-neutral-300 disabled:cursor-not-allowed text-white font-display font-extrabold text-xs shadow-md transition-all cursor-pointer"
             >
-              <RefreshCw className={`size-3.5 ${isSyncing ? "animate-spin" : ""}`} />
-              <span>{isSyncing ? "Menyinkronkan..." : "Sinkronkan Semua Sekarang"}</span>
+              <RefreshCw
+                className={`size-3.5 ${isSyncing ? "animate-spin" : ""}`}
+              />
+              <span>
+                {isSyncing ? "Menyinkronkan..." : "Sinkronkan Semua Sekarang"}
+              </span>
             </button>
           </div>
         </div>
@@ -74,7 +80,9 @@ export function PosSyncView({
         {syncSuccessMsg && (
           <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2 animate-in fade-in duration-200">
             <CheckCircle2 className="size-4 text-emerald-600" />
-            <span>Semua antrean lokal berhasil disinkronkan ke server cloud!</span>
+            <span>
+              Semua antrean lokal berhasil disinkronkan ke server cloud!
+            </span>
           </div>
         )}
 
@@ -107,7 +115,11 @@ export function PosSyncView({
                     : "bg-amber-100 text-amber-800"
                 }`}
               >
-                {isOnline ? <Wifi className="size-6" /> : <WifiOff className="size-6" />}
+                {isOnline ? (
+                  <Wifi className="size-6" />
+                ) : (
+                  <WifiOff className="size-6" />
+                )}
               </div>
 
               <div>
@@ -154,7 +166,9 @@ export function PosSyncView({
               <span className="font-display font-black text-3xl text-brand-green-950">
                 {pendingCount}
               </span>
-              <span className="text-xs font-medium text-neutral-400">transaksi menunggu</span>
+              <span className="text-xs font-medium text-neutral-400">
+                transaksi menunggu
+              </span>
             </div>
 
             <p className="text-[11px] text-neutral-500 mt-2">
@@ -177,7 +191,9 @@ export function PosSyncView({
               <span className="font-display font-black text-3xl text-emerald-800">
                 {syncedCount}
               </span>
-              <span className="text-xs font-medium text-neutral-400">transaksi aman</span>
+              <span className="text-xs font-medium text-neutral-400">
+                transaksi aman
+              </span>
             </div>
 
             <p className="text-[11px] text-neutral-500 mt-2">
@@ -197,7 +213,10 @@ export function PosSyncView({
                 Idempotent Sync & Local-First Resilience
               </h4>
               <p className="text-xs text-neutral-600 mt-0.5 leading-relaxed max-w-2xl">
-                Sistem MacMood POS menggunakan Client-Side UUID v4 sebagai Primary Key pesanan. Jika koneksi terputus lalu tersambung kembali, pengiriman transaksi berulang dijamin aman tanpa risiko pencatatan ganda (*no double recording*).
+                Sistem MacMood POS menggunakan Client-Side UUID v4 sebagai
+                Primary Key pesanan. Jika koneksi terputus lalu tersambung
+                kembali, pengiriman transaksi berulang dijamin aman tanpa risiko
+                pencatatan ganda (*no double recording*).
               </p>
             </div>
           </div>
@@ -229,7 +248,10 @@ export function PosSyncView({
               </thead>
               <tbody className="divide-y divide-neutral-100">
                 {syncQueue.map((item) => (
-                  <tr key={item.id} className="hover:bg-brand-cream-50/50 transition-colors">
+                  <tr
+                    key={item.id}
+                    className="hover:bg-brand-cream-50/50 transition-colors"
+                  >
                     <td className="py-3 px-4 font-mono font-bold text-neutral-900">
                       {item.orderNumber}
                     </td>
@@ -238,7 +260,9 @@ export function PosSyncView({
                     </td>
                     <td className="py-3 px-4">
                       <span className="font-semibold text-neutral-700">
-                        {item.paymentMethod === "CASH" ? "Tunai" : "QRIS Manual"}
+                        {item.paymentMethod === "CASH"
+                          ? "Tunai"
+                          : "QRIS Manual"}
                       </span>
                     </td>
                     <td className="py-3 px-4 text-right font-mono font-bold text-brand-green-900">
@@ -255,7 +279,9 @@ export function PosSyncView({
                             : "bg-amber-100 text-amber-800 border border-amber-200"
                         }`}
                       >
-                        {item.syncStatus === "SYNCED" ? "✓ Tersinkron" : "Antrean Pending"}
+                        {item.syncStatus === "SYNCED"
+                          ? "✓ Tersinkron"
+                          : "Antrean Pending"}
                       </span>
                     </td>
                     <td className="py-3 px-4 text-neutral-500 font-mono text-[11px]">
